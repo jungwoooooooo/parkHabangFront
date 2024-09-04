@@ -5,15 +5,16 @@ const IllegalParkingLayer = ({ illegalParkingData }) => {
   const { map } = useMap();
   const [markers, setMarkers] = useState([]);
   const [activeInfoWindow, setActiveInfoWindow] = useState(null);
+  const [isLayerVisible, setIsLayerVisible] = useState(false); // 레이어 표시 여부 상태
 
   useEffect(() => {
     if (!map || !illegalParkingData) return;
 
-    console.log('Illegal Parking Data:', illegalParkingData); // 데이터 확인
-    console.log('Map Instance:', map);
-
+    // 현재 표시된 마커 제거
     markers.forEach(marker => marker.setMap(null));
     setMarkers([]);
+
+    if (!isLayerVisible) return; // 레이어가 비활성화된 경우 아무 것도 하지 않음
 
     const illegalParkingIconUrl = 'https://cdn-icons-png.flaticon.com/512/4956/4956198.png';
 
@@ -73,9 +74,19 @@ const IllegalParkingLayer = ({ illegalParkingData }) => {
       }
     });
 
-  }, [map, illegalParkingData]);
+  }, [map, illegalParkingData, isLayerVisible]);
 
-  return null;
+  const toggleLayerVisibility = () => {
+    setIsLayerVisible(prev => !prev);
+  };
+
+  return (
+    <>
+      <button onClick={toggleLayerVisibility} style={{ position: 'absolute', top: 10, left: 10, zIndex: 1000 }}>
+        {isLayerVisible ? '숨기기' : '보기'}
+      </button>
+    </>
+  );
 };
 
 export default IllegalParkingLayer;

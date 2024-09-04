@@ -11,7 +11,6 @@ export default function MapContainer() {
   const [searchLocation, setSearchLocation] = useState(null);
   const [parkingLots, setParkingLots] = useState([]);
   const [illegalParkingData, setIllegalParkingData] = useState([]); // 불법 주정차 데이터 상태 추가
-  const [showIllegalParking, setShowIllegalParking] = useState(false); // 불법 주정차 표시 여부 상태
 
   useEffect(() => {
     // API에서 주차장 데이터 가져오기
@@ -93,10 +92,7 @@ export default function MapContainer() {
           options={{ level: 3 }} // 기본 옵션
         />
         <ParkingLotLayer parkingLots={parkingLots} />
-        {showIllegalParking && <IllegalParkingLayer illegalParkingData={illegalParkingData} />}
-        <button onClick={() => setShowIllegalParking(prev => !prev)}>
-          {showIllegalParking ? 'Hide Illegal Parking' : 'Show Illegal Parking'}
-        </button>
+        <IllegalParkingLayer illegalParkingData={illegalParkingData} />
       </MapProvider>
     </>
   );
