@@ -14,7 +14,7 @@ const ParkingLotLayer = ({ parkingLots }) => {
     setMarkers([]); // Clear the markers array
 
     // URL to the parking lot icon image
-    const parkingLotIconUrl = 'https://www.clipartmax.com/png/middle/220-2201264_euclid-autopark-closure-oct-parking-icon-google-maps.png'; // Replace with your icon URL
+    const parkingLotIconUrl = 'https://w7.pngwing.com/pngs/193/1003/png-transparent-white-vehicle-illustration-chicago-spothero-parking-mobile-app-car-park-size-icon-parking-miscellaneous-blue-company.png'; // Replace with your icon URL
 
     // Create new markers
     const newMarkers = parkingLots.map(lot => {
