@@ -82,7 +82,7 @@ const IllegalParkingLayer = ({ illegalParkingData }) => {
 
   return (
     <>
-      <button onClick={toggleLayerVisibility} style={{ position: 'absolute', top: 10, left: 10, zIndex: 1000 }}>
+      <button onClick={toggleLayerVisibility} style={{ position: 'absolute', top: 30, left: 10, zIndex: 1000 }}>
         {isLayerVisible ? '숨기기' : '보기'}
       </button>
     </>
