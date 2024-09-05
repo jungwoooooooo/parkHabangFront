@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useMap } from '../map/MapContext'; // 경로를 필요에 따라 조정하세요
 
+const { kakao } = window;
+
 const IllegalParkingLayer = ({ illegalParkingData }) => {
   const { map } = useMap();
   const [markers, setMarkers] = useState([]);
