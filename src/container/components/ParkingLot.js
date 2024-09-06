@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useMap } from '../map/MapContext'; // Adjust import path as needed
+import generateHtmlContent from '../../utils/HtmlContent'; // Adjust import path as needed
 
 const { kakao } = window;
 
@@ -16,7 +17,7 @@ const ParkingLotLayer = ({ parkingLots }) => {
     setMarkers([]); // Clear the markers array
 
     // URL to the parking lot icon image
-    const parkingLotIconUrl = 'https://w7.pngwing.com/pngs/193/1003/png-transparent-white-vehicle-illustration-chicago-spothero-parking-mobile-app-car-park-size-icon-parking-miscellaneous-blue-company.png'; // Replace with your icon URL
+    const parkingLotIconUrl = 'https://cdn-icons-png.flaticon.com/512/3720/3720866.png'; // Replace with your icon URL
 
     // Create new markers
     const newMarkers = parkingLots.map(lot => {
@@ -37,23 +38,7 @@ const ParkingLotLayer = ({ parkingLots }) => {
             activeInfoWindow.close();
           }
 
-          const content = `
-            <div>
-              <h2>상세정보</h2>
-              <h3>${lot.주차장명}</h3>
-              <p>${lot.주차장구분}</p>
-              <p>${lot.주차장유형}</p>
-              <p>${lot.소재지도로명주소}</p>
-              <p>${lot.소재지지번주소}</p>
-              <p>${lot.주차구획수}</p>
-              <p>${lot.운영요일}</p>
-              <p>${lot.전화번호}</p>
-              <p>기본요금: ${lot.주차기본요금}원</p>
-              <p>총 주차면 : ${lot.총주차면}</p>
-              <p>가능한 주차면 : ${lot.가능한주차면}</p>
-              <p>${lot.요금정보}</p>
-            </div>
-          `;
+          const content = generateHtmlContent(lot);
 
           const infowindow = new kakao.maps.InfoWindow({
             content,
