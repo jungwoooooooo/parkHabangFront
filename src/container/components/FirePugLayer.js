@@ -13,8 +13,8 @@ const FirePlugLayer = ({ firePlugData }) => {
   useEffect(() => {
     if (!map || !firePlugData) return;
 
+    // Function to handle the display of markers and circles
     const displayLayer = () => {
-      // Cleanup existing markers and circles
       markers.forEach(marker => marker.setMap(null));
       circles.forEach(circle => circle.setMap(null));
       setMarkers([]);
@@ -25,7 +25,6 @@ const FirePlugLayer = ({ firePlugData }) => {
       const firePlugIconUrl = 'https://cdn-icons-png.flaticon.com/512/7499/7499842.png'; // Use an appropriate icon URL
       const circleRadius = 5;
 
-      // Filter and batch processing
       const newMarkers = [];
       const newCircles = [];
 
@@ -49,9 +48,7 @@ const FirePlugLayer = ({ firePlugData }) => {
             fillColor: '#0000ff',
             fillOpacity: 0.2,
           });
-
-          newMarkers.push(marker);
-          newCircles.push(circle);
+          circle.setMap(map);
 
           kakao.maps.event.addListener(marker, 'click', () => {
             if (activeInfoWindow) {
@@ -75,6 +72,9 @@ const FirePlugLayer = ({ firePlugData }) => {
             infowindow.open(map, marker);
             setActiveInfoWindow(infowindow);
           });
+
+          newMarkers.push(marker);
+          newCircles.push(circle);
         }
       });
 
@@ -85,9 +85,18 @@ const FirePlugLayer = ({ firePlugData }) => {
     // Display the layer if visible
     displayLayer();
 
+    // Handle click events to close info windows
+    kakao.maps.event.addListener(map, 'click', () => {
+      if (activeInfoWindow) {
+        activeInfoWindow.close();
+        setActiveInfoWindow(null);
+      }
+    });
+
     // Handle zoom level changes
     const handleZoomChange = () => {
       const level = map.getLevel();
+      // Example zoom level threshold (change as needed)
       const zoomThreshold = 8;
       if (level > zoomThreshold && !isLayerVisible) {
         setIsLayerVisible(true);
@@ -99,11 +108,9 @@ const FirePlugLayer = ({ firePlugData }) => {
     // Add event listener for zoom level changes
     kakao.maps.event.addListener(map, 'zoom_changed', handleZoomChange);
 
-    // Clean up event listener and markers on component unmount
+    // Clean up event listener on component unmount
     return () => {
       kakao.maps.event.removeListener(map, 'zoom_changed', handleZoomChange);
-      markers.forEach(marker => marker.setMap(null));
-      circles.forEach(circle => circle.setMap(null));
     };
   }, [map, firePlugData, isLayerVisible]);
 
