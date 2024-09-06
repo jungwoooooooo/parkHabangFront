@@ -93,7 +93,7 @@ const KakaoMap = () => {
         onClick={() => moveToCurrentLocation()}
         style={{
           position: 'absolute',
-          bottom: '20px',
+          bottom: '150px',
           right: '20px',
           zIndex: 10,
           padding: '10px',
@@ -109,7 +109,7 @@ const KakaoMap = () => {
         onClick={toggleTraffic}
         style={{
           position: 'absolute',
-          bottom: '60px',
+          bottom: '100px',
           right: '20px',
           zIndex: 10,
           padding: '10px',

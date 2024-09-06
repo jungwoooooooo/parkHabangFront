@@ -6,6 +6,7 @@ import Header from './components/Header';
 import ParkingLotLayer from './components/ParkingLot';
 import IllegalParkingLayer from './components/IllegalParking';
 import ChildrenAreaLayer from './components/ChildrenAreaLayers';
+import FirePlugLayer from './components/FirePugLayer'; // Add this import
 
 export default function MapContainer() {
   const [currentLocation, setCurrentLocation] = useState(null);
@@ -13,6 +14,7 @@ export default function MapContainer() {
   const [parkingLots, setParkingLots] = useState([]);
   const [illegalParkingData, setIllegalParkingData] = useState([]);
   const [childrenAreaData, setChildrenAreaData] = useState([]);
+  const [firePlugData, setFirePlugData] = useState([]); // Add state for fire plug data
 
   useEffect(() => {
     const fetchParkingLots = async () => {
@@ -57,6 +59,20 @@ export default function MapContainer() {
   }, []);
 
   useEffect(() => {
+    const fetchFirePlugData = async () => { // Add this useEffect for fetching fire plugs
+      try {
+        const response = await fetch('http://localhost:3000/fire-plug');
+        const data = await response.json();
+        setFirePlugData(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error('Error fetching fire plug data:', error);
+      }
+    };
+
+    fetchFirePlugData();
+  }, []);
+
+  useEffect(() => {
     const getCurrentLocation = () => {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
@@ -91,6 +107,7 @@ export default function MapContainer() {
         <ParkingLotLayer parkingLots={parkingLots} />
         <IllegalParkingLayer illegalParkingData={illegalParkingData} />
         <ChildrenAreaLayer childrenAreaData={childrenAreaData} />
+        <FirePlugLayer firePlugData={firePlugData} /> {/* Add FirePlugLayer */}
       </MapProvider>
     </>
   );
