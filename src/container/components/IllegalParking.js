@@ -16,7 +16,7 @@ const IllegalParkingLayer = ({ illegalParkingData }) => {
 
     if (!isLayerVisible) return; // 레이어가 비활성화된 경우 아무 것도 하지 않음
 
-    const illegalParkingIconUrl = 'https://cdn-icons-png.flaticon.com/512/4956/4956198.png';
+    const illegalParkingIconUrl = 'https://cdn-icons-png.flaticon.com/512/4017/4017956.png';
 
     const newMarkers = illegalParkingData.map(parking => {
       if (parking.lon && parking.lat) {
@@ -83,7 +83,7 @@ const IllegalParkingLayer = ({ illegalParkingData }) => {
   return (
     <>
       <button onClick={toggleLayerVisibility} style={{ position: 'absolute', top: 30, left: 10, zIndex: 1000 }}>
-        {isLayerVisible ? '숨기기' : '보기'}
+        {isLayerVisible ? '숨기기' : 'cctv 단속 위치 보기'}
       </button>
     </>
   );
