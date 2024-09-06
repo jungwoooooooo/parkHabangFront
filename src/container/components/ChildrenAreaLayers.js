@@ -1,26 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { useMap } from '../map/MapContext'; // Adjust the import path as needed
 
+const { kakao } = window;
+
 const ChildrenAreaLayer = ({ childrenAreaData }) => {
   const { map } = useMap();
   const [markers, setMarkers] = useState([]);
   const [circles, setCircles] = useState([]);
   const [activeInfoWindow, setActiveInfoWindow] = useState(null);
-  const [isLayerVisible, setIsLayerVisible] = useState(false); // 레이어 표시 여부 상태
+  const [isLayerVisible, setIsLayerVisible] = useState(false);
 
   useEffect(() => {
     if (!map || !childrenAreaData) return;
 
-    // 현재 표시된 마커와 원 제거
     markers.forEach(marker => marker.setMap(null));
     circles.forEach(circle => circle.setMap(null));
     setMarkers([]);
     setCircles([]);
 
-    if (!isLayerVisible) return; // 레이어가 비활성화된 경우 아무 것도 하지 않음
+    if (!isLayerVisible) return;
 
-    const childrenAreaIconUrl = 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Korean_Traffic_sign_%28Watch_out_for_children_-_In_the_School_zone%29.svg/2053px-Korean_Traffic_sign_%28Watch_out_for_children_-_In_the_School_zone%29.svg.png'; // 예시 아이콘 URL
-    const circleRadius = 300; // 300m 반경
+    const childrenAreaIconUrl = 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Korean_Traffic_sign_%28Watch_out_for_children_-_In_the_School_zone%29.svg/2053px-Korean_Traffic_sign_%28Watch_out_for_children_-_In_the_School_zone%29.svg.png';
+    const circleRadius = 300;
 
     const newMarkers = [];
     const newCircles = [];
@@ -29,7 +30,6 @@ const ChildrenAreaLayer = ({ childrenAreaData }) => {
       if (area.경도 && area.위도) {
         const position = new kakao.maps.LatLng(area.위도, area.경도);
 
-        // 마커 생성
         const marker = new kakao.maps.Marker({
           position,
           map,
@@ -37,7 +37,6 @@ const ChildrenAreaLayer = ({ childrenAreaData }) => {
           image: new kakao.maps.MarkerImage(childrenAreaIconUrl, new kakao.maps.Size(32, 32))
         });
 
-        // 원 생성
         const circle = new kakao.maps.Circle({
           center: position,
           radius: circleRadius,
@@ -49,7 +48,6 @@ const ChildrenAreaLayer = ({ childrenAreaData }) => {
         });
         circle.setMap(map);
 
-        // 마커 클릭 이벤트
         kakao.maps.event.addListener(marker, 'click', () => {
           if (activeInfoWindow) {
             activeInfoWindow.close();
@@ -73,33 +71,6 @@ const ChildrenAreaLayer = ({ childrenAreaData }) => {
 
           infowindow.open(map, marker);
           setActiveInfoWindow(infowindow);
-        });
-
-        // 원의 반경 내 클릭 이벤트
-        kakao.maps.event.addListener(map, 'click', (mouseEvent) => {
-          const clickedPosition = mouseEvent.latLng;
-          const distance = kakao.maps.Util.computeDistanceBetween(position, clickedPosition);
-
-          if (distance <= circleRadius) {
-            if (activeInfoWindow) {
-              activeInfoWindow.close();
-            }
-
-            const content = `
-              <div>
-                <h2>알림</h2>
-                <p>어린이 보호구역으로 인한 주차금지 구역입니다.</p>
-              </div>
-            `;
-
-            const infowindow = new kakao.maps.InfoWindow({
-              content,
-              position: clickedPosition,
-            });
-
-            infowindow.open(map);
-            setActiveInfoWindow(infowindow);
-          }
         });
 
         newMarkers.push(marker);

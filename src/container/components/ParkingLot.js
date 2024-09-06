@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useMap } from '../map/MapContext'; // Adjust import path as needed
 
+const { kakao } = window;
+
 const ParkingLotLayer = ({ parkingLots }) => {
   const { map } = useMap(); // Retrieve map instance from context
   const [markers, setMarkers] = useState([]);
