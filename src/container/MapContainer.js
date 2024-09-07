@@ -95,11 +95,15 @@ export default function MapContainer() {
 
   const center = searchLocation || currentLocation || { lat: 37.5665, lng: 126.978 };
 
+  useEffect(() => {
+    console.log('Search location updated:', searchLocation);
+  }, [searchLocation]);
+
   return (
     <div className="map-container"> {/* Add a wrapper div with a class */}
       <Header />
       <MapProvider>
-        <SearchPlace onLocationChange={setSearchLocation} />
+        <SearchPlace onLocationChange={setSearchLocation} /> {/* onLocationChange 콜백 전달 */}
         <KakaoMap
           center={center}
           markers={[{ title: '현재 위치', position: center }]}
