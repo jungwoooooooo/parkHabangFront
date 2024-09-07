@@ -84,6 +84,9 @@ const ParkingLotLayer = ({ parkingLots }) => {
             <div style="padding:5px; background-color:white; border:1px solid black; border-radius:5px;">
               <div><strong>${lot.주차장명}</strong></div>
               <div>요금: ${lot.요금정보}</div>
+              <div>기본 요금: ${lot.주차기본요금}</div>
+              <div>구분: ${lot.주차장구분}</div>
+              <div>운영요일: ${lot.운영요일}</div>
               <div>잔여 수: ${lot.가능한주차면}</div>
             </div>
           `;
@@ -130,7 +133,7 @@ const ParkingLotLayer = ({ parkingLots }) => {
     // 지도 중심 변경 시 반경 내 주차장 필터링
     const updateVisibleParkingLots = () => {
       const center = map.getCenter();
-      const radius = 500; // 반경 1km
+      const radius = 800; // 반경 1km
       const circle = new kakao.maps.Circle({
         center: center,
         radius: radius
