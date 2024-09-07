@@ -25,11 +25,11 @@ const ParkingLotLayer = ({ parkingLots }) => {
           ? 'https://github.com/jungwoooooooo/parkpark/blob/master/src/assert/free-removebg-preview.png?raw=true' // 무료 주차장 아이콘 URL
           : lot.요금정보 === '유료'
           ? 'https://github.com/jungwoooooooo/parkpark/blob/master/src/assert/fee.png?raw=true' // 유료 주차장 아이콘 URL
-          : 'https://github.com/jungwoooooooo/parkpark/blob/master/src/assert/mixed.png?raw=true'; // 혼합 주차장 아이콘 URL
+          : 'https://github.com/jungwoooooooo/parkpark/blob/master/src/assert/mix.png?raw=true'; // 혼합 주차장 아이콘 URL
 
         const markerImage = new kakao.maps.MarkerImage(
           iconUrl,
-          new kakao.maps.Size(100, 100), // 아이콘 크기 조정
+          new kakao.maps.Size(80, 80), // 아이콘 크기 조정
           { offset: new kakao.maps.Point(16, 32) } // 아이콘 중심점 조정
         );
 
@@ -53,7 +53,7 @@ const ParkingLotLayer = ({ parkingLots }) => {
             <div style="padding:5px; background-color:white; border:1px solid black; border-radius:5px;">
               <div><strong>${lot.주차장명}</strong></div>
               <div>요금: ${lot.요금정보}</div>
-              <div>잔여 수: ${lot.잔여수}</div>
+              <div>잔여 수: ${lot.가능한주차면}</div>
             </div>
           `;
 
