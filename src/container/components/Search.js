@@ -17,6 +17,11 @@ const Container = styled(Box)(({ theme }) => ({
     boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
     zIndex: 1000,
     width: '200px',
+    [theme.breakpoints.down('sm')]: {
+        width: '30%', // 모바일 화면에서 너비 조정
+        left: '20%', // 중앙 정렬
+        transform: 'translateX(-50%)', // 중앙 정렬
+    },
 }));
 
 const AddressList = styled(List)(({ theme }) => ({
@@ -50,6 +55,7 @@ const SearchPlace = ({ onLocationChange }) => {
     const [addressList, setAddressList] = useState([]);
 
     const completeHandler = (data) => {
+        console.log('Complete handler data:', data);
         setZipcode(data.zonecode);
         setRoadAddress(data.roadAddress);
         setIsOpen(false);
@@ -68,11 +74,13 @@ const SearchPlace = ({ onLocationChange }) => {
                     }
                 );
                 const documents = response.data.documents;
+                console.log('Search address response:', documents);
                 setAddressList(documents);
 
                 if (documents.length > 0) {
                     const { x, y } = documents[0].address;
                     if (onLocationChange) {
+                        console.log('Updating location:', { lat: parseFloat(y), lng: parseFloat(x) });
                         onLocationChange({ lat: parseFloat(y), lng: parseFloat(x) });
                     }
                 }
@@ -84,7 +92,9 @@ const SearchPlace = ({ onLocationChange }) => {
 
     const selectAddress = (address) => {
         const { x, y } = address;
+        console.log('Selected address:', address);
         if (onLocationChange) {
+            console.log('Updating location:', { lat: parseFloat(y), lng: parseFloat(x) });
             onLocationChange({ lat: parseFloat(y), lng: parseFloat(x) });
         }
     }
