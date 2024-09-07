@@ -49,7 +49,7 @@ const KakaoMap = ({ center }) => {
       loadKakaoMap();
     } else {
       const script = document.createElement('script');
-      script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=YOUR_APP_KEY&autoload=false`;
+      script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=29187a8aea804dffe76ce4693aee5c9b&autoload=false`;
       script.onload = () => {
         window.kakao.maps.load(loadKakaoMap);
       };
