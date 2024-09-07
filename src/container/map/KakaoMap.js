@@ -9,25 +9,65 @@ const KakaoMap = () => {
   const [isTrafficVisible, setIsTrafficVisible] = useState(false);
 
   useEffect(() => {
-    const container = document.getElementById('map');
-    const options = {
-      center: new kakao.maps.LatLng(37.566826, 126.9786567),
-      level: 3
+    const loadKakaoMap = () => {
+      const { kakao } = window;
+      if (kakao && kakao.maps) {
+        const container = document.getElementById('map');
+        const options = {
+          center: new kakao.maps.LatLng(37.566826, 126.9786567),
+          level: 3,
+          draggable: true,
+          scrollwheel: true,
+          disableDoubleClickZoom: false,
+          touch: true
+        };
+
+        // 기존 지도 인스턴스가 있으면 제거
+        if (map) {
+          map.destroy();
+        }
+
+        const newMap = new kakao.maps.Map(container, options);
+
+        // 지도 컨트롤러 추가
+        const mapTypeControl = new kakao.maps.MapTypeControl();
+        newMap.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPRIGHT);
+
+        const zoomControl = new kakao.maps.ZoomControl();
+        newMap.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
+
+        setMap(newMap);
+
+        // 현재 위치로 이동
+        moveToCurrentLocation(newMap);
+
+        // 모바일 터치 이벤트 핸들링 제거
+        // container.addEventListener('touchstart', (e) => {
+        //   e.stopPropagation();
+        // }, { passive: true });
+
+        // container.addEventListener('touchmove', (e) => {
+        //   e.stopPropagation();
+        // }, { passive: true });
+
+        // container.addEventListener('touchend', (e) => {
+        //   e.stopPropagation();
+        // }, { passive: true });
+      } else {
+        console.error("Kakao Maps API is not loaded.");
+      }
     };
-    const newMap = new kakao.maps.Map(container, options);
 
-    // 지도 컨트롤러 추가
-    const mapTypeControl = new kakao.maps.MapTypeControl();
-    newMap.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPRIGHT);
-
-    const zoomControl = new kakao.maps.ZoomControl();
-    newMap.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
-
-    setMap(newMap);
-
-    // 현재 위치로 이동
-    moveToCurrentLocation(newMap);
-
+    if (window.kakao && window.kakao.maps) {
+      loadKakaoMap();
+    } else {
+      const script = document.createElement('script');
+      script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=YOUR_APP_KEY&autoload=false`;
+      script.onload = () => {
+        window.kakao.maps.load(loadKakaoMap);
+      };
+      document.head.appendChild(script);
+    }
   }, [setMap]);
 
   const moveToCurrentLocation = (mapInstance = map) => {
@@ -62,7 +102,7 @@ const KakaoMap = () => {
         },
         (error) => {
           console.error("Error getting current location:", error);
-          alert("현재 위치를 가져올 수 없습니다.");
+          alert(`현재 위치를 가져올 수 없습니다. 오류 코드: ${error.code}, 메시지: ${error.message}`);
         },
         {
           enableHighAccuracy: true,
