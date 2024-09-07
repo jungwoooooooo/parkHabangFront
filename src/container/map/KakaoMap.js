@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useMap } from './MapContext';
+import '../css/KakaoMap.css'; // CSS 파일을 import
 
 const { kakao } = window;
 
@@ -15,11 +16,13 @@ const KakaoMap = ({ center }) => {
         const container = document.getElementById('map');
         const options = {
           center: new kakao.maps.LatLng(37.566826, 126.9786567),
-          level: 3,
+          level: 0,
+          maxLevel: 30, // 최대 확대 줌 레벨 설정
           draggable: true,
           scrollwheel: true,
           disableDoubleClickZoom: false,
-          touch: true
+          touch: true,
+          tileAnimation: true // 타일 애니메이션 활성화
         };
 
         // 기존 지도 인스턴스가 있으면 제거
@@ -137,11 +140,24 @@ const KakaoMap = ({ center }) => {
     }
   };
 
+  const zoomIn = () => {
+    if (map) {
+      map.setLevel(map.getLevel() - 1, { animate: true });
+    }
+  };
+
+  const zoomOut = () => {
+    if (map) {
+      map.setLevel(map.getLevel() + 1, { animate: true });
+    }
+  };
+
   return (
     <div style={{ position: 'relative', width: '100%', height: '100vh' }}>
-      <div id="map" style={{ width: '100%', height: '100%' }}></div>
+      <div id="map" className="map-container" style={{ width: '100%', height: '100%' }}></div>
       <button 
         onClick={() => moveToCurrentLocation()}
+        className="highlight-button"
         style={{
           position: 'absolute',
           bottom: '150px',
@@ -152,14 +168,15 @@ const KakaoMap = ({ center }) => {
           border: '1px solid #ccc',
           borderRadius: '5px',
           cursor: 'pointer',
-          // 모바일 화면에서 버튼 크기 조정
-          fontSize: '14px'
+          fontSize: '14px',
+          transition: 'all 0.3s ease', // 부드러운 전환 효과 추가
         }}
       >
         현재 위치로 이동
       </button>
       <button 
         onClick={toggleTraffic}
+        className="highlight-button"
         style={{
           position: 'absolute',
           bottom: '100px',
@@ -170,11 +187,49 @@ const KakaoMap = ({ center }) => {
           border: '1px solid #ccc',
           borderRadius: '5px',
           cursor: 'pointer',
-          // 모바일 화면에서 버튼 크기 조정
-          fontSize: '14px'
+          fontSize: '14px',
+          transition: 'all 0.3s ease', // 부드러운 전환 효과 추가
         }}
       >
         {isTrafficVisible ? '교통 정보 끄기' : '교통 정보 켜기'}
+      </button>
+      <button 
+        onClick={zoomIn}
+        className="highlight-button"
+        style={{
+          position: 'absolute',
+          bottom: '50px',
+          right: '20px',
+          zIndex: 10,
+          padding: '10px',
+          backgroundColor: 'white',
+          border: '1px solid #ccc',
+          borderRadius: '5px',
+          cursor: 'pointer',
+          fontSize: '14px',
+          transition: 'all 0.3s ease', // 부드러운 전환 효과 추가
+        }}
+      >
+        확대
+      </button>
+      <button 
+        onClick={zoomOut}
+        className="highlight-button"
+        style={{
+          position: 'absolute',
+          bottom: '0px',
+          right: '20px',
+          zIndex: 10,
+          padding: '10px',
+          backgroundColor: 'white',
+          border: '1px solid #ccc',
+          borderRadius: '5px',
+          cursor: 'pointer',
+          fontSize: '14px',
+          transition: 'all 0.3s ease', // 부드러운 전환 효과 추가
+        }}
+      >
+        축소
       </button>
     </div>
   );
