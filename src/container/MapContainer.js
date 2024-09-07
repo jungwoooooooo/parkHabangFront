@@ -7,6 +7,7 @@ import ParkingLotLayer from './components/ParkingLot';
 import IllegalParkingLayer from './components/IllegalParking';
 import ChildrenAreaLayer from './components/ChildrenAreaLayers';
 import FirePlugLayer from './components/FirePugLayer'; // Add this import
+import './css/MapContainer.css'
 
 export default function MapContainer() {
   const [currentLocation, setCurrentLocation] = useState(null);
@@ -95,7 +96,7 @@ export default function MapContainer() {
   const center = searchLocation || currentLocation || { lat: 37.5665, lng: 126.978 };
 
   return (
-    <>
+    <div className="map-container"> {/* Add a wrapper div with a class */}
       <Header />
       <MapProvider>
         <SearchPlace onLocationChange={setSearchLocation} />
@@ -109,6 +110,6 @@ export default function MapContainer() {
         <ChildrenAreaLayer childrenAreaData={childrenAreaData} />
         <FirePlugLayer firePlugData={firePlugData} /> {/* Add FirePlugLayer */}
       </MapProvider>
-    </>
+    </div>
   );
 }
