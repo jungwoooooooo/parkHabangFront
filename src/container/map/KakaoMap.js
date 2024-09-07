@@ -151,7 +151,9 @@ const KakaoMap = ({ center }) => {
           backgroundColor: 'white',
           border: '1px solid #ccc',
           borderRadius: '5px',
-          cursor: 'pointer'
+          cursor: 'pointer',
+          // 모바일 화면에서 버튼 크기 조정
+          fontSize: '14px'
         }}
       >
         현재 위치로 이동
@@ -167,7 +169,9 @@ const KakaoMap = ({ center }) => {
           backgroundColor: 'white',
           border: '1px solid #ccc',
           borderRadius: '5px',
-          cursor: 'pointer'
+          cursor: 'pointer',
+          // 모바일 화면에서 버튼 크기 조정
+          fontSize: '14px'
         }}
       >
         {isTrafficVisible ? '교통 정보 끄기' : '교통 정보 켜기'}
