@@ -4,6 +4,7 @@ import Modal from 'react-modal';
 import axios from 'axios';
 import { Box, Button, TextField, Typography, List, ListItem, ListItemText } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import '../css/Search.css'; // CSS 파일 경로 수정
 
 const Container = styled(Box)(({ theme }) => ({
     position: 'absolute',
