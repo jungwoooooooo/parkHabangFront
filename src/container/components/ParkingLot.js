@@ -22,12 +22,12 @@ const ParkingLotLayer = ({ parkingLots }) => {
 
         // 유료 주차장과 무료 주차장에 대한 아이콘 URL 설정
         const iconUrl = lot.요금정보 === '무료' 
-          ? 'https://github.com/jungwoooooooo/parkpark/blob/master/src/assert/%EA%B2%80%EC%9D%80%EC%83%89_%EB%B0%8F_%EB%85%B8%EB%9E%80%EC%83%89_%EC%9B%90_%EC%9D%8C%EC%95%85_%EB%B0%B4%EB%93%9C_%EB%A1%9C%EA%B3%A0-removebg-preview.png?raw=true' // 무료 주차장 아이콘 URL
+          ? 'https://github.com/jungwoooooooo/parkpark/blob/master/src/assert/free-removebg-preview.png?raw=true' // 무료 주차장 아이콘 URL
           : 'https://github.com/jungwoooooooo/parkpark/blob/master/src/assert/%EA%B2%80%EC%9D%80%EC%83%89_%EB%B0%8F_%EB%85%B8%EB%9E%80%EC%83%89_%EC%9B%90_%EC%9D%8C%EC%95%85_%EB%B0%B4%EB%93%9C_%EB%A1%9C%EA%B3%A0-removebg-preview.png?raw=true'; // 유료 주차장 아이콘 URL
 
         const markerImage = new kakao.maps.MarkerImage(
           iconUrl,
-          new kakao.maps.Size(32, 32), // 아이콘 크기 조정
+          new kakao.maps.Size(80, 80), // 아이콘 크기 조정
           { offset: new kakao.maps.Point(16, 32) } // 아이콘 중심점 조정
         );
 
