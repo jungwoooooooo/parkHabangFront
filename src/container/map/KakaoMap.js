@@ -3,7 +3,7 @@ import { useMap } from './MapContext';
 
 const { kakao } = window;
 
-const KakaoMap = () => {
+const KakaoMap = ({ center }) => {
   const { map, setMap } = useMap();
   const [currentLocationMarker, setCurrentLocationMarker] = useState(null);
   const [isTrafficVisible, setIsTrafficVisible] = useState(false);
@@ -40,19 +40,6 @@ const KakaoMap = () => {
 
         // 현재 위치로 이동
         moveToCurrentLocation(newMap);
-
-        // 모바일 터치 이벤트 핸들링 제거
-        // container.addEventListener('touchstart', (e) => {
-        //   e.stopPropagation();
-        // }, { passive: true });
-
-        // container.addEventListener('touchmove', (e) => {
-        //   e.stopPropagation();
-        // }, { passive: true });
-
-        // container.addEventListener('touchend', (e) => {
-        //   e.stopPropagation();
-        // }, { passive: true });
       } else {
         console.error("Kakao Maps API is not loaded.");
       }
@@ -70,6 +57,26 @@ const KakaoMap = () => {
     }
   }, [setMap]);
 
+  useEffect(() => {
+    if (map && center) {
+      const moveLatLng = new kakao.maps.LatLng(center.lat, center.lng);
+      map.panTo(moveLatLng);
+
+      // 기존 마커 제거
+      if (currentLocationMarker) {
+        currentLocationMarker.setMap(null);
+      }
+
+      // 새 마커 생성
+      const marker = new kakao.maps.Marker({
+        position: moveLatLng,
+        map: map
+      });
+
+      setCurrentLocationMarker(marker);
+    }
+  }, [center, map]);
+
   const moveToCurrentLocation = (mapInstance = map) => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -79,20 +86,20 @@ const KakaoMap = () => {
           const moveLatLng = new kakao.maps.LatLng(lat, lng);
           
           mapInstance.panTo(moveLatLng);
-
+  
           // 기존 마커 제거
           if (currentLocationMarker) {
             currentLocationMarker.setMap(null);
           }
-
+  
           // 새 마커 생성
           const marker = new kakao.maps.Marker({
             position: moveLatLng,
             map: mapInstance
           });
-
+  
           setCurrentLocationMarker(marker);
-
+  
           // 선택적: 인포윈도우 추가
           const iwContent = '<div style="padding:5px;">현재 위치</div>';
           const infowindow = new kakao.maps.InfoWindow({
@@ -102,7 +109,11 @@ const KakaoMap = () => {
         },
         (error) => {
           console.error("Error getting current location:", error);
-          alert(`현재 위치를 가져올 수 없습니다. 오류 코드: ${error.code}, 메시지: ${error.message}`);
+          if (error.code === error.PERMISSION_DENIED) {
+            alert("위치 권한이 거부되었습니다. 브라우저 설정에서 위치 권한을 허용해주세요.");
+          } else {
+            alert(`현재 위치를 가져올 수 없습니다. 오류 코드: ${error.code}, 메시지: ${error.message}`);
+          }
         },
         {
           enableHighAccuracy: true,
