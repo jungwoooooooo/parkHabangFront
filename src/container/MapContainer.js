@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { Box, Button } from '@mui/material'; // Box와 Button을 @mui/material에서 임포트
 import KakaoMap from './map/KakaoMap';
 import SearchPlace from './components/Search';
 import { MapProvider } from './map/MapContext';
@@ -9,69 +11,41 @@ import ChildrenAreaLayer from './components/ChildrenAreaLayers';
 import FirePlugLayer from './components/FirePugLayer'; // Add this import
 import './css/MapContainer.css'
 
-export default function MapContainer() {
+export default function MapContainer({ setParkingLots }) {
   const [currentLocation, setCurrentLocation] = useState(null);
   const [searchLocation, setSearchLocation] = useState(null);
-  const [parkingLots, setParkingLots] = useState([]);
+  const [parkingLots, setLocalParkingLots] = useState([]);
   const [illegalParkingData, setIllegalParkingData] = useState([]);
   const [childrenAreaData, setChildrenAreaData] = useState([]);
   const [firePlugData, setFirePlugData] = useState([]); // Add state for fire plug data
 
   useEffect(() => {
-    const fetchParkingLots = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:3000/parking-lots');
-        const data = await response.json();
-        setParkingLots(data);
+        const [parkingResponse, illegalParkingResponse, childrenAreaResponse, firePlugResponse] = await Promise.all([
+          fetch('http://localhost:3000/parking-lots'),
+          fetch('http://localhost:3000/illegal-parking'),
+          fetch('http://localhost:3000/children-area'),
+          fetch('http://localhost:3000/fire-plug')
+        ]);
+
+        const parkingData = await parkingResponse.json();
+        const illegalParkingData = await illegalParkingResponse.json();
+        const childrenAreaData = await childrenAreaResponse.json();
+        const firePlugData = await firePlugResponse.json();
+
+        setLocalParkingLots(parkingData);
+        setParkingLots(parkingData); // App.js의 parkingLots 상태 업데이트
+        setIllegalParkingData(Array.isArray(illegalParkingData) ? illegalParkingData : []);
+        setChildrenAreaData(Array.isArray(childrenAreaData) ? childrenAreaData : []);
+        setFirePlugData(Array.isArray(firePlugData) ? firePlugData : []);
       } catch (error) {
-        console.error('Error fetching parking lots:', error);
+        console.error('Error fetching data:', error);
       }
     };
 
-    fetchParkingLots();
-  }, []);
-
-  useEffect(() => {
-    const fetchIllegalParkingData = async () => {
-      try {
-        const response = await fetch('http://localhost:3000/illegal-parking');
-        const data = await response.json();
-        setIllegalParkingData(Array.isArray(data) ? data : []);
-      } catch (error) {
-        console.error('Error fetching illegal parking data:', error);
-      }
-    };
-
-    fetchIllegalParkingData();
-  }, []);
-
-  useEffect(() => {
-    const fetchChildrenAreaData = async () => {
-      try {
-        const response = await fetch('http://localhost:3000/children-area');
-        const data = await response.json();
-        setChildrenAreaData(Array.isArray(data) ? data : []);
-      } catch (error) {
-        console.error('Error fetching children area data:', error);
-      }
-    };
-
-    fetchChildrenAreaData();
-  }, []);
-
-  useEffect(() => {
-    const fetchFirePlugData = async () => { // Add this useEffect for fetching fire plugs
-      try {
-        const response = await fetch('http://localhost:3000/fire-plug');
-        const data = await response.json();
-        setFirePlugData(Array.isArray(data) ? data : []);
-      } catch (error) {
-        console.error('Error fetching fire plug data:', error);
-      }
-    };
-
-    fetchFirePlugData();
-  }, []);
+    fetchData();
+  }, [setParkingLots]);
 
   useEffect(() => {
     const getCurrentLocation = () => {
@@ -114,6 +88,11 @@ export default function MapContainer() {
         <ChildrenAreaLayer childrenAreaData={childrenAreaData} />
         <FirePlugLayer firePlugData={firePlugData} /> {/* Add FirePlugLayer */}
       </MapProvider>
+      <Box display="flex" justifyContent="center" marginTop="16px">
+        <Link to="/register-parking-lot">
+          <Button variant="contained" color="primary">내 주차장 등록하기</Button>
+        </Link>
+      </Box>
     </div>
   );
 }

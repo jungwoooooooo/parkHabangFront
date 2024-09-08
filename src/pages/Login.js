@@ -1,47 +1,40 @@
-// src/pages/Login.js
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { TextField, Button, Box, Typography } from '@mui/material';
 
-const Login = () => {
-  const [username, setUsername] = useState('');
+const Login = ({ onLogin }) => {
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const navigate = useNavigate();
 
-  const handleLogin = (event) => {
-    event.preventDefault();
-
-    // 간단한 로그인 검증 (실제 환경에서는 백엔드와 연동해야 합니다)
-    if (username === 'admin' && password === 'password') {
-      localStorage.setItem('isLoggedIn', 'true'); // 로그인 상태를 저장
-      navigate('/map'); // 로그인 성공 시 /map으로 이동
-    } else {
-      alert('Invalid credentials');
-    }
+  const handleLogin = () => {
+    // 로그인 로직 추가
+    console.log('로그인 시도:', { email, password });
+    onLogin(); // 로그인 성공 시 호출
   };
 
   return (
-    <div>
-      <h2>Login</h2>
-      <form onSubmit={handleLogin}>
-        <div>
-          <label>Username:</label>
-          <input
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-        </div>
-        <div>
-          <label>Password:</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
-        <button type="submit">Login</button>
-      </form>
-    </div>
+    <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="100vh">
+      <Typography variant="h4" gutterBottom>로그인</Typography>
+      <TextField
+        label="이메일"
+        variant="outlined"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        margin="normal"
+        fullWidth
+      />
+      <TextField
+        label="비밀번호"
+        type="password"
+        variant="outlined"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        margin="normal"
+        fullWidth
+      />
+      <Button variant="contained" color="primary" onClick={handleLogin} style={{ marginTop: '16px' }}>
+        로그인
+      </Button>
+    </Box>
   );
 };
 
