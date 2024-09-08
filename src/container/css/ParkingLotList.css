@@ -9,11 +9,11 @@
   
   .parking-lot-item:hover {
     border-color: #F7819F; /* 테두리 색상을 진하게 변경 */
-    border-width: 15px; /* 테두리 두께를 2px로 증가 */
+    border-width: 2px; /* 테두리 두께를 2px로 증가 */
   }
-
+  
   .parking-lot-item.highlighted {
     border-color: #F7819F; /* 테두리 색상을 진하게 변경 */
-    border-width: 15px; /* 테두리 두께를 2px로 증가 */
+    border-width: 2px; /* 테두리 두께를 2px로 증가 */
     background-color: #f0f0f0; /* 배경색 변경 */
   }
