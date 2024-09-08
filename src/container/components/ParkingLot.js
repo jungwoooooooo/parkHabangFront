@@ -164,17 +164,17 @@ const ParkingLotLayer = ({ parkingLots }) => {
       const lotPosition = new kakao.maps.LatLng(lot.위도, lot.경도);
       return markerPosition.equals(lotPosition);
     });
-  
+
     if (marker) {
       console.log('Marker found for lot:', lot); // 마커 찾기 확인
-  
+
       // 마커의 이미지 URL을 직접 사용
       const iconUrl = lot.요금정보 === '무료' 
         ? 'https://github.com/jungwoooooooo/parkpark/blob/master/src/assert/free-removebg-preview.png?raw=true' // 무료 주차장 아이콘 URL
         : lot.요금정보 === '유료'
         ? 'https://github.com/jungwoooooooo/parkpark/blob/master/src/assert/fee.png?raw=true' // 유료 주차장 아이콘 URL
         : 'https://github.com/jungwoooooooo/parkpark/blob/master/src/assert/mix.png?raw=true'; // 혼합 주차장 아이콘 URL
-  
+
       marker.setImage(new kakao.maps.MarkerImage(
         iconUrl,
         new kakao.maps.Size(150, 150), // 아이콘 크기 증가
@@ -183,7 +183,7 @@ const ParkingLotLayer = ({ parkingLots }) => {
       setHighlightedMarker(marker);
       setHighlightedLot(lot); // 리스트 항목 하이라이트
       console.log('Highlighted lot set to:', lot); // 하이라이트된 주차장 설정 확인
-  
+
       // 상세 정보를 표시하는 인포윈도우 콘텐츠 생성
       const detailContent = `
         <div style="padding:5px; background-color:white; border:1px solid black; border-radius:5px;">
@@ -195,12 +195,12 @@ const ParkingLotLayer = ({ parkingLots }) => {
           <div>잔여 수: ${lot.가능한주차면}</div>
         </div>
       `;
-  
+
       const infowindow = new kakao.maps.InfoWindow({
         content: detailContent,
         position: marker.getPosition(),
       });
-  
+
       infowindow.open(map, marker);
       setActiveInfoWindow(infowindow);
     } else {
@@ -209,10 +209,22 @@ const ParkingLotLayer = ({ parkingLots }) => {
   };
 
   const handleMouseOutListItem = (lot) => {
-    const marker = markers.find(marker => marker.getPosition().getLat() === lot.위도 && marker.getPosition().getLng() === lot.경도);
+    const marker = markers.find(marker => {
+      const markerPosition = marker.getPosition();
+      const lotPosition = new kakao.maps.LatLng(lot.위도, lot.경도);
+      return markerPosition.equals(lotPosition);
+    });
+
     if (marker) {
+      // 마커의 이미지 URL을 직접 사용
+      const iconUrl = lot.요금정보 === '무료' 
+        ? 'https://github.com/jungwoooooooo/parkpark/blob/master/src/assert/free-removebg-preview.png?raw=true' // 무료 주차장 아이콘 URL
+        : lot.요금정보 === '유료'
+        ? 'https://github.com/jungwoooooooo/parkpark/blob/master/src/assert/fee.png?raw=true' // 유료 주차장 아이콘 URL
+        : 'https://github.com/jungwoooooooo/parkpark/blob/master/src/assert/mix.png?raw=true'; // 혼합 주차장 아이콘 URL
+
       marker.setImage(new kakao.maps.MarkerImage(
-        marker.getImage().getSrc(),
+        iconUrl,
         new kakao.maps.Size(100, 100), // 아이콘 크기 복원
         { offset: new kakao.maps.Point(20, 20) }
       ));
