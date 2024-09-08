@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
-import '../css/ParkingLotList.css'; // CSS 파일을 임포트합니다.
+import { Link } from 'react-router-dom';
+import '../css/ParkingLotList.css';
 
 const ParkingLotList = ({ parkingLots, onMouseOverListItem, onMouseOutListItem, onClickListItem, highlightedLot }) => {
   useEffect(() => {
@@ -13,7 +14,7 @@ const ParkingLotList = ({ parkingLots, onMouseOverListItem, onMouseOutListItem, 
         {parkingLots.map((lot, index) => (
           <li 
             key={index} 
-            className={`parking-lot-item ${highlightedLot === lot ? 'highlighted' : ''}`} // 하이라이트 클래스 추가
+            className={`parking-lot-item ${highlightedLot && highlightedLot.id === lot.id ? 'highlighted' : ''}`} // 하이라이트 클래스 추가
             onMouseOver={() => {
               console.log('Mouse over:', lot); // 마우스 오버 시 콘솔 출력
               onMouseOverListItem && onMouseOverListItem(lot);  // 마우스 오버 시 해당 로직 실행
@@ -26,7 +27,13 @@ const ParkingLotList = ({ parkingLots, onMouseOverListItem, onMouseOutListItem, 
           >
             <strong>{lot.주차장명}</strong><br />
             요금: {lot.요금정보}<br />
-            잔여 수: {lot.가능한주차면}
+            잔여 수: {lot.가능한주차면}<br />
+            <Link to={`/parking-lot/${lot.id}`}>
+              <button>상세 페이지 가기</button>
+            </Link>
+            <Link to={`/reservation?lotId=${lot.id}`}>
+              <button>예약하기</button>
+            </Link>
           </li>
         ))}
       </ul>
