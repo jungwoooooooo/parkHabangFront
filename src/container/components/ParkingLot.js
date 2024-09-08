@@ -9,6 +9,8 @@ const ParkingLotLayer = ({ parkingLots }) => {
   const [markers, setMarkers] = useState([]);
   const [activeInfoWindow, setActiveInfoWindow] = useState(null);
   const [visibleParkingLots, setVisibleParkingLots] = useState([]);
+  const [highlightedMarker, setHighlightedMarker] = useState(null);
+  const [highlightedLot, setHighlightedLot] = useState(null);
 
   useEffect(() => {
     if (!map || !parkingLots) return;
@@ -65,10 +67,14 @@ const ParkingLotLayer = ({ parkingLots }) => {
             new kakao.maps.Size(150, 150), // 아이콘 크기 증가
             { offset: new kakao.maps.Point(30, 30) }
           ));
+          setHighlightedLot(lot); // 리스트 항목 하이라이트
         });
 
         kakao.maps.event.addListener(marker, 'mouseout', () => {
-          marker.setImage(markerImage); // 원래 아이콘으로 복원
+          if (highlightedMarker !== marker) {
+            marker.setImage(markerImage); // 원래 아이콘으로 복원
+          }
+          setHighlightedLot(null); // 리스트 항목 하이라이트 해제
         });
 
         // 마커 클릭 이벤트 추가
@@ -118,18 +124,6 @@ const ParkingLotLayer = ({ parkingLots }) => {
     clusterer.addMarkers(newMarkers);
     setMarkers(newMarkers);
 
-    // 클러스터 마우스오버 이벤트 추가
-    kakao.maps.event.addListener(clusterer, 'clusterover', (cluster) => {
-      const clusterMarker = cluster.getClusterMarker();
-      clusterMarker.getElement().style.transform = 'scale(1.2)'; // 클러스터 확대
-    });
-
-    // 클러스터 마우스아웃 이벤트 추가
-    kakao.maps.event.addListener(clusterer, 'clusterout', (cluster) => {
-      const clusterMarker = cluster.getClusterMarker();
-      clusterMarker.getElement().style.transform = 'scale(1)'; // 클러스터 원래 크기로 복원
-    });
-
     // 지도 중심 변경 시 반경 내 주차장 필터링
     const updateVisibleParkingLots = () => {
       const center = map.getCenter();
@@ -162,12 +156,90 @@ const ParkingLotLayer = ({ parkingLots }) => {
       }
     });
 
-  }, [map, parkingLots, activeInfoWindow]);
+  }, [map, parkingLots, activeInfoWindow, highlightedMarker]);
+
+  const handleMouseOverListItem = (lot) => {
+    const marker = markers.find(marker => {
+      const markerPosition = marker.getPosition();
+      const lotPosition = new kakao.maps.LatLng(lot.위도, lot.경도);
+      return markerPosition.equals(lotPosition);
+    });
+  
+    if (marker) {
+      console.log('Marker found for lot:', lot); // 마커 찾기 확인
+  
+      // 마커의 이미지 URL을 직접 사용
+      const iconUrl = lot.요금정보 === '무료' 
+        ? 'https://github.com/jungwoooooooo/parkpark/blob/master/src/assert/free-removebg-preview.png?raw=true' // 무료 주차장 아이콘 URL
+        : lot.요금정보 === '유료'
+        ? 'https://github.com/jungwoooooooo/parkpark/blob/master/src/assert/fee.png?raw=true' // 유료 주차장 아이콘 URL
+        : 'https://github.com/jungwoooooooo/parkpark/blob/master/src/assert/mix.png?raw=true'; // 혼합 주차장 아이콘 URL
+  
+      marker.setImage(new kakao.maps.MarkerImage(
+        iconUrl,
+        new kakao.maps.Size(150, 150), // 아이콘 크기 증가
+        { offset: new kakao.maps.Point(30, 30) }
+      ));
+      setHighlightedMarker(marker);
+      setHighlightedLot(lot); // 리스트 항목 하이라이트
+      console.log('Highlighted lot set to:', lot); // 하이라이트된 주차장 설정 확인
+  
+      // 상세 정보를 표시하는 인포윈도우 콘텐츠 생성
+      const detailContent = `
+        <div style="padding:5px; background-color:white; border:1px solid black; border-radius:5px;">
+          <div><strong>${lot.주차장명}</strong></div>
+          <div>요금: ${lot.요금정보}</div>
+          <div>기본 요금: ${lot.주차기본요금}</div>
+          <div>구분: ${lot.주차장구분}</div>
+          <div>운영요일: ${lot.운영요일}</div>
+          <div>잔여 수: ${lot.가능한주차면}</div>
+        </div>
+      `;
+  
+      const infowindow = new kakao.maps.InfoWindow({
+        content: detailContent,
+        position: marker.getPosition(),
+      });
+  
+      infowindow.open(map, marker);
+      setActiveInfoWindow(infowindow);
+    } else {
+      console.log('Marker not found for lot:', lot); // 마커 찾기 실패 확인
+    }
+  };
+
+  const handleMouseOutListItem = (lot) => {
+    const marker = markers.find(marker => marker.getPosition().getLat() === lot.위도 && marker.getPosition().getLng() === lot.경도);
+    if (marker) {
+      marker.setImage(new kakao.maps.MarkerImage(
+        marker.getImage().getSrc(),
+        new kakao.maps.Size(100, 100), // 아이콘 크기 복원
+        { offset: new kakao.maps.Point(20, 20) }
+      ));
+      setHighlightedMarker(null);
+      setHighlightedLot(null); // 리스트 항목 하이라이트 해제
+
+      if (activeInfoWindow) {
+        activeInfoWindow.close();
+        setActiveInfoWindow(null);
+      }
+    }
+  };
+
+  const handleClickListItem = (lot) => {
+    const position = new kakao.maps.LatLng(lot.위도, lot.경도);
+    map.setCenter(position);
+  };
 
   return (
     <>
-      <ParkingLotList parkingLots={visibleParkingLots} />
-      {/* 지도 컴포넌트는 여기에 렌더링됩니다 */}
+      <ParkingLotList 
+        parkingLots={visibleParkingLots} 
+        onMouseOverListItem={handleMouseOverListItem} 
+        onMouseOutListItem={handleMouseOutListItem} 
+        onClickListItem={handleClickListItem}
+        highlightedLot={highlightedLot} // 하이라이트된 주차장 전달
+      />
     </>
   );
 };
