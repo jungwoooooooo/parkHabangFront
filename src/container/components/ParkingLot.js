@@ -11,6 +11,30 @@ const ParkingLotLayer = ({ parkingLots }) => {
   const [visibleParkingLots, setVisibleParkingLots] = useState([]);
   const [highlightedMarker, setHighlightedMarker] = useState(null);
   const [highlightedLot, setHighlightedLot] = useState(null);
+  const [radius, setRadius] = useState(800); // 초기 반경 800m
+
+  const handleRadiusIncrease = () => {
+    const newRadius = radius + 200; // 반경 200m 증가
+    setRadius(newRadius);
+    
+    // 새 반경에 맞게 지도 줌 레벨 조정
+    const level = calculateZoomLevel(newRadius);
+    map.setLevel(level);
+    
+    // 지도 중심 유지
+    const center = map.getCenter();
+    map.setCenter(center);
+  };
+
+  // 반경에 따른 적절한 줌 레벨 계산 함수
+  const calculateZoomLevel = (radius) => {
+    if (radius <= 500) return 3;
+    if (radius <= 1000) return 5;
+    if (radius <= 2000) return 6;
+    if (radius <= 4000) return 7;
+    if (radius <= 8000) return 8;
+    return 10;
+  };
 
   useEffect(() => {
     if (!map || !parkingLots) return;
@@ -25,15 +49,6 @@ const ParkingLotLayer = ({ parkingLots }) => {
       averageCenter: true,
       minLevel: 5, // 클러스터 할 최소 지도 레벨
       minClusterSize: 2, // 클러스터를 형성하기 위한 최소 마커 개수
-      styles: [{
-        width: '40px', height: '40px',
-        background: 'rgba(51, 204, 255, .8)',
-        borderRadius: '20px',
-        color: '#000',
-        textAlign: 'center',
-        lineHeight: '40px',
-        transition: 'transform 0.2s ease' // 부드러운 전환 효과 추가
-      }]
     });
 
     // 새로운 마커 생성
@@ -50,7 +65,7 @@ const ParkingLotLayer = ({ parkingLots }) => {
 
         const markerImage = new kakao.maps.MarkerImage(
           iconUrl,
-          new kakao.maps.Size(100, 100), // 아이콘 크기 조정 (작게)
+          new kakao.maps.Size(80, 80), // 아이콘 크기 조정 (작게)
           { offset: new kakao.maps.Point(20, 20) } // 아이콘 중심점 조정
         );
 
@@ -64,7 +79,7 @@ const ParkingLotLayer = ({ parkingLots }) => {
         kakao.maps.event.addListener(marker, 'mouseover', () => {
           marker.setImage(new kakao.maps.MarkerImage(
             iconUrl,
-            new kakao.maps.Size(150, 150), // 아이콘 크기 증가
+            new kakao.maps.Size(100, 100), // 아이콘 크기 증가
             { offset: new kakao.maps.Point(30, 30) }
           ));
           setHighlightedLot(lot); // 리스트 항목 하이라이트
@@ -127,7 +142,6 @@ const ParkingLotLayer = ({ parkingLots }) => {
     // 지도 중심 변경 시 반경 내 주차장 필터링
     const updateVisibleParkingLots = () => {
       const center = map.getCenter();
-      const radius = 800; // 반경 1km
       const circle = new kakao.maps.Circle({
         center: center,
         radius: radius
@@ -145,6 +159,7 @@ const ParkingLotLayer = ({ parkingLots }) => {
 
     // 지도 이동 이벤트 리스너 추가
     kakao.maps.event.addListener(map, 'center_changed', updateVisibleParkingLots);
+    kakao.maps.event.addListener(map, 'zoom_changed', updateVisibleParkingLots);
     updateVisibleParkingLots(); // 초기 필터링
 
     // 지도 클릭 시 활성화된 인포윈도우 닫기
@@ -156,7 +171,7 @@ const ParkingLotLayer = ({ parkingLots }) => {
       }
     });
 
-  }, [map, parkingLots, activeInfoWindow, highlightedMarker]);
+  }, [map, parkingLots, activeInfoWindow, highlightedMarker, radius]);
 
   const handleMouseOverListItem = (lot) => {
     const marker = markers.find(marker => {
@@ -250,7 +265,8 @@ const ParkingLotLayer = ({ parkingLots }) => {
         onMouseOverListItem={handleMouseOverListItem} 
         onMouseOutListItem={handleMouseOutListItem} 
         onClickListItem={handleClickListItem}
-        highlightedLot={highlightedLot} // 하이라이트된 주차장 전달
+        highlightedLot={highlightedLot}
+        onRadiusIncrease={handleRadiusIncrease}
       />
     </>
   );
