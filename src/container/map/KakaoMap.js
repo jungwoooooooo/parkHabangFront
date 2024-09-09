@@ -155,81 +155,68 @@ const KakaoMap = ({ center }) => {
   return (
     <div style={{ position: 'relative', width: '100%', height: '100vh' }}>
       <div id="map" className="map-container" style={{ width: '100%', height: '100%' }}></div>
+      
+      {/* 현재 위치 버튼 */}
       <button 
         onClick={() => moveToCurrentLocation()}
         className="highlight-button"
         style={{
           position: 'absolute',
-          bottom: '150px',
-          right: '20px',
+          top: '275px',
+          right: '40px',
           zIndex: 10,
-          padding: '10px',
+          padding: '5px',
           backgroundColor: 'white',
           border: '1px solid #ccc',
-          borderRadius: '5px',
+          borderRadius: '50%',
           cursor: 'pointer',
-          fontSize: '14px',
-          transition: 'all 0.3s ease', // 부드러운 전환 효과 추가
+          transition: 'all 0.3s ease',
+          width: '40px',
+          height: '40px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
+        title="현재 위치로 이동"
       >
-        현재 위치로 이동
+        <img 
+          src="https://cdn-icons-png.flaticon.com/128/67/67335.png" 
+          alt="현재 위치" 
+          style={{ width: '80px', height: '80px' }} 
+        />
       </button>
+
+      {/* 교통정보 켜기/끄기 버튼 */}
       <button 
         onClick={toggleTraffic}
         className="highlight-button"
         style={{
           position: 'absolute',
-          bottom: '100px',
-          right: '20px',
+          top: '380px',
+          right: '40px',
           zIndex: 10,
-          padding: '10px',
+          padding: '5px',
           backgroundColor: 'white',
           border: '1px solid #ccc',
-          borderRadius: '5px',
+          borderRadius: '50%',
           cursor: 'pointer',
-          fontSize: '14px',
-          transition: 'all 0.3s ease', // 부드러운 전환 효과 추가
+          transition: 'all 0.3s ease',
+          width: '40px',
+          height: '40px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
+        title={isTrafficVisible ? '교통 정보 끄기' : '교통 정보 켜기'}
       >
-        {isTrafficVisible ? '교통 정보 끄기' : '교통 정보 켜기'}
-      </button>
-      <button 
-        onClick={zoomIn}
-        className="highlight-button"
-        style={{
-          position: 'absolute',
-          bottom: '50px',
-          right: '20px',
-          zIndex: 10,
-          padding: '10px',
-          backgroundColor: 'white',
-          border: '1px solid #ccc',
-          borderRadius: '5px',
-          cursor: 'pointer',
-          fontSize: '14px',
-          transition: 'all 0.3s ease', // 부드러운 전환 효과 추가
-        }}
-      >
-        확대
-      </button>
-      <button 
-        onClick={zoomOut}
-        className="highlight-button"
-        style={{
-          position: 'absolute',
-          bottom: '0px',
-          right: '20px',
-          zIndex: 10,
-          padding: '10px',
-          backgroundColor: 'white',
-          border: '1px solid #ccc',
-          borderRadius: '5px',
-          cursor: 'pointer',
-          fontSize: '14px',
-          transition: 'all 0.3s ease', // 부드러운 전환 효과 추가
-        }}
-      >
-        축소
+        <img 
+          src={isTrafficVisible 
+            ? "https://cdn-icons-png.flaticon.com/512/8727/8727737.png"  // 교통정보 켜진 상태 아이콘
+            : "https://cdn-icons-png.flaticon.com/512/8727/8727737.png"  // 교통정보 꺼진 상태 아이콘
+          } 
+          alt={isTrafficVisible ? '교통 정보 끄기' : '교통 정보 켜기'} 
+          style={{ width: '100px', height: '100px' }} 
+        />
       </button>
     </div>
   );
