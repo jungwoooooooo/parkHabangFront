@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { List, ListItem, Typography, Button, Paper, Box, Divider, Dialog, DialogTitle, DialogContent, DialogActions, Alert, AlertTitle } from '@mui/material';
+import { List, ListItem, Typography, Button, Paper, Box, Divider, Alert, AlertTitle } from '@mui/material';
 import { styled, ThemeProvider, createTheme } from '@mui/material/styles';
 import { FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 
@@ -41,6 +41,7 @@ const ParkingLotList = ({ parkingLots, onMouseOverListItem, onMouseOutListItem, 
           mapCenter.lat, 
           mapCenter.lng
         );
+        console.log(`주차장: ${lot.주차장명}, 거리: ${distance} km`); // 거리 값 콘솔 출력
         return {
           ...lot,
           distance: Math.round(distance * 1000) // km를 m로 변환하고 반올림
@@ -128,7 +129,7 @@ const ParkingLotList = ({ parkingLots, onMouseOverListItem, onMouseOutListItem, 
                     <Typography variant="subtitle1">{lot.주차장명}</Typography>
                     <Typography variant="body2">요금: {lot.요금정보}</Typography>
                     <Typography variant="body2">잔여 수: {lot.가능한주차면}</Typography>
-                    <Typography variant="body2">거리: {lot.distance}m</Typography>
+                    <Typography variant="body2">거리: {lot.distance}m</Typography> {/* 거리 표시 추가 */}
                     <Box mt={1}>
                       <Button component={Link} to={`/parking-lot/${lot.id}`} variant="outlined" size="small" sx={{ mr: 1 }}>
                         상세 정보
