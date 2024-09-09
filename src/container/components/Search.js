@@ -8,15 +8,15 @@ import '../css/Search.css'; // CSS 파일 경로 수정
 
 const Container = styled(Box)(({ theme }) => ({
     position: 'absolute',
-    top: '80px',
-    left: '120px',
+    top: '50px',
+    left: '160px',
     transform: 'translateX(-50%)',
     backgroundColor: 'rgba(255, 255, 255, 0.8)',
     padding: '5px',
     borderRadius: '4px',
     boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
     zIndex: 1000,
-    width: '200px',
+    width: '300px',
     [theme.breakpoints.down('sm')]: {
         width: '30%', // 모바일 화면에서 너비 조정
         left: '20%', // 중앙 정렬
