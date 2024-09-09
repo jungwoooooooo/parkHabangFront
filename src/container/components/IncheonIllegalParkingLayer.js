@@ -76,7 +76,7 @@ const IncheonIllegalParkingLayer = ({ incheonIllegalParkingData }) => {
   };
 
   return (
-    <div style={{ position: 'absolute', top: 10, left: 300, zIndex: 1000 }}>
+    <div style={{ position: 'absolute', top: 50, left: 320, zIndex: 1000 }}>
       <button 
         onClick={toggleAllCategories}
         style={{ 
@@ -94,7 +94,7 @@ const IncheonIllegalParkingLayer = ({ incheonIllegalParkingData }) => {
           borderRadius: '4px'
         }}
       >
-        전체 {Object.values(visibleCategories).every(value => value) ? '끄기' : '켜기'}
+        불법주차 구역 {Object.values(visibleCategories).every(value => value) ? '끄기' : '보기'}
       </button>
       {Object.keys(visibleCategories).map(category => (
         <button 
