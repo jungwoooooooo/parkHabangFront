@@ -10,6 +10,7 @@ import IllegalParkingLayer from './components/IllegalParking';
 import ChildrenAreaLayer from './components/ChildrenAreaLayers';
 import FirePlugLayer from './components/FirePugLayer'; // Add this import
 import './css/MapContainer.css'
+import IncheonIllegalParkingLayer from './components/IncheonIllegalParkingLayer';
 
 export default function MapContainer({ setParkingLots }) {
   const [currentLocation, setCurrentLocation] = useState(null);
@@ -18,27 +19,31 @@ export default function MapContainer({ setParkingLots }) {
   const [illegalParkingData, setIllegalParkingData] = useState([]);
   const [childrenAreaData, setChildrenAreaData] = useState([]);
   const [firePlugData, setFirePlugData] = useState([]); // Add state for fire plug data
+  const [incheonIllegalParkingData, setIncheonIllegalParkingData] = useState([]); // Add state for incheon illegal parking data
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [parkingResponse, illegalParkingResponse, childrenAreaResponse, firePlugResponse] = await Promise.all([
+        const [parkingResponse, illegalParkingResponse, childrenAreaResponse, firePlugResponse, incheonIllegalParkingResponse] = await Promise.all([
           fetch('http://localhost:3000/parking-lots'),
           fetch('http://localhost:3000/illegal-parking'),
           fetch('http://localhost:3000/children-area'),
-          fetch('http://localhost:3000/fire-plug')
+          fetch('http://localhost:3000/fire-plug'),
+          fetch('http://localhost:3000/incheon-illegal-parking')
         ]);
 
         const parkingData = await parkingResponse.json();
         const illegalParkingData = await illegalParkingResponse.json();
         const childrenAreaData = await childrenAreaResponse.json();
         const firePlugData = await firePlugResponse.json();
+        const incheonIllegalParkingData = await incheonIllegalParkingResponse.json();
 
         setLocalParkingLots(parkingData);
         setParkingLots(parkingData); // App.js의 parkingLots 상태 업데이트
         setIllegalParkingData(Array.isArray(illegalParkingData) ? illegalParkingData : []);
         setChildrenAreaData(Array.isArray(childrenAreaData) ? childrenAreaData : []);
         setFirePlugData(Array.isArray(firePlugData) ? firePlugData : []);
+        setIncheonIllegalParkingData(Array.isArray(incheonIllegalParkingData) ? incheonIllegalParkingData : []);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -87,6 +92,7 @@ export default function MapContainer({ setParkingLots }) {
         <IllegalParkingLayer illegalParkingData={illegalParkingData} />
         <ChildrenAreaLayer childrenAreaData={childrenAreaData} />
         <FirePlugLayer firePlugData={firePlugData} /> {/* Add FirePlugLayer */}
+        <IncheonIllegalParkingLayer incheonIllegalParkingData={incheonIllegalParkingData} />
       </MapProvider>
       <Box display="flex" justifyContent="center" marginTop="16px">
         <Link to="/register-parking-lot">
