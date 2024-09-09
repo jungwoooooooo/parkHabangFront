@@ -60,7 +60,7 @@ const ParkingLotLayer = ({ parkingLots }) => {
         const iconUrl = lot.요금정보 === '무료' 
           ? 'https://github.com/jungwoooooooo/parkpark/blob/master/src/assert/%EB%AC%B4%EB%A3%8C%EC%9D%B4%EB%AF%B8%EC%A7%80.png?raw=true' // 무료 주차장 아이콘 URL
           : lot.요금정보 === '유료'
-          ? 'https://github.com/jungwoooooooo/parkpark/blob/master/src/assert/fee.png?raw=true' // 유료 주차장 아이콘 URL
+          ? 'https://github.com/jungwoooooooo/parkpark/blob/master/src/assert/%EC%9C%A0%EB%A3%8C%EC%9D%B4%EB%AF%B8%EC%A7%80.png?raw=true' // 유료 주차장 아이콘 URL
           : 'https://github.com/jungwoooooooo/parkpark/blob/master/src/assert/mix.png?raw=true'; // 혼합 주차장 아이콘 URL
 
         const markerImage = new kakao.maps.MarkerImage(
@@ -187,7 +187,7 @@ const ParkingLotLayer = ({ parkingLots }) => {
       const iconUrl = lot.요금정보 === '무료' 
         ? 'https://github.com/jungwoooooooo/parkpark/blob/master/src/assert/%EB%AC%B4%EB%A3%8C%EC%9D%B4%EB%AF%B8%EC%A7%80.png?raw=true' // 무료 주차장 아이콘 URL
         : lot.요금정보 === '유료'
-        ? 'https://github.com/jungwoooooooo/parkpark/blob/master/src/assert/fee.png?raw=true' // 유료 주차장 아이콘 URL
+        ? 'https://github.com/jungwoooooooo/parkpark/blob/master/src/assert/%EC%9C%A0%EB%A3%8C%EC%9D%B4%EB%AF%B8%EC%A7%80.png?raw=true' // 유료 주차장 아이콘 URL
         : 'https://github.com/jungwoooooooo/parkpark/blob/master/src/assert/mix.png?raw=true'; // 혼합 주차장 아이콘 URL
 
       marker.setImage(new kakao.maps.MarkerImage(
@@ -235,7 +235,7 @@ const ParkingLotLayer = ({ parkingLots }) => {
       const iconUrl = lot.요금정보 === '무료' 
         ? 'https://github.com/jungwoooooooo/parkpark/blob/master/src/assert/%EB%AC%B4%EB%A3%8C%EC%9D%B4%EB%AF%B8%EC%A7%80.png?raw=true' // 무료 주차장 아이콘 URL
         : lot.요금정보 === '유료'
-        ? 'https://github.com/jungwoooooooo/parkpark/blob/master/src/assert/fee.png?raw=true' // 유료 주차장 아이콘 URL
+        ? 'https://github.com/jungwoooooooo/parkpark/blob/master/src/assert/%EC%9C%A0%EB%A3%8C%EC%9D%B4%EB%AF%B8%EC%A7%80.png?raw=true' // 유료 주차장 아이콘 URL
         : 'https://github.com/jungwoooooooo/parkpark/blob/master/src/assert/mix.png?raw=true'; // 혼합 주차장 아이콘 URL
 
       marker.setImage(new kakao.maps.MarkerImage(
