@@ -15,8 +15,8 @@ const IncheonIllegalParkingLayer = ({ incheonIllegalParkingData }) => {
 
   const categoryIcons = {
     fire: 'https://cdn-icons-png.flaticon.com/512/353/353902.png',
-    child: 'https://cdn-icons-png.flaticon.com/512/3097/3097048.png',
-    cctv: 'https://cdn-icons-png.flaticon.com/512/2089/2089795.png'
+    child: 'https://github.com/jungwoooooooo/parkpark/blob/master/src/assert/3c1ad7636808a88d4b3250d95329dd28-removebg-preview.png?raw=true',
+    cctv: 'https://cdn-icons-png.flaticon.com/512/4017/4017956.png'
   };
 
   useEffect(() => {
@@ -36,32 +36,11 @@ const IncheonIllegalParkingLayer = ({ incheonIllegalParkingData }) => {
             position,
             map,
             title: parking.location,
-            image: new kakao.maps.MarkerImage(categoryIcons[parking.category], new kakao.maps.Size(32, 32))
-          });
-
-          kakao.maps.event.addListener(marker, 'click', () => {
-            if (activeInfoWindow) {
-              activeInfoWindow.close();
-            }
-
-            const content = `
-              <div>
-                <h2>상세정보</h2>
-                <h3>${parking.location}</h3>
-                <p>카테고리: ${parking.category}</p>
-                <p>위치: ${parking.latitude}, ${parking.longitude}</p>
-                <p>구역: ${parking.district || '정보 없음'}</p>
-                <p>단속 지점: ${parking.enforcement_point || '정보 없음'}</p>
-              </div>
-            `;
-
-            const infowindow = new kakao.maps.InfoWindow({
-              content,
-              position: marker.getPosition(),
-            });
-
-            infowindow.open(map, marker);
-            setActiveInfoWindow(infowindow);
+            image: new kakao.maps.MarkerImage(
+              categoryIcons[parking.category],
+              new kakao.maps.Size(45, 45),  // 여기서 아이콘 크기를 조절합니다 (예: 40x40 픽셀)
+              { offset: new kakao.maps.Point(20, 20) }  // 앵커 포인트 설정 (선택사항)
+            )
           });
 
           return marker;
@@ -87,8 +66,36 @@ const IncheonIllegalParkingLayer = ({ incheonIllegalParkingData }) => {
     }));
   };
 
+  const toggleAllCategories = () => {
+    const allCategoriesActive = Object.values(visibleCategories).every(value => value);
+    const newState = Object.keys(visibleCategories).reduce((acc, category) => {
+      acc[category] = !allCategoriesActive;
+      return acc;
+    }, {});
+    setVisibleCategories(newState);
+  };
+
   return (
-    <div style={{ position: 'absolute', top: 10, left: 10, zIndex: 1000 }}>
+    <div style={{ position: 'absolute', top: 10, left: 300, zIndex: 1000 }}>
+      <button 
+        onClick={toggleAllCategories}
+        style={{ 
+          marginRight: '10px', 
+          backgroundColor: Object.values(visibleCategories).every(value => value) ? '#4CAF50' : '#f44336',
+          color: 'white',
+          border: 'none',
+          padding: '10px 20px',
+          textAlign: 'center',
+          textDecoration: 'none',
+          display: 'inline-block',
+          fontSize: '16px',
+          margin: '4px 2px',
+          cursor: 'pointer',
+          borderRadius: '4px'
+        }}
+      >
+        전체 {Object.values(visibleCategories).every(value => value) ? '끄기' : '켜기'}
+      </button>
       {Object.keys(visibleCategories).map(category => (
         <button 
           key={category} 
@@ -108,6 +115,11 @@ const IncheonIllegalParkingLayer = ({ incheonIllegalParkingData }) => {
             borderRadius: '4px'
           }}
         >
+          <img 
+            src={categoryIcons[category]} 
+            alt={category} 
+            style={{ width: '20px', height: '20px', marginRight: '5px', verticalAlign: 'middle' }} 
+          />
           {category.charAt(0).toUpperCase() + category.slice(1)}
         </button>
       ))}
