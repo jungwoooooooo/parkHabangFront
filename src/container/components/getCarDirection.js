@@ -1,22 +1,27 @@
+// 카카오 주차장 경로 찾기
 export async function getCarDirection(startPoint, endPoint) {
-    const REST_API_KEY = '5ec7f2e09042f5b2767eac42a19e37f1';
-    const url = 'https://apis-navi.kakaomobility.com/v1/directions';
+    const REST_API_KEY = '5ec7f2e09042f5b2767eac42a19e37f1';//카카오 주차장 경로 찾기
+    const url = 'https://apis-navi.kakaomobility.com/v1/directions';//
 
-    const origin = `${startPoint.lng},${startPoint.lat}`; 
-    const destination = `${endPoint.lng},${endPoint.lat}`;
+    const origin = `${startPoint.lng},${startPoint.lat}`; // 출발지 좌표
+    const destination = `${endPoint.lng},${endPoint.lat}`; // 도착지 좌표
     
+    // 헤더 설정
     const headers = {
       Authorization: `KakaoAK ${REST_API_KEY}`,
       'Content-Type': 'application/json'
     };
   
+    // 쿼리 파라미터 설정
     const queryParams = new URLSearchParams({
-      origin: origin,
-      destination: destination
+      origin: origin,//출발지 좌표
+      destination: destination//도착지 좌표
     });
     
+    // 요청 URL 생성
     const requestUrl = `${url}?${queryParams}`;
 
+    // 요청 처리
     try {
       const response = await fetch(requestUrl, {
         method: 'GET',
