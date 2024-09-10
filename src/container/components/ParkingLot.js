@@ -3,20 +3,35 @@ import { useMap } from '../map/MapContext';
 import ParkingLotList from './ParkingLotList';
 import { getCarDirection } from './getCarDirection';
 
+// 카카오맵 초기화
 const { kakao } = window;
 
+// 주차장 레이어 컴포넌트
 const ParkingLotLayer = ({ parkingLots }) => {
+  // 카카오맵 초기화
   const { map } = useMap();
+  // 마커 상태 관리
   const [markers, setMarkers] = useState([]);
+  // 활성화된 정보 창 상태 관리
   const [activeInfoWindow, setActiveInfoWindow] = useState(null);
+  // 보이는 주차장 상태 관리
   const [visibleParkingLots, setVisibleParkingLots] = useState([]);
+  // 강조된 주차장 상태 관리
   const [highlightedLot, setHighlightedLot] = useState(null);
+  // 반경 반지름 상태 관리
   const [radius, setRadius] = useState(800);
+  // 지도 중심 상태 관리
   const [mapCenter, setMapCenter] = useState({ lat: 37.5665, lng: 126.9780 });
+  // 마커 맵 상태 관리
   const [markerMap, setMarkerMap] = useState({});
+  // 경로 상태 관리
   const [routePath, setRoutePath] = useState(null);
+  // 사용자 위치 상태 관리
   const [userLocation, setUserLocation] = useState(null);
+  // 하이라이트 원 상태 관리
+  const [highlightCircle, setHighlightCircle] = useState(null);
 
+  // 정보 창 생성 함수
   const createInfoWindowContent = useCallback((lot) => {
     return `
       <div style="padding:5px; background-color:white; border:1px solid black; border-radius:5px;">
@@ -31,6 +46,7 @@ const ParkingLotLayer = ({ parkingLots }) => {
     `;
   }, []);
 
+  // 주차장 선택 시 처리
   const handleClickListItem = useCallback(async (lot) => {
     const position = new kakao.maps.LatLng(lot.위도, lot.경도);
     map.panTo(position, {
@@ -41,12 +57,14 @@ const ParkingLotLayer = ({ parkingLots }) => {
       activeInfoWindow.close();
     }
   
+    // 정보 창 생성
     const infowindow = new kakao.maps.InfoWindow({
       content: createInfoWindowContent(lot),
       position: position,
       zIndex: 9999,
     });
   
+    // 정보 창 열기
     infowindow.open(map);
     setActiveInfoWindow(infowindow);
 
@@ -56,6 +74,7 @@ const ParkingLotLayer = ({ parkingLots }) => {
         throw new Error("사용자 위치를 가져올 수 없습니다.");
       }
 
+      // 경로 데이터 가져오기
       const routeData = await getCarDirection(
         userLocation,
         { lat: lot.위도, lng: lot.경도 }
@@ -68,6 +87,7 @@ const ParkingLotLayer = ({ parkingLots }) => {
         routePath.setMap(null);
       }
 
+      // 경로 데이터가 유효하다면 경로 표시
       if (routeData.routes && routeData.routes.length > 0 && routeData.routes[0].sections) {
         const path = routeData.routes[0].sections[0].roads.flatMap(road =>
           road.vertexes.reduce((acc, coord, index) => {
@@ -78,6 +98,7 @@ const ParkingLotLayer = ({ parkingLots }) => {
           }, [])
         );
 
+        // 경로 표시
         if (path.length > 0) {
           const polyline = new kakao.maps.Polyline({
             path: path,
@@ -133,6 +154,7 @@ const ParkingLotLayer = ({ parkingLots }) => {
     map.setCenter(center);
   }, [radius, map]);
 
+  // 줌 레벨 계산 함수
   const calculateZoomLevel = useCallback((radius) => {
     if (radius <= 500) return 3;
     if (radius <= 1000) return 5;
@@ -142,7 +164,7 @@ const ParkingLotLayer = ({ parkingLots }) => {
     return 10;
   }, []);
 
-  const createMarkerImage = useCallback((lot, size = 80) => {
+  const createMarkerImage = useCallback((lot, size = 40) => {
     const iconUrl = lot.요금정보 === '무료' 
       ? 'https://github.com/jungwoooooooo/parkpark/blob/master/src/assert/%EB%AC%B4%EB%A3%8C%EC%9D%B4%EB%AF%B8%EC%A7%80.png?raw=true'
       : lot.요금정보 === '유료'
@@ -152,30 +174,52 @@ const ParkingLotLayer = ({ parkingLots }) => {
     return new kakao.maps.MarkerImage(
       iconUrl,
       new kakao.maps.Size(size, size),
-      { offset: new kakao.maps.Point(size / 4, size / 4) }
+      { offset: new kakao.maps.Point(size / 2, size / 2) }
     );
   }, []);
 
+  const updateMarkerHighlight = useCallback((lot, highlighted) => {
+    if (highlightCircle) {
+      highlightCircle.setMap(null);
+      setHighlightCircle(null);
+    }
+
+    if (highlighted && lot && markerMap[lot.id]) {
+      const marker = markerMap[lot.id];
+      const position = marker.getPosition();
+      
+      // 하이라이트 원 생성
+      const circle = new kakao.maps.Circle({
+        center: position,//중심
+        radius: 28,//반지름
+        strokeWeight: 3,//선 두께
+        strokeColor: '#FA58D0',//선 색상
+        strokeOpacity: 0.8,//선 투명도
+        strokeStyle: 'solid',//선 스타일
+        fillColor: '#FA58D0',//채우기 색상
+        fillOpacity: 0.3//채우기 투명도
+      });
+
+      circle.setMap(map);
+      setHighlightCircle(circle);
+
+      marker.setZIndex(10);
+    } else {
+      Object.values(markerMap).forEach(marker => marker.setZIndex(0));
+    }
+  }, [map, markerMap, highlightCircle]);
+
+  // 주차장 선택 시 처리
   const handleMouseOverListItem = useCallback((lot) => {
-    const marker = markerMap[lot.id];
-    if (marker) {
-      marker.setImage(createMarkerImage(lot, 100));
-      setHighlightedLot(lot);
-    }
-  }, [markerMap, createMarkerImage]);
+    setHighlightedLot(lot);
+  }, []);
 
-  const handleMouseOutListItem = useCallback((lot) => {
-    const marker = markerMap[lot.id];
-    if (marker) {
-      marker.setImage(createMarkerImage(lot));
-      if (activeInfoWindow) {
-        activeInfoWindow.close();
-        setActiveInfoWindow(null);
-      }
-    }
+  // 마우스 아웃 시 처리
+  const handleMouseOutListItem = useCallback(() => {
     setHighlightedLot(null);
-  }, [markerMap, createMarkerImage, activeInfoWindow]);
+  }, []);
 
+  // 사용자 위치 가져오기
   useEffect(() => {
     // 사용자의 현재 위치를 가져오는 함수
     const getUserLocation = () => {
@@ -217,7 +261,8 @@ const ParkingLotLayer = ({ parkingLots }) => {
       minLevel: 5,
       minClusterSize: 2,
     });
-
+    
+    // 마커 생성
     const newMarkerMap = {};
     const newMarkers = parkingLots
       .filter(lot => lot.경도 && lot.위도)
@@ -225,17 +270,7 @@ const ParkingLotLayer = ({ parkingLots }) => {
         const position = new kakao.maps.LatLng(lot.위도, lot.경도);
         const markerImage = createMarkerImage(lot);
 
-        const marker = new kakao.maps.Marker({ position, image: markerImage });
-
-        kakao.maps.event.addListener(marker, 'mouseover', () => {
-          marker.setImage(createMarkerImage(lot, 100));
-          setHighlightedLot(lot);
-        });
-
-        kakao.maps.event.addListener(marker, 'mouseout', () => {
-          marker.setImage(markerImage);
-          setHighlightedLot(null);
-        });
+        const marker = new kakao.maps.Marker({ position, image: markerImage, zIndex: 0 });
 
         kakao.maps.event.addListener(marker, 'click', () => {
           if (activeInfoWindow) {
@@ -316,6 +351,10 @@ const ParkingLotLayer = ({ parkingLots }) => {
       };
     }
   }, [map]);
+
+  useEffect(() => {
+    updateMarkerHighlight(highlightedLot, !!highlightedLot);
+  }, [highlightedLot, updateMarkerHighlight]);
 
   return (
     <ParkingLotList 
