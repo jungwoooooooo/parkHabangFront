@@ -5,7 +5,8 @@ export async function getCarDirection(startPoint, endPoint) {
 
     const origin = `${startPoint.lng},${startPoint.lat}`; // 출발지 좌표
     const destination = `${endPoint.lng},${endPoint.lat}`; // 도착지 좌표
-    
+    const priority = 'time';//우선순위
+
     // 헤더 설정
     const headers = {
       Authorization: `KakaoAK ${REST_API_KEY}`,
@@ -15,7 +16,8 @@ export async function getCarDirection(startPoint, endPoint) {
     // 쿼리 파라미터 설정
     const queryParams = new URLSearchParams({
       origin: origin,//출발지 좌표
-      destination: destination//도착지 좌표
+      destination: destination,//도착지 좌표,
+      priority: priority
     });
     
     // 요청 URL 생성
