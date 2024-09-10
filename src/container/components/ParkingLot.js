@@ -82,7 +82,7 @@ const ParkingLotLayer = ({ parkingLots }) => {
           const polyline = new kakao.maps.Polyline({
             path: path,
             strokeWeight: 5,
-            strokeColor: '#FF0000',
+            strokeColor: '#424242',
             strokeOpacity: 0.7,
             strokeStyle: 'solid'
           });
