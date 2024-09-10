@@ -5,11 +5,14 @@ import '../css/KakaoMap.css'; // CSS 파일을 import
 const { kakao } = window;
 
 const KakaoMap = ({ center }) => {
+  // 맵 컨텍스트에서 map과 setMap을 가져옵니다.
   const { map, setMap } = useMap();
+  // 현재 위치 마커와 교통 정보 표시 여부를 위한 상태를 설정합니다.
   const [currentLocationMarker, setCurrentLocationMarker] = useState(null);
   const [isTrafficVisible, setIsTrafficVisible] = useState(false);
 
   useEffect(() => {
+    // 카카오 맵을 로드하는 함수입니다.
     const loadKakaoMap = () => {
       const { kakao } = window;
       if (kakao && kakao.maps) {
@@ -61,6 +64,7 @@ const KakaoMap = ({ center }) => {
   }, [setMap]);
 
   useEffect(() => {
+    // 중심 위치가 변경되면 지도를 해당 위치로 이동시킵니다.
     if (map && center) {
       const moveLatLng = new kakao.maps.LatLng(center.lat, center.lng);
       map.panTo(moveLatLng);
@@ -80,6 +84,7 @@ const KakaoMap = ({ center }) => {
     }
   }, [center, map]);
 
+  // 현재 위치로 이동하는 함수입니다.
   const moveToCurrentLocation = (mapInstance = map) => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -129,6 +134,7 @@ const KakaoMap = ({ center }) => {
     }
   };
 
+  // 교통 정보를 토글하는 함수입니다.
   const toggleTraffic = () => {
     if (map) {
       if (isTrafficVisible) {
@@ -140,12 +146,14 @@ const KakaoMap = ({ center }) => {
     }
   };
 
+  // 지도를 확대하는 함수입니다.
   const zoomIn = () => {
     if (map) {
       map.setLevel(map.getLevel() - 1, { animate: true });
     }
   };
 
+  // 지도를 축소하는 함수입니다.
   const zoomOut = () => {
     if (map) {
       map.setLevel(map.getLevel() + 1, { animate: true });

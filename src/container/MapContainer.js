@@ -11,8 +11,10 @@ import ChildrenAreaLayer from './components/ChildrenAreaLayers';
 import FirePlugLayer from './components/FirePugLayer'; // Add this import
 import './css/MapContainer.css'
 import IncheonIllegalParkingLayer from './components/IncheonIllegalParkingLayer';
+import View from './components/View';
 
 export default function MapContainer({ setParkingLots }) {
+  // 여러 상태들을 정의합니다.
   const [currentLocation, setCurrentLocation] = useState(null);
   const [searchLocation, setSearchLocation] = useState(null);
   const [parkingLots, setLocalParkingLots] = useState([]);
@@ -22,8 +24,10 @@ export default function MapContainer({ setParkingLots }) {
   const [incheonIllegalParkingData, setIncheonIllegalParkingData] = useState([]); // Add state for incheon illegal parking data
 
   useEffect(() => {
+    // 여러 데이터를 비동기적으로 가져옵니다.
     const fetchData = async () => {
       try {
+        // 여러 API 엔드포인트에서 데이터를 동시에 가져옵니다.
         const [parkingResponse, illegalParkingResponse, childrenAreaResponse, firePlugResponse, incheonIllegalParkingResponse] = await Promise.all([
           fetch('http://localhost:3000/parking-lots'),
           fetch('http://localhost:3000/illegal-parking'),
@@ -32,12 +36,14 @@ export default function MapContainer({ setParkingLots }) {
           fetch('http://localhost:3000/incheon-illegal-parking')
         ]);
 
+        // 응답을 JSON으로 파싱합니다.
         const parkingData = await parkingResponse.json();
         const illegalParkingData = await illegalParkingResponse.json();
         const childrenAreaData = await childrenAreaResponse.json();
         const firePlugData = await firePlugResponse.json();
         const incheonIllegalParkingData = await incheonIllegalParkingResponse.json();
 
+        // 파싱된 데이터를 상태에 설정합니다.
         setLocalParkingLots(parkingData);
         setParkingLots(parkingData); // App.js의 parkingLots 상태 업데이트
         setIllegalParkingData(Array.isArray(illegalParkingData) ? illegalParkingData : []);
@@ -53,6 +59,7 @@ export default function MapContainer({ setParkingLots }) {
   }, [setParkingLots]);
 
   useEffect(() => {
+    // 현재 위치를 가져오는 함수입니다.
     const getCurrentLocation = () => {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
@@ -72,6 +79,7 @@ export default function MapContainer({ setParkingLots }) {
     getCurrentLocation();
   }, []);
 
+  // 지도의 중심 위치를 결정합니다.
   const center = searchLocation || currentLocation || { lat: 37.5665, lng: 126.978 };
 
   useEffect(() => {
