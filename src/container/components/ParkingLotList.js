@@ -18,7 +18,7 @@ const StyledListItem = styled(ListItem)(({ theme, highlighted }) => ({
 }));
 
 //주차장 리스트 컴포넌트
-const ParkingLotList = ({ parkingLots, onMouseOverListItem, onMouseOutListItem, onClickListItem, highlightedLot, onRadiusIncrease, mapCenter, currentRadius }) => {
+const ParkingLotList = ({ parkingLots, onMouseOverListItem, onMouseOutListItem, onClickListItem, highlightedLot, onRadiusIncrease, mapCenter, currentRadius, userLocation }) => {
   const [showRadiusAlert, setShowRadiusAlert] = useState(false);//반경 알림 상태 초기화
   const [sortBy, setSortBy] = useState('distance');//정렬 기준 상태 초기화
   const [sortedParkingLots, setSortedParkingLots] = useState([]);//정렬된 주차장 상태 초기화
@@ -33,8 +33,10 @@ const ParkingLotList = ({ parkingLots, onMouseOverListItem, onMouseOutListItem, 
 
     // 주차장 정렬
     const sortLots = () => {
-      if (!mapCenter || typeof mapCenter.lat !== 'number' || typeof mapCenter.lng !== 'number') {
-        console.warn('mapCenter가 올바르게 정의되지 않았습니다:', mapCenter);
+      const referenceLocation = userLocation || mapCenter;
+
+      if (!referenceLocation || typeof referenceLocation.lat !== 'number' || typeof referenceLocation.lng !== 'number') {
+        console.warn('위치 정보가 올바르게 정의되지 않았습니다:', referenceLocation);
         setSortedParkingLots(parkingLots);
         return;
       }
@@ -43,8 +45,8 @@ const ParkingLotList = ({ parkingLots, onMouseOverListItem, onMouseOutListItem, 
         const distance = calculateDistance(
           parseFloat(lot.위도), 
           parseFloat(lot.경도), 
-          mapCenter.lat, 
-          mapCenter.lng
+          referenceLocation.lat, 
+          referenceLocation.lng
         );
         return {
           ...lot,
@@ -65,7 +67,7 @@ const ParkingLotList = ({ parkingLots, onMouseOverListItem, onMouseOutListItem, 
     };
 
     sortLots();
-  }, [parkingLots, sortBy, mapCenter]);
+  }, [parkingLots, sortBy, userLocation, mapCenter]);
 
   const handleRadiusIncrease = () => {
     onRadiusIncrease();
