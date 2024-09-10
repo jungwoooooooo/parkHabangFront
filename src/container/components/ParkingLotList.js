@@ -3,33 +3,38 @@ import { Link } from 'react-router-dom';
 import { List, ListItem, Typography, Button, Paper, Box, Divider, Alert, AlertTitle } from '@mui/material';
 import { styled, ThemeProvider, createTheme } from '@mui/material/styles';
 import { FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { debounce } from 'lodash'; // Import debounce from lodash
 
 const theme = createTheme(); // 기본 테마 생성
 
+//주차장 리스트 스타일 컴포넌트
 const StyledListItem = styled(ListItem)(({ theme, highlighted }) => ({
-  marginBottom: theme.spacing(2),
-  backgroundColor: highlighted ? theme.palette.action.selected : 'inherit',
+  marginBottom: theme.spacing(2),//마진 추가
+  backgroundColor: highlighted ? theme.palette.action.selected : 'inherit',//배경 색 설정
+  border: '2px solid #000', // 테두리 추가
   '&:hover': {
-    backgroundColor: theme.palette.action.hover,
+    backgroundColor: theme.palette.action.hover,//마우스 오버 시 배경 색 변경
   },
 }));
 
-const ParkingLotList = ({ parkingLots, onMouseOverListItem, onMouseOutListItem, onClickListItem, highlightedLot, onRadiusIncrease, mapCenter }) => {
-  const [showRadiusAlert, setShowRadiusAlert] = useState(false);
-  const [sortBy, setSortBy] = useState('distance');
-  const [sortedParkingLots, setSortedParkingLots] = useState([]);
+//주차장 리스트 컴포넌트
+const ParkingLotList = ({ parkingLots, onMouseOverListItem, onMouseOutListItem, onClickListItem, highlightedLot, onRadiusIncrease, mapCenter, currentRadius }) => {
+  const [showRadiusAlert, setShowRadiusAlert] = useState(false);//반경 알림 상태 초기화
+  const [sortBy, setSortBy] = useState('distance');//정렬 기준 상태 초기화
+  const [sortedParkingLots, setSortedParkingLots] = useState([]);//정렬된 주차장 상태 초기화
 
+  //주차장 리스트 상태 업데이트
   useEffect(() => {
-    if (parkingLots.length <= 2) {
-      setShowRadiusAlert(true);
-    } else {
-      setShowRadiusAlert(false);
+    if (parkingLots.length <= 2) {//주차장 리스트가 2개 이하일 경우
+      setShowRadiusAlert(true);//반경 알림 상태 업데이트
+    } else {//주차장 리스트가 2개 이상일 경우
+      setShowRadiusAlert(false);//반경 알림 상태 업데이트
     }
 
     // 주차장 정렬
     const sortLots = () => {
-      if (!mapCenter || !mapCenter.lat || !mapCenter.lng) {
-        console.warn('mapCenter is not properly defined');
+      if (!mapCenter || typeof mapCenter.lat !== 'number' || typeof mapCenter.lng !== 'number') {
+        console.warn('mapCenter가 올바르게 정의되지 않았습니다:', mapCenter);
         setSortedParkingLots(parkingLots);
         return;
       }
@@ -41,7 +46,6 @@ const ParkingLotList = ({ parkingLots, onMouseOverListItem, onMouseOutListItem, 
           mapCenter.lat, 
           mapCenter.lng
         );
-        console.log(`주차장: ${lot.주차장명}, 거리: ${distance} km`); // 거리 값 콘솔 출력
         return {
           ...lot,
           distance: Math.round(distance * 1000) // km를 m로 변환하고 반올림
@@ -87,11 +91,81 @@ const ParkingLotList = ({ parkingLots, onMouseOverListItem, onMouseOutListItem, 
     return deg * (Math.PI/180)
   }
 
+  // 디바운스 시간을 더 늘립니다
+  const debouncedMouseOver = React.useMemo(
+    () => debounce((lot) => {
+      onMouseOverListItem && onMouseOverListItem(lot);
+    }, 300), // 200ms에서 300ms로 증가
+    [onMouseOverListItem]
+  );
+
+  const debouncedMouseOut = React.useMemo(
+    () => debounce((lot) => {
+      onMouseOutListItem && onMouseOutListItem(lot);
+    }, 300), // 200ms에서 300ms로 증가
+    [onMouseOutListItem]
+  );
+
+  // 메모이제이션된 리스트 아이템 컴포넌트를 최적화합니다
+  const MemoizedListItem = React.memo(({ lot, index }) => {
+    const isHighlighted = highlightedLot && highlightedLot.id === lot.id;
+
+    const handleMouseEnter = React.useCallback(() => {
+      debouncedMouseOver(lot);
+    }, [lot]);
+
+    const handleMouseLeave = React.useCallback(() => {
+      debouncedMouseOut(lot);
+    }, [lot]);
+
+    const handleClick = React.useCallback(() => {
+      onClickListItem && onClickListItem(lot);
+    }, [lot]);
+
+    return (
+      <React.Fragment>
+        <StyledListItem
+          highlighted={isHighlighted}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+          onClick={handleClick}
+        >
+          <Box>
+            <Typography variant="subtitle1">{lot.주차장명}</Typography>
+            <Typography variant="body2">요금: {lot.요금정보}</Typography>
+            <Typography variant="body2">잔여 수: {lot.가능한주차면}</Typography>
+            <Typography variant="body2">거리: {lot.distance}m</Typography>
+            <Box mt={1}>
+              <Button component={Link} to={`/parking-lot/${lot.id}`} variant="outlined" size="small" sx={{ mr: 1 }}>
+                상세 정보
+              </Button>
+              <Button component={Link} to={`/reservation?lotId=${lot.id}`} variant="contained" size="small" sx={{ mr: 1 }}>
+                예약하기
+              </Button>
+              <Button variant="contained" size="small" color="secondary" onClick={(e) => {
+                e.stopPropagation();
+                onClickListItem(lot);
+              }}>
+                길찾기
+              </Button>
+            </Box>
+          </Box>
+        </StyledListItem>
+        {index < sortedParkingLots.length - 1 && <Divider />}
+      </React.Fragment>
+    );
+  }, (prevProps, nextProps) => {
+    return prevProps.lot.id === nextProps.lot.id &&
+           prevProps.index === nextProps.index &&
+           (prevProps.highlightedLot && prevProps.highlightedLot.id) === (nextProps.highlightedLot && nextProps.highlightedLot.id);
+  });
+
   return (
     <ThemeProvider theme={theme}>
       <Paper elevation={3} sx={{ width: '320px', height: 'calc(93vh - 200px)', overflowY: 'auto', position: 'absolute', left: 0, top: '280px', zIndex: 10 }}>
         <Box p={2}>
           <Typography variant="h5" gutterBottom>주차장 리스트</Typography>
+          <Typography variant="body2" gutterBottom>현재 검색 반경: {currentRadius}m</Typography>
           <FormControl fullWidth sx={{ mb: 2 }}>
             <InputLabel>정렬 기준</InputLabel>
             <Select
@@ -113,35 +187,17 @@ const ParkingLotList = ({ parkingLots, onMouseOverListItem, onMouseOutListItem, 
               onClose={() => setShowRadiusAlert(false)}
             >
               <AlertTitle>반경 확장</AlertTitle>
-              반경을 넓혀서 다시 검색하시겠습니까?
+              현재 반경 {currentRadius}m를 확장하여 다시 검색하시겠습니까?
             </Alert>
           )}
           <List>
             {sortedParkingLots.map((lot, index) => (
-              <React.Fragment key={index}>
-                <StyledListItem
-                  highlighted={highlightedLot && highlightedLot.id === lot.id ? true : undefined}
-                  onMouseOver={() => onMouseOverListItem && onMouseOverListItem(lot)}
-                  onMouseOut={() => onMouseOutListItem && onMouseOutListItem(lot)}
-                  onClick={() => onClickListItem && onClickListItem(lot)}
-                >
-                  <Box>
-                    <Typography variant="subtitle1">{lot.주차장명}</Typography>
-                    <Typography variant="body2">요금: {lot.요금정보}</Typography>
-                    <Typography variant="body2">잔여 수: {lot.가능한주차면}</Typography>
-                    <Typography variant="body2">거리: {lot.distance}m</Typography> {/* 거리 표시 추가 */}
-                    <Box mt={1}>
-                      <Button component={Link} to={`/parking-lot/${lot.id}`} variant="outlined" size="small" sx={{ mr: 1 }}>
-                        상세 정보
-                      </Button>
-                      <Button component={Link} to={`/reservation?lotId=${lot.id}`} variant="contained" size="small">
-                        예약하기
-                      </Button>
-                    </Box>
-                  </Box>
-                </StyledListItem>
-                {index < sortedParkingLots.length - 1 && <Divider />}
-              </React.Fragment>
+              <MemoizedListItem 
+                key={lot.id} 
+                lot={lot} 
+                index={index} 
+                highlightedLot={highlightedLot}
+              />
             ))}
           </List>
         </Box>
@@ -150,4 +206,4 @@ const ParkingLotList = ({ parkingLots, onMouseOverListItem, onMouseOutListItem, 
   );
 };
 
-export default ParkingLotList;
+export default React.memo(ParkingLotList);
