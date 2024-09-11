@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useMap } from '../map/MapContext';
+import { useMediaQuery, Button, Box } from '@mui/material';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 const { kakao } = window;
+
+const theme = createTheme();
 
 const IncheonIllegalParkingLayer = ({ incheonIllegalParkingData }) => {
   const { map } = useMap();
@@ -12,6 +16,8 @@ const IncheonIllegalParkingLayer = ({ incheonIllegalParkingData }) => {
     child: false,
     cctv: false
   });
+
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const categoryIcons = {
     fire: 'https://cdn-icons-png.flaticon.com/512/353/353902.png',
@@ -76,54 +82,70 @@ const IncheonIllegalParkingLayer = ({ incheonIllegalParkingData }) => {
   };
 
   return (
-    <div style={{ position: 'absolute', top: 50, left: 320, zIndex: 1000 }}>
-      <button 
-        onClick={toggleAllCategories}
-        style={{ 
-          marginRight: '10px', 
-          backgroundColor: Object.values(visibleCategories).every(value => value) ? '#4CAF50' : '#f44336',
-          color: 'white',
-          border: 'none',
-          padding: '10px 20px',
-          textAlign: 'center',
-          textDecoration: 'none',
-          display: 'inline-block',
-          fontSize: '16px',
-          margin: '4px 2px',
-          cursor: 'pointer',
-          borderRadius: '4px'
-        }}
-      >
-        불법주차 구역 {Object.values(visibleCategories).every(value => value) ? '끄기' : '보기'}
-      </button>
-      {Object.keys(visibleCategories).map(category => (
-        <button 
-          key={category} 
-          onClick={() => toggleCategory(category)}
-          style={{ 
-            marginRight: '10px', 
-            backgroundColor: visibleCategories[category] ? '#4CAF50' : '#f44336',
+    <ThemeProvider theme={theme}>
+      <Box sx={{ 
+        position: 'absolute', 
+        bottom: isMobile ? 70 : 'auto', // 여기를 10에서 20으로 변경
+        top: isMobile ? 'auto' : 50, 
+        left: isMobile ? 10 : 320, 
+        right: isMobile ? 10 : 'auto',
+        zIndex: 1000,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: isMobile ? 'stretch' : 'flex-start',
+        gap: 1
+      }}>
+        <Button 
+          variant="contained"
+          onClick={toggleAllCategories}
+          size={isMobile ? "small" : "medium"}
+          sx={{ 
+            backgroundColor: Object.values(visibleCategories).every(value => value) ? '#4CAF50' : '#f44336',
             color: 'white',
-            border: 'none',
-            padding: '10px 20px',
-            textAlign: 'center',
-            textDecoration: 'none',
-            display: 'inline-block',
-            fontSize: '16px',
-            margin: '4px 2px',
-            cursor: 'pointer',
-            borderRadius: '4px'
+            '&:hover': {
+              backgroundColor: Object.values(visibleCategories).every(value => value) ? '#45a049' : '#da190b',
+            },
+            fontSize: isMobile ? '0.7rem' : '0.875rem',
+            padding: isMobile ? '8px 16px' : '6px 16px',
           }}
         >
-          <img 
-            src={categoryIcons[category]} 
-            alt={category} 
-            style={{ width: '20px', height: '20px', marginRight: '5px', verticalAlign: 'middle' }} 
-          />
-          {category.charAt(0).toUpperCase() + category.slice(1)}
-        </button>
-      ))}
-    </div>
+          불법주차 구역 {Object.values(visibleCategories).every(value => value) ? '끄기' : '보기'}
+        </Button>
+        <Box sx={{ 
+          display: 'flex', 
+          flexDirection: 'row',
+          flexWrap: 'wrap',
+          justifyContent: isMobile ? 'space-between' : 'flex-start',
+          gap: 1
+        }}>
+          {Object.keys(visibleCategories).map(category => (
+            <Button 
+              key={category} 
+              variant="contained"
+              onClick={() => toggleCategory(category)}
+              size={isMobile ? "small" : "medium"}
+              sx={{ 
+                backgroundColor: visibleCategories[category] ? '#4CAF50' : '#f44336',
+                color: 'white',
+                '&:hover': {
+                  backgroundColor: visibleCategories[category] ? '#45a049' : '#da190b',
+                },
+                fontSize: isMobile ? '0.7rem' : '0.875rem',
+                padding: isMobile ? '8px 16px' : '6px 16px',
+                flex: isMobile ? '1 0 30%' : 'none',
+              }}
+            >
+              <img 
+                src={categoryIcons[category]} 
+                alt={category} 
+                style={{ width: isMobile ? '20px' : '20px', height: isMobile ? '20px' : '20px',marginRight: '5px', verticalAlign: 'middle' }} 
+              />
+              {category.charAt(0).toUpperCase() + category.slice(1)}
+            </Button>
+          ))}
+        </Box>
+      </Box>
+    </ThemeProvider>
   );
 };
 

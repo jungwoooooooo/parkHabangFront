@@ -167,63 +167,29 @@ const KakaoMap = ({ center }) => {
       {/* 현재 위치 버튼 */}
       <button 
         onClick={() => moveToCurrentLocation()}
-        className="highlight-button"
-        style={{
-          position: 'absolute',
-          top: '275px',
-          right: '40px',
-          zIndex: 10,
-          padding: '5px',
-          backgroundColor: 'white',
-          border: '1px solid #ccc',
-          borderRadius: '50%',
-          cursor: 'pointer',
-          transition: 'all 0.3s ease',
-          width: '40px',
-          height: '40px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
+        className="highlight-button current-location-button"
         title="현재 위치로 이동"
       >
         <img 
           src="https://cdn-icons-png.flaticon.com/128/67/67335.png" 
           alt="현재 위치" 
-          style={{ width: '80px', height: '80px' }} 
+          className="button-icon"
         />
       </button>
 
       {/* 교통정보 켜기/끄기 버튼 */}
       <button 
         onClick={toggleTraffic}
-        className="highlight-button"
-        style={{
-          position: 'absolute',
-          top: '380px',
-          right: '40px',
-          zIndex: 10,
-          padding: '5px',
-          backgroundColor: 'white',
-          border: '1px solid #ccc',
-          borderRadius: '50%',
-          cursor: 'pointer',
-          transition: 'all 0.3s ease',
-          width: '40px',
-          height: '40px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
+        className="highlight-button traffic-button"
         title={isTrafficVisible ? '교통 정보 끄기' : '교통 정보 켜기'}
       >
         <img 
           src={isTrafficVisible 
-            ? "https://cdn-icons-png.flaticon.com/512/8727/8727737.png"  // 교통정보 켜진 상태 아이콘
-            : "https://cdn-icons-png.flaticon.com/512/8727/8727737.png"  // 교통정보 꺼진 상태 아이콘
+            ? "https://cdn-icons-png.flaticon.com/512/8727/8727737.png"
+            : "https://cdn-icons-png.flaticon.com/512/8727/8727737.png"
           } 
           alt={isTrafficVisible ? '교통 정보 끄기' : '교통 정보 켜기'} 
-          style={{ width: '100px', height: '100px' }} 
+          className="button-icon"
         />
       </button>
     </div>
