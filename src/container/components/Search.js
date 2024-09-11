@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import DaumPostcode from 'react-daum-postcode';
 import Modal from 'react-modal';
 import axios from 'axios';
-import { Box, Button, TextField, Typography, List, ListItem, ListItemText } from '@mui/material';
+import { Box, Button, TextField, Typography, List, ListItem, ListItemText, useTheme, useMediaQuery } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import '../css/Search.css'; // CSS 파일 경로 수정
 
+// 주소 검색 컨테이너
 const Container = styled(Box)(({ theme }) => ({
     position: 'absolute',
     top: '50px',
@@ -18,18 +19,24 @@ const Container = styled(Box)(({ theme }) => ({
     zIndex: 1000,
     width: '300px',
     [theme.breakpoints.down('sm')]: {
-        width: '30%', // 모바일 화면에서 너비 조정
-        left: '20%', // 중앙 정렬
-        transform: 'translateX(-50%)', // 중앙 정렬
+        width: 'auto',
+        left: '15%',
+        transform: 'translateX(-50%)',
+        top: '50px',
+        padding: '3px',
+        backgroundColor: 'transparent',
+        boxShadow: 'none',
     },
 }));
 
+// 주소 목록 스타일
 const AddressList = styled(List)(({ theme }) => ({
     marginTop: '8px',
     maxHeight: '120px',
     overflowY: 'auto',
 }));
 
+// 주소 목록 항목 스타일
 const AddressListItem = styled(ListItem)(({ theme }) => ({
     cursor: 'pointer',
     '&:hover': {
@@ -37,10 +44,12 @@ const AddressListItem = styled(ListItem)(({ theme }) => ({
     },
 }));
 
+// 작은 텍스트 스타일
 const SmallTypography = styled(Typography)(({ theme }) => ({
     fontSize: '0.75rem',
 }));
 
+// 작은 텍스트 필드 스타일
 const SmallTextField = styled(TextField)(({ theme }) => ({
     '& .MuiInputBase-input': {
         fontSize: '0.75rem',
@@ -48,12 +57,17 @@ const SmallTextField = styled(TextField)(({ theme }) => ({
     marginBottom: '5px',
 }));
 
+// 주소 검색 컴포넌트
 const SearchPlace = ({ onLocationChange }) => {
     const [zipCode, setZipcode] = useState("");
     const [roadAddress, setRoadAddress] = useState("");
     const [isOpen, setIsOpen] = useState(false);
     const [addressList, setAddressList] = useState([]);
 
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+    // 우편번호 완료 핸들러
     const completeHandler = (data) => {
         console.log('Complete handler data:', data);
         setZipcode(data.zonecode);
@@ -62,6 +76,7 @@ const SearchPlace = ({ onLocationChange }) => {
         searchAddress(data.roadAddress);
     }
 
+    // 주소 검색 함수
     const searchAddress = async (address) => {
         if (address) {
             try {
@@ -90,6 +105,7 @@ const SearchPlace = ({ onLocationChange }) => {
         }
     }
 
+    // 주소 선택 핸들러
     const selectAddress = (address) => {
         const { x, y } = address;
         console.log('Selected address:', address);
@@ -99,47 +115,63 @@ const SearchPlace = ({ onLocationChange }) => {
         }
     }
 
+    // 모달 토글 함수
     const toggleModal = () => {
         setIsOpen(!isOpen);
     }
 
+    // 렌더링
     return (
         <Container>
-            <SmallTypography variant="h6" gutterBottom>
-                주소 검색
-            </SmallTypography>
-            <SmallTextField
-                fullWidth
-                value={zipCode}
-                readOnly
-                label="우편번호"
-                margin="normal"
-                variant="outlined"
-            />
-            <Button
-                variant="contained"
-                color="primary"
-                fullWidth
-                onClick={toggleModal}
-                style={{ fontSize: '0.625rem' }}
-            >
-                우편번호 검색
-            </Button>
-            <SmallTextField
-                fullWidth
-                value={roadAddress}
-                onChange={(e) => setRoadAddress(e.target.value)}
-                label="도로명 주소"
-                margin="normal"
-                variant="outlined"
-            />
-            <AddressList>
-                {addressList.map((address, index) => (
-                    <AddressListItem key={index} onClick={() => selectAddress(address)}>
-                        <ListItemText primary={address.address_name} />
-                    </AddressListItem>
-                ))}
-            </AddressList>
+            {isMobile ? (
+                <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={toggleModal}
+                    style={{ fontSize: '0.75rem' }}
+                >
+                    우편번호 검색
+                </Button>
+            ) : (
+                <>
+                    <SmallTypography variant="h6" gutterBottom>
+                        주소 검색
+                    </SmallTypography>
+                    <SmallTextField
+                        fullWidth
+                        value={zipCode}
+                        readOnly
+                        label="우편번호"
+                        margin="normal"
+                        variant="outlined"
+                    />
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        fullWidth
+                        onClick={toggleModal}
+                        style={{ fontSize: '0.625rem' }}
+                    >
+                        우편번호 검색
+                    </Button>
+                    <SmallTextField
+                        fullWidth
+                        value={roadAddress}
+                        onChange={(e) => setRoadAddress(e.target.value)}
+                        label="도로명 주소"
+                        margin="normal"
+                        variant="outlined"
+                    />
+                    <AddressList>
+                        {addressList.map((address, index) => (
+                            <AddressListItem key={index} onClick={() => selectAddress(address)}>
+                                <ListItemText primary={address.address_name} />
+                            </AddressListItem>
+                        ))}
+                    </AddressList>
+                </>
+            )}
+            {/* Modal 코드는 그대로 유지 */}
             <Modal
                 isOpen={isOpen}
                 onRequestClose={toggleModal}
