@@ -197,7 +197,7 @@ const ParkingLotLayer = ({ parkingLots }) => {
         } else if (lot.요금정보 === '유료') {
           iconUrl = 'https://github.com/jungwoooooooo/parkpark/blob/master/src/assert/highlighted_paid_marker.png?raw=true';
         } else {
-          iconUrl = 'https://github.com/jungwoooooooo/parkpark/blob/master/src/assert/highlighted_mixed_marker.png?raw=true';
+          iconUrl = 'https://github.com/jungwoooooooo/parkpark/blob/master/src/assert/%ED%98%BC%ED%95%A9_%ED%95%98%EC%9D%B4%EB%9D%BC%EC%9D%B4%ED%8A%B8.png?raw=true';
         }
       } else {
         // 기존 로직
