@@ -31,8 +31,6 @@ const ParkingLotLayer = ({ parkingLots }) => {
   const [userLocation, setUserLocation] = useState(null);
   // 하이라이트 원 상태 관리
   const [highlightCircle, setHighlightCircle] = useState(null);
-  // 호버된 주차장 상태 관리
-  const [hoveredLot, setHoveredLot] = useState(null);
   // 커스텀 오버레이 상태 관리
   const [isOpen, setIsOpen] = useState(false)
   const [hoveredMarker, setHoveredMarker] = useState(null);
@@ -193,9 +191,9 @@ const ParkingLotLayer = ({ parkingLots }) => {
       if (isHighlighted) {
         // 하이라이트된 마커용 이미지 (3가지 종류)
         if (lot.요금정보 === '무료') {
-          iconUrl = 'https://github.com/jungwoooooooo/parkpark/blob/master/src/assert/highlighted_free_marker.png?raw=true';
+          iconUrl = 'https://github.com/jungwoooooooo/parkpark/blob/master/src/assert/%EB%AC%B4%EB%A3%8C_%ED%95%98%EC%9D%B4%EB%9D%BC%EC%9D%B4%ED%8A%B8.png?raw=true';
         } else if (lot.요금정보 === '유료') {
-          iconUrl = 'https://github.com/jungwoooooooo/parkpark/blob/master/src/assert/highlighted_paid_marker.png?raw=true';
+          iconUrl = 'https://github.com/jungwoooooooo/parkpark/blob/master/src/assert/%EC%9C%A0%EB%A3%8C_%ED%95%98%EC%9D%B4%EB%9D%BC%EC%9D%B4%ED%8A%B8.png?raw=true';
         } else {
           iconUrl = 'https://github.com/jungwoooooooo/parkpark/blob/master/src/assert/%ED%98%BC%ED%95%A9_%ED%95%98%EC%9D%B4%EB%9D%BC%EC%9D%B4%ED%8A%B8.png?raw=true';
         }
@@ -220,7 +218,7 @@ const ParkingLotLayer = ({ parkingLots }) => {
   const updateMarkerHighlight = useCallback((lot, highlighted) => {
     if (lot && markerMapRef.current[lot.id]) {
       const marker = markerMapRef.current[lot.id];
-      const size = highlighted ? 60 : 40;
+      const size = highlighted ? 90 : 40;
       const markerImage = createMarkerImage(lot, size, highlighted);
       marker.setImage(markerImage);
       marker.setZIndex(highlighted ? 10 : 0);
@@ -229,7 +227,7 @@ const ParkingLotLayer = ({ parkingLots }) => {
 
   // 마커 및 리스트 아이템 하이라이트 처리 함수
   const handleHighlight = useCallback((lot, highlighted) => {
-    setHoveredLot(highlighted ? lot : null);
+    setHighlightedLot(highlighted ? lot : null);
     updateMarkerHighlight(lot, highlighted);
   }, [updateMarkerHighlight]);
 
@@ -240,10 +238,10 @@ const ParkingLotLayer = ({ parkingLots }) => {
 
   // 마우스 아웃 이벤트 핸들러
   const handleMouseOutListItem = useCallback(() => {
-    if (hoveredLot) {
-      handleHighlight(hoveredLot, false);
+    if (highlightedLot) {
+      handleHighlight(highlightedLot, false);
     }
-  }, [hoveredLot, handleHighlight]);
+  }, [highlightedLot, handleHighlight]);
 
   // 사용자 위치 가져오기
   useEffect(() => {
@@ -293,24 +291,22 @@ const ParkingLotLayer = ({ parkingLots }) => {
   useEffect(() => {
     if (!map || !parkingLots) return;
 
-    markers.forEach(marker => marker.setMap(null));
-    setMarkers([]);
+    // 기존 마커 제거
+    Object.values(markerMapRef.current).forEach(marker => marker.setMap(null));
+    markerMapRef.current = {};
 
-    const clusterer = new kakao.maps.MarkerClusterer({
-      map: map,
-      averageCenter: true,
-      minLevel: 5,
-      minClusterSize: 2,
-    });
-    
-    // 마커 생성
-    const newMarkers = parkingLots
-      .filter(lot => lot.경도 && lot.위도)
-      .map(lot => {
+    // 새 마커 생성
+    parkingLots.forEach(lot => {
+      if (lot.경도 && lot.위도) {
         const position = new kakao.maps.LatLng(lot.위도, lot.경도);
         const markerImage = createMarkerImage(lot);
 
-        const marker = new kakao.maps.Marker({ position, image: markerImage, zIndex: 0 });
+        const marker = new kakao.maps.Marker({ 
+          position, 
+          image: markerImage, 
+          map: map,
+          zIndex: 0 
+        });
 
         kakao.maps.event.addListener(marker, 'click', () => {
           if (activeInfoWindow) {
@@ -327,22 +323,17 @@ const ParkingLotLayer = ({ parkingLots }) => {
           setActiveInfoWindow(infowindow);
         });
 
-        // 마커에 마우스 오버 이벤트 추가
         kakao.maps.event.addListener(marker, 'mouseover', () => {
           handleHighlight(lot, true);
         });
 
-        // 마커에 마우스 아웃 이벤트 추가
         kakao.maps.event.addListener(marker, 'mouseout', () => {
           handleHighlight(lot, false);
         });
 
         markerMapRef.current[lot.id] = marker;
-        return marker;
-      });
-
-    clusterer.addMarkers(newMarkers);
-    setMarkers(newMarkers);
+      }
+    });
 
     const mapEventListeners = [];
 
@@ -414,7 +405,7 @@ const ParkingLotLayer = ({ parkingLots }) => {
       onMouseOverListItem={handleMouseOverListItem} 
       onMouseOutListItem={handleMouseOutListItem} 
       onClickListItem={handleClickListItem}
-      highlightedLot={hoveredLot}
+      highlightedLot={highlightedLot}
       onRadiusIncrease={handleRadiusIncrease}
       mapCenter={mapCenterRef.current}
     />
