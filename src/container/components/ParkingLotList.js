@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { List, ListItem, Typography, Button, Paper, Box, Divider, Alert, AlertTitle } from '@mui/material';
+import { List, ListItem, Typography, Button, Paper, Box, Divider, Alert, AlertTitle, Drawer } from '@mui/material';
 import { styled, ThemeProvider, createTheme } from '@mui/material/styles';
 import { FormControl, InputLabel, Select, MenuItem } from '@mui/material';
-import { debounce } from 'lodash'; // Import debounce from lodash
+import { debounce } from 'lodash';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
-const theme = createTheme(); // 기본 테마 생성
+const theme = createTheme();
 
 //주차장 리스트 스타일 컴포넌트
 const StyledListItem = styled(ListItem)(({ theme, highlighted }) => ({
@@ -22,6 +23,9 @@ const ParkingLotList = ({ parkingLots, onMouseOverListItem, onMouseOutListItem, 
   const [showRadiusAlert, setShowRadiusAlert] = useState(false);//반경 알림 상태 초기화
   const [sortBy, setSortBy] = useState('distance');//정렬 기준 상태 초기화
   const [sortedParkingLots, setSortedParkingLots] = useState([]);//정렬된 주차장 상태 초기화
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   //주차장 리스트 상태 업데이트
   useEffect(() => {
@@ -127,7 +131,7 @@ const ParkingLotList = ({ parkingLots, onMouseOverListItem, onMouseOutListItem, 
     return (
       <React.Fragment>
         <StyledListItem
-          highlighted={isHighlighted}
+          data-highlighted = {isHighlighted ? 'true' : 'false'}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
           onClick={handleClick}
@@ -162,48 +166,89 @@ const ParkingLotList = ({ parkingLots, onMouseOverListItem, onMouseOutListItem, 
            (prevProps.highlightedLot && prevProps.highlightedLot.id) === (nextProps.highlightedLot && nextProps.highlightedLot.id);
   });
 
+  const toggleDrawer = () => {
+    setIsDrawerOpen(!isDrawerOpen);
+  };
+
+  const drawerContent = (
+    <Box p={2}>
+      <Typography variant="h5" gutterBottom>주차장 리스트</Typography>
+      <Typography variant="body2" gutterBottom>현재 검색 반경: {currentRadius}m</Typography>
+      <FormControl fullWidth sx={{ mb: 2 }}>
+        <InputLabel>정렬 기준</InputLabel>
+        <Select
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value)}
+        >
+          <MenuItem value="distance">거리순</MenuItem>
+          <MenuItem value="price">요금순</MenuItem>
+        </Select>
+      </FormControl>
+      {showRadiusAlert && (
+        <Alert 
+          severity="info" 
+          action={
+            <Button color="inherit" size="small" onClick={handleRadiusIncrease}>
+              네
+            </Button>
+          }
+          onClose={() => setShowRadiusAlert(false)}
+        >
+          <AlertTitle>반경 확장</AlertTitle>
+          현재 반경 {currentRadius}m를 확장하여 다시 검색하시겠습니까?
+        </Alert>
+      )}
+      <List>
+        {sortedParkingLots.map((lot, index) => (
+          <MemoizedListItem 
+            key={lot.id} 
+            lot={lot} 
+            index={index} 
+            highlightedLot={highlightedLot}
+          />
+        ))}
+      </List>
+    </Box>
+  );
+
   return (
     <ThemeProvider theme={theme}>
-      <Paper elevation={3} sx={{ width: '320px', height: 'calc(93vh - 200px)', overflowY: 'auto', position: 'absolute', left: 0, top: '280px', zIndex: 10 }}>
-        <Box p={2}>
-          <Typography variant="h5" gutterBottom>주차장 리스트</Typography>
-          <Typography variant="body2" gutterBottom>현재 검색 반경: {currentRadius}m</Typography>
-          <FormControl fullWidth sx={{ mb: 2 }}>
-            <InputLabel>정렬 기준</InputLabel>
-            <Select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-            >
-              <MenuItem value="distance">거리순</MenuItem>
-              <MenuItem value="price">요금순</MenuItem>
-            </Select>
-          </FormControl>
-          {showRadiusAlert && (
-            <Alert 
-              severity="info" 
-              action={
-                <Button color="inherit" size="small" onClick={handleRadiusIncrease}>
-                  네
-                </Button>
-              }
-              onClose={() => setShowRadiusAlert(false)}
-            >
-              <AlertTitle>반경 확장</AlertTitle>
-              현재 반경 {currentRadius}m를 확장하여 다시 검색하시겠습니까?
-            </Alert>
-          )}
-          <List>
-            {sortedParkingLots.map((lot, index) => (
-              <MemoizedListItem 
-                key={lot.id} 
-                lot={lot} 
-                index={index} 
-                highlightedLot={highlightedLot}
-              />
-            ))}
-          </List>
-        </Box>
-      </Paper>
+      {isMobile ? (
+        <>
+          <Button 
+            variant="contained" 
+            onClick={toggleDrawer} 
+            sx={{ position: 'fixed', bottom: 16, left: '50%', transform: 'translateX(-50%)', zIndex: 1000 }}
+          >
+            주차장 리스트 {isDrawerOpen ? '닫기' : '열기'}
+          </Button>
+          <Drawer
+            anchor="bottom"
+            open={isDrawerOpen}
+            onClose={toggleDrawer}
+            sx={{
+              '& .MuiDrawer-paper': {
+                height: '70%',
+                overflow: 'auto',
+              },
+            }}
+          >
+            {drawerContent}
+          </Drawer>
+        </>
+      ) : (
+        <Paper elevation={3} sx={{ 
+          width: '320px', 
+          height: 'calc(93vh - 200px)', 
+          overflowY: 'auto', 
+          position: 'absolute', 
+          left: 0, 
+          top: '280px', 
+          zIndex: 10,
+        }}>
+          {drawerContent}
+        </Paper>
+      )}
     </ThemeProvider>
   );
 };
