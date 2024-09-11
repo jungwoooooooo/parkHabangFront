@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import React, { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { useMap } from '../map/MapContext';
 import ParkingLotList from './ParkingLotList';
 import { getCarDirection } from './getCarDirection';
@@ -21,7 +21,7 @@ const ParkingLotLayer = ({ parkingLots }) => {
   // 반경 반지름 상태 관리
   const [radius, setRadius] = useState(800);
   // 지도 중심 상태 관리
-  const [mapCenter, setMapCenter] = useState({ lat: 37.5665, lng: 126.9780 });
+  const mapCenterRef = useRef({ lat: 37.5665, lng: 126.9780 });
   // 마커 맵 상태 관리
   const [markerMap, setMarkerMap] = useState({});
   // 경로 상태 관리
@@ -30,10 +30,18 @@ const ParkingLotLayer = ({ parkingLots }) => {
   const [userLocation, setUserLocation] = useState(null);
   // 하이라이트 원 상태 관리
   const [highlightCircle, setHighlightCircle] = useState(null);
+  // 호버된 주차장 상태 관리
+  const [hoveredLot, setHoveredLot] = useState(null);
+  // 커스텀 오버레이 상태 관리
+  const [isOpen, setIsOpen] = useState(false)
+  const [hoveredMarker, setHoveredMarker] = useState(null);
+  const [customOverlay, setCustomOverlay] = useState(null);
+
 
   // 정보 창 생성 함수
   const createInfoWindowContent = useCallback((lot) => {
-    return `
+    const content = document.createElement('div');
+    content.innerHTML = `
       <div style="padding:5px; background-color:white; border:1px solid black; border-radius:5px;">
         <div><strong>${lot.주차장명}</strong></div>
         <div>요금: ${lot.요금정보}</div>
@@ -41,9 +49,16 @@ const ParkingLotLayer = ({ parkingLots }) => {
         <div>구분: ${lot.주차장구분}</div>
         <div>운영요일: ${lot.운영요일}</div>
         <div>잔여 수: ${lot.가능한주차면}</div>
-        <button onclick="window.handleFindRoute('${lot.id}')" style="margin-top:5px;">길찾기</button>
       </div>
     `;
+    
+    const button = document.createElement('button');
+    button.textContent = '길찾기';
+    button.style.marginTop = '5px';
+    button.onclick = () => window.handleFindRoute(lot.id);
+    content.querySelector('div').appendChild(button);
+    
+    return content;
   }, []);
 
   // 주차장 선택 시 처리
@@ -120,7 +135,9 @@ const ParkingLotLayer = ({ parkingLots }) => {
       }
     } catch (error) {
       console.error('경로를 가져오는 데 실패했습니다:', error);
-      if (error.message.includes('5 m 이내')) {
+      if (error instanceof TypeError && error.message.includes('insertBefore')) {
+        alert('지도 표시 중 오류가 발생했습니다. 페이지를 새로고침해 주세요.');
+      } else if (error.message.includes('5 m 이내')) {
         alert('출발지와 도착지가 너무 가깝습니다. 다른 주차장을 선택해 주세요.');
       } else if (error.message.includes('사용자 위치를 가져올 수 없습니다')) {
         alert('사용자 위치를 가져올 수 없습니다. 위치 서비스를 확인해 주세요.');
@@ -179,35 +196,37 @@ const ParkingLotLayer = ({ parkingLots }) => {
   }, []);
 
   const updateMarkerHighlight = useCallback((lot, highlighted) => {
-    if (highlightCircle) {
-      highlightCircle.setMap(null);
-      setHighlightCircle(null);
-    }
-
+    setHighlightCircle((prevCircle) => {
+      if (prevCircle) {
+        prevCircle.setMap(null);
+      }
+      return null;
+    });
+  
     if (highlighted && lot && markerMap[lot.id]) {
       const marker = markerMap[lot.id];
       const position = marker.getPosition();
       
       // 하이라이트 원 생성
       const circle = new kakao.maps.Circle({
-        center: position,//중심
-        radius: 28,//반지름
-        strokeWeight: 3,//선 두께
-        strokeColor: '#FA58D0',//선 색상
-        strokeOpacity: 0.8,//선 투명도
-        strokeStyle: 'solid',//선 스타일
-        fillColor: '#FA58D0',//채우기 색상
-        fillOpacity: 0.3//채우기 투명도
+        center: position,
+        radius: 28,
+        strokeWeight: 3,
+        strokeColor: '#FA58D0',
+        strokeOpacity: 0.8,
+        strokeStyle: 'solid',
+        fillColor: '#FA58D0',
+        fillOpacity: 0.3
       });
-
+  
       circle.setMap(map);
       setHighlightCircle(circle);
-
+  
       marker.setZIndex(10);
     } else {
       Object.values(markerMap).forEach(marker => marker.setZIndex(0));
     }
-  }, [map, markerMap, highlightCircle]);
+  }, [map, markerMap, setHighlightCircle]);
 
   // 주차장 선택 시 처리
   const handleMouseOverListItem = useCallback((lot) => {
@@ -249,6 +268,21 @@ const ParkingLotLayer = ({ parkingLots }) => {
     getUserLocation();
   }, [map]);
 
+  const updateVisibleParkingLots = useCallback(() => {
+    if (!map) return;
+    
+    const center = map.getCenter();
+    const circle = new kakao.maps.Circle({ center, radius });
+    const bounds = circle.getBounds();
+
+    const visibleLots = parkingLots.filter(lot => {
+      const position = new kakao.maps.LatLng(lot.위도, lot.경도);
+      return bounds.contain(position);
+    });
+
+    setVisibleParkingLots(visibleLots);
+  }, [map, parkingLots, radius]);
+
   useEffect(() => {
     if (!map || !parkingLots) return;
 
@@ -287,6 +321,36 @@ const ParkingLotLayer = ({ parkingLots }) => {
           setActiveInfoWindow(infowindow);
         });
 
+        // 마커에 마우스 오버 이벤트 추가
+        kakao.maps.event.addListener(marker, 'mouseover', () => {
+          setHoveredLot(lot);
+          setHoveredMarker(marker);
+          
+          // if (customOverlay) {
+          //   customOverlay.setMap(null);
+          // }
+          
+          // const content = `<div style="padding:5px;background-color:white;border-radius:3px;box-shadow:0 2px 5px rgba(0,0,0,0.1);">${lot.주차장명}</div>`;
+          // const overlay = new kakao.maps.CustomOverlay({
+          //   content: content,
+          //   map: map,
+          //   position: marker.getPosition(),
+          //   yAnchor: 1.5
+          // });
+          
+          // setCustomOverlay(overlay);
+        });
+
+        // 마커에 마우스 아웃 이벤트 추가
+        kakao.maps.event.addListener(marker, 'mouseout', () => {
+          setHoveredLot(null);
+          setHoveredMarker(null);
+          if (customOverlay) {
+            customOverlay.setMap(null);
+            setCustomOverlay(null);
+          }
+        });
+
         newMarkerMap[lot.id] = marker;
         return marker;
       });
@@ -294,19 +358,6 @@ const ParkingLotLayer = ({ parkingLots }) => {
     clusterer.addMarkers(newMarkers);
     setMarkers(newMarkers);
     setMarkerMap(newMarkerMap);
-
-    const updateVisibleParkingLots = () => {
-      const center = map.getCenter();
-      const circle = new kakao.maps.Circle({ center, radius });
-      const bounds = circle.getBounds();
-
-      const visibleLots = parkingLots.filter(lot => {
-        const position = new kakao.maps.LatLng(lot.위도, lot.경도);
-        return bounds.contain(position);
-      });
-
-      setVisibleParkingLots(visibleLots);
-    };
 
     const mapEventListeners = [];
 
@@ -332,18 +383,22 @@ const ParkingLotLayer = ({ parkingLots }) => {
           kakao.maps.event.removeListener(listener);
         }
       });
+      if (customOverlay) {
+        customOverlay.setMap(null);
+        setCustomOverlay(null);
+      }
     };
-  }, [map, parkingLots, radius, createMarkerImage, createInfoWindowContent, activeInfoWindow]);
+  }, [map, parkingLots, radius, activeInfoWindow, createInfoWindowContent, updateVisibleParkingLots, customOverlay]);
 
   useEffect(() => {
     if (map) {
       const updateMapCenter = () => {
         const center = map.getCenter();
-        setMapCenter({ lat: center.getLat(), lng: center.getLng() });
+        mapCenterRef.current = { lat: center.getLat(), lng: center.getLng() };
       };
-  
+
       const centerChangedListener = kakao.maps.event.addListener(map, 'center_changed', updateMapCenter);
-  
+
       return () => {
         if (centerChangedListener && kakao.maps.event.removeListener) {
           kakao.maps.event.removeListener(centerChangedListener);
@@ -353,7 +408,11 @@ const ParkingLotLayer = ({ parkingLots }) => {
   }, [map]);
 
   useEffect(() => {
-    updateMarkerHighlight(highlightedLot, !!highlightedLot);
+    if (highlightedLot) {
+      updateMarkerHighlight(highlightedLot, true);
+    } else {
+      updateMarkerHighlight(null, false);
+    }
   }, [highlightedLot, updateMarkerHighlight]);
 
   return (
@@ -362,9 +421,9 @@ const ParkingLotLayer = ({ parkingLots }) => {
       onMouseOverListItem={handleMouseOverListItem} 
       onMouseOutListItem={handleMouseOutListItem} 
       onClickListItem={handleClickListItem}
-      highlightedLot={highlightedLot}
+      highlightedLot={highlightedLot || hoveredLot}
       onRadiusIncrease={handleRadiusIncrease}
-      mapCenter={mapCenter}
+      mapCenter={mapCenterRef.current}
     />
   );
 };
