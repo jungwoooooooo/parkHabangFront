@@ -131,7 +131,7 @@ const ParkingLotList = ({ parkingLots, onMouseOverListItem, onMouseOutListItem, 
     return (
       <React.Fragment>
         <StyledListItem
-          data-highlighted = {isHighlighted ? 'true' : 'false'}
+          data-highlighted={isHighlighted ? 'true' : 'false'}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
           onClick={handleClick}
@@ -150,6 +150,7 @@ const ParkingLotList = ({ parkingLots, onMouseOverListItem, onMouseOutListItem, 
               </Button>
               <Button variant="contained" size="small" color="secondary" onClick={(e) => {
                 e.stopPropagation();
+                console.log('길찾기 버튼 클릭:', lot); // 로그 추가
                 onClickListItem(lot);
               }}>
                 길찾기
