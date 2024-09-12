@@ -5,7 +5,7 @@ import KakaoMap from './map/KakaoMap';
 import SearchPlace from './components/Search';
 import { MapProvider } from './map/MapContext';
 import Header from './components/Header';
-import ParkingLotLayer from './components/ParkingLot';
+import ParkingLotLayer from './components/ParkingLotLayer';
 import IllegalParkingLayer from './components/IllegalParking';
 import ChildrenAreaLayer from './components/ChildrenAreaLayers';
 import FirePlugLayer from './components/FirePugLayer'; // Add this import

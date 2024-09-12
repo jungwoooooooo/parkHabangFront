@@ -36,7 +36,9 @@ const ParkingLotLayer = ({ parkingLots }) => {
   const [hoveredMarker, setHoveredMarker] = useState(null);
   const [customOverlay, setCustomOverlay] = useState(null);
   const [isMapReady, setIsMapReady] = useState(false);
-
+  // 클러스터러 상태 관리
+  const clustererRef = useRef(null);
+  const customOverlaysRef = useRef([]);
 
   // 정보 창 생성 함수
   const createInfoWindowContent = useCallback((lot) => {
@@ -53,7 +55,7 @@ const ParkingLotLayer = ({ parkingLots }) => {
     `;
     
     const findRouteButton = document.createElement('button');
-    findRouteButton.textContent = '길찾기';
+    findRouteButton.textContent = '경로표시';
     findRouteButton.style.marginTop = '5px';
     findRouteButton.onclick = (e) => {
       e.stopPropagation(); // 이벤트 버블링 방지
@@ -88,72 +90,76 @@ const ParkingLotLayer = ({ parkingLots }) => {
   }, [map, activeInfoWindow, createInfoWindowContent]);
 
   // 길찾기 함수
-  const handleFindRoute = useCallback(async (lotId) => {
-    const lot = parkingLots.find(l => l.id === lotId);
-    if (!lot) return;
+  // ... existing code ...
 
-    try {
-      if (!userLocation) {
-        throw new Error("사용자 위치를 가져올 수 없습니다.");
-      }
+const handleFindRoute = useCallback(async (lotId) => {
+  const lot = parkingLots.find(l => l.id === lotId);
+  if (!lot) return;
 
-      // 경로 데이터 가져오기
-      const routeData = await getCarDirection(
-        userLocation,
-        { lat: lot.위도, lng: lot.경도 }
-      );
-      
-      console.log('Route data:', JSON.stringify(routeData, null, 2));
-
-      // 기존 경로가 있다면 제거합니다
-      if (routePath) {
-        routePath.setMap(null);
-      }
-
-      // 경로 데이터가 유효하다면 경로 표시
-      if (routeData.routes && routeData.routes.length > 0 && routeData.routes[0].sections) {
-        const path = routeData.routes[0].sections[0].roads.flatMap(road =>
-          road.vertexes.reduce((acc, coord, index) => {
-            if (index % 2 === 0) {
-              acc.push(new kakao.maps.LatLng(road.vertexes[index + 1], coord));
-            }
-            return acc;
-          }, [])
-        );
-
-        // 경로 표시
-        if (path.length > 0) {
-          const polyline = new kakao.maps.Polyline({
-            path: path,
-            strokeWeight: 5,
-            strokeColor: '#424242',
-            strokeOpacity: 0.7,
-            strokeStyle: 'solid'
-          });
-
-          polyline.setMap(map);
-          setRoutePath(polyline);
-        } else {
-          console.warn('경로 좌표가 없습니다.');
-          alert('경로를 표시할 수 없습니다. 출발지와 도착지가 너무 가깝습니다.');
-        }
-      } else {
-        console.warn('유효한 경로 데이터가 없습니다.');
-        alert('경로를 찾을 수 없습니다. 출발지와 도착지를 확인해 주세요.');
-      }
-    } catch (error) {
-      console.error('경로를 가져오는 데 실패했습니다:', error);
-      if (error instanceof TypeError && error.message.includes('insertBefore')) {
-        alert('지도 표시 중 오류가 발생했습니다. 페이지를 새로고침해 주세요.');
-      } else if (error.message.includes('5 m 이내')) {
-        alert('출발지와 도착지가 너무 가깝습니다. 다른 주차장을 선택해 주세요.');
-      } else if (error.message.includes('사용자 위치를 가져올 수 없습니다')) {
-        alert('사용자 위치를 가져올 수 없습니다. 위치 서비스를 확인해 주세요.');
-      } else {
-        alert('경로를 가져오는 데 실패했습니다. 잠시 후 다시 시도해 주세요.');
-      }
+  try {
+    if (!userLocation) {
+      throw new Error("사용자 위치를 가져올 수 없습니다.");
     }
-  }, [map, userLocation, routePath]);
+
+    // 경로 데이터 가져오기
+    const routeData = await getCarDirection(
+      userLocation,
+      { lat: lot.위도, lng: lot.경도 }
+    );
+    
+    console.log('Route data:', JSON.stringify(routeData, null, 2)); // 경로 데이터 로그 추가
+
+    // 기존 경로가 있다면 제거합니다
+    if (routePath) {
+      routePath.setMap(null);
+    }
+
+    // 경로 데이터가 유효하다면 경로 표시
+    if (routeData.routes && routeData.routes.length > 0 && routeData.routes[0].sections) {
+      const path = routeData.routes[0].sections[0].roads.flatMap(road =>
+        road.vertexes.reduce((acc, coord, index) => {
+          if (index % 2 === 0) {
+            acc.push(new kakao.maps.LatLng(road.vertexes[index + 1], coord));
+          }
+          return acc;
+        }, [])
+      );
+
+      // 경로 표시
+      if (path.length > 0) {
+        const polyline = new kakao.maps.Polyline({
+          path: path,
+          strokeWeight: 5,
+          strokeColor: '#424242',
+          strokeOpacity: 0.7,
+          strokeStyle: 'solid'
+        });
+
+        polyline.setMap(map);
+        setRoutePath(polyline);
+      } else {
+        console.warn('경로 좌표가 없습니다.');
+        alert('경로를 표시할 수 없습니다. 출발지와 도착지가 너무 가깝습니다.');
+      }
+    } else {
+      console.warn('유효한 경로 데이터가 없습니다.');
+      alert('경로를 찾을 수 없습니다. 출발지와 도착지를 확인해 주세요.');
+    }
+  } catch (error) {
+    console.error('경로를 가져오는 데 실패했습니다:', error);
+    if (error instanceof TypeError && error.message.includes('insertBefore')) {
+      alert('지도 표시 중 오류가 발생했습니다. 페이지를 새로고침해 주세요.');
+    } else if (error.message.includes('5 m 이내')) {
+      alert('출발지와 도착지가 너무 가깝습니다. 다른 주차장을 선택해 주세요.');
+    } else if (error.message.includes('사용자 위치를 가져올 수 없습니다')) {
+      alert('사용자 위치를 가져올 수 없습니다. 위치 서비스를 확인해 주세요.');
+    } else {
+      alert('경로를 가져오는 데 실패했습니다. 잠시 후 다시 시도해 주세요.');
+    }
+  }
+}, [map, userLocation, routePath]);
+
+// ... existing code ...
 
   useEffect(() => {
     // 전역 함수로 길찾기 핸들러 추가
@@ -273,7 +279,7 @@ const ParkingLotLayer = ({ parkingLots }) => {
     getUserLocation();
   }, [map, isMapReady]);
 
-  const updateVisibleParkingLots = useCallback(() => {
+  const updateVisibleParkingLots = useCallback(debounce(() => {
     if (!map) return;
     
     const center = map.getCenter();
@@ -286,17 +292,95 @@ const ParkingLotLayer = ({ parkingLots }) => {
     });
 
     setVisibleParkingLots(visibleLots);
-  }, [map, parkingLots, radius]);
+  }, 300), [map, parkingLots, radius]);
+
+  const createCustomOverlay = useCallback((lot) => {
+    const content = document.createElement('div');
+    content.className = 'custom-overlay';
+    content.style.padding = '5px';
+    content.style.borderRadius = '5px';
+    content.style.fontSize = '12px';
+    content.style.fontWeight = 'bold';
+    content.style.textAlign = 'center';
+    content.style.minWidth = '100px';
+    content.style.position = 'relative';  // 상대 위치 설정
+    content.style.bottom = '25px';  // 아래쪽에서 40px 위로 이동
+
+    // 잔여석에 따른 색상 설정
+    let backgroundColor;
+    if (lot.가능한주차면 === '0') {
+      backgroundColor = 'red';
+    } else if (lot.가능한주차면 <= 10) {
+      backgroundColor = 'orange';
+    } else {
+      backgroundColor = 'green';
+    }
+
+    content.style.backgroundColor = backgroundColor;
+    content.style.color = 'white';
+    content.innerHTML = `
+      <div>${lot.주차장명}</div>
+      <div>잔여: ${lot.가능한주차면}</div>
+      <div class="arrow"></div> <!-- 꼬리 추가 -->
+    `;
+
+    // 스타일을 삽입
+    const style = document.createElement('style');
+    style.innerHTML = `
+      .custom-overlay {
+        position: relative; /* 위치 설정 */
+        padding: 10px;
+      }
+      .custom-overlay .arrow {
+        position: absolute;
+        bottom: -10px; /* 꼬리가 오버레이 아래에 위치 */
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 0;
+        border-left: 10px solid transparent;
+        border-right: 10px solid transparent;
+        border-top: 10px solid ${backgroundColor}; /* 배경색과 동일 */
+      }
+    `;
+    document.head.appendChild(style);
+
+    return new kakao.maps.CustomOverlay({
+      content: content,
+      position: new kakao.maps.LatLng(lot.위도, lot.경도),
+      zIndex: 1,
+      yAnchor: 1.0  // y축 앵커 포인트를 오버레이의 하단으로 설정
+    });
+  }, []);
 
   useEffect(() => {
     if (!map || !parkingLots) return;
 
+    // 클러스터러 초기화
+    if (!clustererRef.current) {
+      clustererRef.current = new kakao.maps.MarkerClusterer({
+        map: map,
+        averageCenter: true,
+        minLevel: 2, // 클러스터링을 최소 2개의 마커로 적용
+        disableClickZoom: true,
+      });
+      console.log('클러스터러 초기화 완료');
+    }
+
+    // 클러스터러 클릭 이벤트 추가
+    kakao.maps.event.addListener(clustererRef.current, 'clusterclick', (cluster) => {
+      const level = map.getLevel() - 1;
+      map.setLevel(level, { anchor: cluster.getCenter() });
+    });
+
     // 기존 마커 제거
     Object.values(markerMapRef.current).forEach(marker => marker.setMap(null));
     markerMapRef.current = {};
+    customOverlaysRef.current.forEach(overlay => overlay.setMap(null));
+    customOverlaysRef.current = [];
 
     // 새 마커 생성
-    parkingLots.forEach(lot => {
+    const markers = parkingLots.map(lot => {
       if (lot.경도 && lot.위도) {
         const position = new kakao.maps.LatLng(lot.위도, lot.경도);
         const markerImage = createMarkerImage(lot);
@@ -304,7 +388,6 @@ const ParkingLotLayer = ({ parkingLots }) => {
         const marker = new kakao.maps.Marker({ 
           position, 
           image: markerImage, 
-          map: map,
           zIndex: 0 
         });
 
@@ -332,8 +415,34 @@ const ParkingLotLayer = ({ parkingLots }) => {
         });
 
         markerMapRef.current[lot.id] = marker;
+
+        // 커스텀 오버레이 생성 및 추가
+        const customOverlay = createCustomOverlay(lot);
+        customOverlay.setMap(map);
+        customOverlaysRef.current.push(customOverlay);
+
+        return marker;
       }
-    });
+      return null;
+    }).filter(marker => marker !== null);
+
+    // 클러스터러에 마커 추가
+    clustererRef.current.addMarkers(markers);
+    console.log('마커 클러스터러에 추가 완료:', markers.length);
+
+    // 줌 레벨 변경 시 커스텀 오버레이 표시/숨김 처리
+    const handleZoomChanged = () => {
+      const currentZoom = map.getLevel();
+      customOverlaysRef.current.forEach(overlay => {
+        if (currentZoom > 2) { // 줌 레벨이 5보다 크면 숨김
+          overlay.setMap(null);
+        } else {
+          overlay.setMap(map);
+        }
+      });
+    };
+
+    kakao.maps.event.addListener(map, 'zoom_changed', handleZoomChanged);
 
     const mapEventListeners = [];
 
@@ -366,11 +475,21 @@ const ParkingLotLayer = ({ parkingLots }) => {
         customOverlay.setMap(null);
         setCustomOverlay(null);
       }
+      // 클러스터러에서 마커 제거
+      if (clustererRef.current) {
+        clustererRef.current.clear();
+        console.log('클러스터러 마커 제거 완료');
+      }
       // 클린업 함수
       Object.values(markerMapRef.current).forEach(marker => {
         marker.setMap(null);
       });
       markerMapRef.current = {};
+      // 커스텀 오버레이 제거
+      customOverlaysRef.current.forEach(overlay => overlay.setMap(null));
+      customOverlaysRef.current = [];
+      // 줌 변경 이벤트 리스너 제거
+      kakao.maps.event.removeListener(map, 'zoom_changed', handleZoomChanged);
     };
   }, [map, parkingLots, radius, activeInfoWindow, createInfoWindowContent, updateVisibleParkingLots, customOverlay, handleHighlight]);
 
