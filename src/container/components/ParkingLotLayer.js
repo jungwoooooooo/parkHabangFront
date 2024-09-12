@@ -115,14 +115,16 @@ const handleFindRoute = useCallback(async (lotId) => {
     }
 
     // 경로 데이터가 유효하다면 경로 표시
-    if (routeData.routes && routeData.routes.length > 0 && routeData.routes[0].sections) {
-      const path = routeData.routes[0].sections[0].roads.flatMap(road =>
-        road.vertexes.reduce((acc, coord, index) => {
-          if (index % 2 === 0) {
-            acc.push(new kakao.maps.LatLng(road.vertexes[index + 1], coord));
-          }
-          return acc;
-        }, [])
+    if (routeData && routeData.routes && routeData.routes.length > 0 && routeData.routes[0].sections) {
+      const path = routeData.routes[0].sections.flatMap(section =>
+        section.roads.flatMap(road =>
+          road.vertexes.reduce((acc, coord, index) => {
+            if (index % 2 === 0) {
+              acc.push(new kakao.maps.LatLng(road.vertexes[index + 1], coord));
+            }
+            return acc;
+          }, [])
+        )
       );
 
       // 경로 표시
@@ -137,25 +139,19 @@ const handleFindRoute = useCallback(async (lotId) => {
 
         polyline.setMap(map);
         setRoutePath(polyline);
+        const bounds = new kakao.maps.LatLngBounds();
+        path.forEach(point => bounds.extend(point));
+        map.setBounds(bounds);
       } else {
         console.warn('경로 좌표가 없습니다.');
         alert('경로를 표시할 수 없습니다. 출발지와 도착지가 너무 가깝습니다.');
       }
     } else {
-      console.warn('유효한 경로 데이터가 없습니다.');
-      alert('경로를 찾을 수 없습니다. 출발지와 도착지를 확인해 주세요.');
+      throw new Error('유효한 경로 데이터가 없습니다.');
     }
   } catch (error) {
     console.error('경로를 가져오는 데 실패했습니다:', error);
-    if (error instanceof TypeError && error.message.includes('insertBefore')) {
-      alert('지도 표시 중 오류가 발생했습니다. 페이지를 새로고침해 주세요.');
-    } else if (error.message.includes('5 m 이내')) {
-      alert('출발지와 도착지가 너무 가깝습니다. 다른 주차장을 선택해 주세요.');
-    } else if (error.message.includes('사용자 위치를 가져올 수 없습니다')) {
-      alert('사용자 위치를 가져올 수 없습니다. 위치 서비스를 확인해 주세요.');
-    } else {
-      alert('경로를 가져오는 데 실패했습니다. 잠시 후 다시 시도해 주세요.');
-    }
+    alert(error.message || '경로를 가져오는 데 실패했습니다. 잠시 후 다시 시도해 주세요.');
   }
 }, [map, userLocation, routePath]);
 

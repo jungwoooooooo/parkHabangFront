@@ -1,41 +1,41 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { List, ListItem, Typography, Button, Paper, Box, Divider, Alert, AlertTitle, Drawer } from '@mui/material';
+import { List, ListItem, Typography, Button, Paper, Box, Divider, Alert, AlertTitle, Drawer, Menu, MenuItem, Popover } from '@mui/material';
 import { styled, ThemeProvider, createTheme } from '@mui/material/styles';
-import { FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { FormControl, InputLabel, Select } from '@mui/material';
 import { debounce } from 'lodash';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
 const theme = createTheme();
 
-//주차장 리스트 스타일 컴포넌트
+// 주차장 리스트 스타일 컴포넌트
 const StyledListItem = styled(ListItem)(({ theme, highlighted }) => ({
-  marginBottom: theme.spacing(2),//마진 추가
-  backgroundColor: highlighted ? theme.palette.action.selected : 'inherit',//배경 색 설정
-  border: '2px solid #000', // 테두리 추가
+  marginBottom: theme.spacing(2),
+  backgroundColor: highlighted ? theme.palette.action.selected : 'inherit',
+  border: '2px solid #000',
   '&:hover': {
-    backgroundColor: theme.palette.action.hover,//마우스 오버 시 배경 색 변경
+    backgroundColor: theme.palette.action.hover,
   },
 }));
 
-//주차장 리스트 컴포넌트
+// 주차장 리스트 컴포넌트
 const ParkingLotList = ({ parkingLots, onMouseOverListItem, onMouseOutListItem, onClickListItem, highlightedLot, onRadiusIncrease, mapCenter, currentRadius, userLocation }) => {
-  const [showRadiusAlert, setShowRadiusAlert] = useState(false);//반경 알림 상태 초기화
-  const [sortBy, setSortBy] = useState('distance');//정렬 기준 상태 초기화
-  const [sortedParkingLots, setSortedParkingLots] = useState([]);//정렬된 주차장 상태 초기화
+  const [showRadiusAlert, setShowRadiusAlert] = useState(false);
+  const [sortBy, setSortBy] = useState('distance');
+  const [sortedParkingLots, setSortedParkingLots] = useState([]);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [selectedLot, setSelectedLot] = useState(null);
 
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  //주차장 리스트 상태 업데이트
   useEffect(() => {
-    if (parkingLots.length <= 2) {//주차장 리스트가 2개 이하일 경우
-      setShowRadiusAlert(true);//반경 알림 상태 업데이트
-    } else {//주차장 리스트가 2개 이상일 경우
-      setShowRadiusAlert(false);//반경 알림 상태 업데이트
+    if (parkingLots.length <= 2) {
+      setShowRadiusAlert(true);
+    } else {
+      setShowRadiusAlert(false);
     }
 
-    // 주차장 정렬
     const sortLots = () => {
       const referenceLocation = userLocation || mapCenter;
 
@@ -54,7 +54,7 @@ const ParkingLotList = ({ parkingLots, onMouseOverListItem, onMouseOutListItem, 
         );
         return {
           ...lot,
-          distance: Math.round(distance * 1000) // km를 m로 변환하고 반올림
+          distance: Math.round(distance * 1000)
         };
       }).sort((a, b) => {
         if (sortBy === 'distance') {
@@ -78,9 +78,8 @@ const ParkingLotList = ({ parkingLots, onMouseOverListItem, onMouseOutListItem, 
     setShowRadiusAlert(false);
   };
 
-  // 두 지점 간의 거리를 계산하는 함수
   const calculateDistance = (lat1, lon1, lat2, lon2) => {
-    const R = 6371; // 지구의 반경 (km)
+    const R = 6371;
     const dLat = deg2rad(lat2 - lat1);
     const dLon = deg2rad(lon2 - lon1);
     const a = 
@@ -89,7 +88,7 @@ const ParkingLotList = ({ parkingLots, onMouseOverListItem, onMouseOutListItem, 
       Math.sin(dLon/2) * Math.sin(dLon/2)
     ; 
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-    const d = R * c; // 거리 (km)
+    const d = R * c;
     return d;
   }
 
@@ -97,22 +96,47 @@ const ParkingLotList = ({ parkingLots, onMouseOverListItem, onMouseOutListItem, 
     return deg * (Math.PI/180)
   }
 
-  // 디바운스 시간을 더 늘립니다
   const debouncedMouseOver = React.useMemo(
     () => debounce((lot) => {
       onMouseOverListItem && onMouseOverListItem(lot);
-    }, 300), // 200ms에서 300ms로 증가
+    }, 300),
     [onMouseOverListItem]
   );
 
   const debouncedMouseOut = React.useMemo(
     () => debounce((lot) => {
       onMouseOutListItem && onMouseOutListItem(lot);
-    }, 300), // 200ms에서 300ms로 증가
+    }, 300),
     [onMouseOutListItem]
   );
 
-  // 메모이제이션된 리스트 아이템 컴포넌트를 최적화합니다
+  const handleFindRouteClick = (event, lot) => {
+    setAnchorEl(event.currentTarget);
+    setSelectedLot(lot);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleMapChoice = (mapType) => {
+    if (!selectedLot) return;
+
+    const encodedName = encodeURIComponent(selectedLot.주차장명);
+    let url;
+
+    if (mapType === 'kakao') {
+      url = `https://map.kakao.com/link/to/${encodedName},${selectedLot.위도},${selectedLot.경도}`;
+    } else if (mapType === 'naver') {
+      const startLat = userLocation ? userLocation.lat : mapCenter.lat;
+      const startLng = userLocation ? userLocation.lng : mapCenter.lng;
+      url = `http://map.naver.com/index.nhn?slng=${startLng}&slat=${startLat}&stext=현재위치&elng=${selectedLot.경도}&elat=${selectedLot.위도}&etext=${encodedName}&menu=route`;
+    }
+
+    window.open(url, '_blank');
+    handleClose();
+  };
+
   const MemoizedListItem = React.memo(({ lot, index }) => {
     const isHighlighted = highlightedLot && highlightedLot.id === lot.id;
 
@@ -131,11 +155,11 @@ const ParkingLotList = ({ parkingLots, onMouseOverListItem, onMouseOutListItem, 
     const formatDistance = (distance) => {
       return distance > 1000 ? `${(distance / 1000).toFixed(1)}km` : `${distance}m`;
     };
-    
+
     return (
       <React.Fragment>
         <StyledListItem
-          data-highlighted = {isHighlighted ? 'true' : 'false'}
+          data-highlighted={isHighlighted ? 'true' : 'false'}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
           onClick={handleClick}
@@ -152,10 +176,15 @@ const ParkingLotList = ({ parkingLots, onMouseOverListItem, onMouseOutListItem, 
               <Button component={Link} to={`/reservation?lotId=${lot.id}`} variant="contained" size="small" sx={{ mr: 1 }}>
                 예약하기
               </Button>
-              <Button variant="contained" size="small" color="secondary" onClick={(e) => {
-                e.stopPropagation();
-                onClickListItem(lot);
-              }}>
+              <Button 
+                variant="contained" 
+                size="small" 
+                color="secondary" 
+                onClick={(e) => {
+                  e.stopPropagation(); // 이벤트 버블링 방지
+                  handleFindRouteClick(e, lot);
+                }}
+              >
                 길찾기
               </Button>
             </Box>
@@ -253,6 +282,22 @@ const ParkingLotList = ({ parkingLots, onMouseOverListItem, onMouseOutListItem, 
           {drawerContent}
         </Paper>
       )}
+      <Popover
+        open={Boolean(anchorEl)}
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'left',
+        }}
+      >
+        <MenuItem onClick={() => handleMapChoice('kakao')}>카카오 지도로 보기</MenuItem>
+        <MenuItem onClick={() => handleMapChoice('naver')}>네이버 지도로 보기</MenuItem>
+      </Popover>
     </ThemeProvider>
   );
 };
