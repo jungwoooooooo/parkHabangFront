@@ -128,10 +128,14 @@ const ParkingLotList = ({ parkingLots, onMouseOverListItem, onMouseOutListItem, 
       onClickListItem && onClickListItem(lot);
     }, [lot]);
 
+    const formatDistance = (distance) => {
+      return distance > 1000 ? `${(distance / 1000).toFixed(1)}km` : `${distance}m`;
+    };
+    
     return (
       <React.Fragment>
         <StyledListItem
-          data-highlighted={isHighlighted ? 'true' : 'false'}
+          data-highlighted = {isHighlighted ? 'true' : 'false'}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
           onClick={handleClick}
@@ -140,7 +144,7 @@ const ParkingLotList = ({ parkingLots, onMouseOverListItem, onMouseOutListItem, 
             <Typography variant="subtitle1">{lot.주차장명}</Typography>
             <Typography variant="body2">요금: {lot.요금정보}</Typography>
             <Typography variant="body2">잔여 수: {lot.가능한주차면}</Typography>
-            <Typography variant="body2">거리: {lot.distance}m</Typography>
+            <Typography variant="body2">거리: {formatDistance(lot.distance)}</Typography>
             <Box mt={1}>
               <Button component={Link} to={`/parking-lot/${lot.id}`} variant="outlined" size="small" sx={{ mr: 1 }}>
                 상세 정보
@@ -150,7 +154,6 @@ const ParkingLotList = ({ parkingLots, onMouseOverListItem, onMouseOutListItem, 
               </Button>
               <Button variant="contained" size="small" color="secondary" onClick={(e) => {
                 e.stopPropagation();
-                console.log('길찾기 버튼 클릭:', lot); // 로그 추가
                 onClickListItem(lot);
               }}>
                 길찾기

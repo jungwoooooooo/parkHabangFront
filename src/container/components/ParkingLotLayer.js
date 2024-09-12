@@ -527,6 +527,7 @@ const handleFindRoute = useCallback(async (lotId) => {
       highlightedLot={highlightedLot}
       onRadiusIncrease={handleRadiusIncrease}
       mapCenter={mapCenterRef.current}
+      userLocation={userLocation}
     />
   );
 };
