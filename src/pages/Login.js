@@ -1,14 +1,20 @@
 import React, { useState } from 'react';
 import { TextField, Button, Box, Typography } from '@mui/material';
+import axios from 'axios';
 
 const Login = ({ onLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
-    // 로그인 로직 추가
-    console.log('로그인 시도:', { email, password });
-    onLogin(); // 로그인 성공 시 호출
+  const handleLogin = async () => {
+    try {
+      const response = await axios.post('http://localhost:3000/signin', { email, password });
+      console.log('로그인 성공:', response.data);
+      onLogin(); // 로그인 성공 시 호출
+    } catch (error) {
+      console.error('로그인 실패:', error);
+      alert('로그인 실패. 이메일 또는 비밀번호를 확인해 주세요.');
+    }
   };
 
   return (
