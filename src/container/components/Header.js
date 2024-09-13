@@ -1,10 +1,11 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { AppBar, Toolbar, Typography, Button } from '@mui/material';
 
 // 색상과 스타일을 사용자 정의합니다.
 const customAppBarStyle = {
   backgroundColor: '#E0F2F7', // 헤더 배경 색상
-  height: '50px', // 헤더 높이
+  height: '30px', // 헤더 높이
 };
 
 const customToolbarStyle = {
@@ -27,15 +28,16 @@ const customButtonStyle = {
 
 const Header = () => {
   return (
-    <AppBar position="static" sx={customAppBarStyle}>
-      <Toolbar sx={customToolbarStyle}>
-        <Typography variant="h6" component="div" sx={customTypographyStyle}>
-          Parking service
+    <AppBar position="static">
+      <Toolbar>
+        <Typography variant="h6" style={{ flexGrow: 1 }}>
+          My App
         </Typography>
-        <div>
-          <Button sx={customButtonStyle} style={{ marginRight: '8px' }}>로그인</Button>
-          <Button sx={customButtonStyle}>회원가입</Button>
-        </div>
+        <Link to="/register-parking-lot" style={{ textDecoration: 'none' }}>
+          <Button variant="contained" color="primary">
+            내 주차장 등록하기
+          </Button>
+        </Link>
       </Toolbar>
     </AppBar>
   );

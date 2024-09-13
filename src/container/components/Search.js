@@ -9,8 +9,8 @@ import '../css/Search.css'; // CSS 파일 경로 수정
 // 주소 검색 컨테이너
 const Container = styled(Box)(({ theme }) => ({
     position: 'absolute',
-    top: '50px',
-    left: '160px',
+    top: '10px',
+    left: '50%',
     transform: 'translateX(-50%)',
     backgroundColor: 'rgba(255, 255, 255, 0.8)',
     padding: '5px',
@@ -20,9 +20,9 @@ const Container = styled(Box)(({ theme }) => ({
     width: '300px',
     [theme.breakpoints.down('sm')]: {
         width: 'auto',
-        left: '15%',
+        left: '50%',
         transform: 'translateX(-50%)',
-        top: '50px',
+        top: '10px',
         padding: '3px',
         backgroundColor: 'transparent',
         boxShadow: 'none',
@@ -59,8 +59,6 @@ const SmallTextField = styled(TextField)(({ theme }) => ({
 
 // 주소 검색 컴포넌트
 const SearchPlace = ({ onLocationChange }) => {
-    const [zipCode, setZipcode] = useState("");
-    const [roadAddress, setRoadAddress] = useState("");
     const [isOpen, setIsOpen] = useState(false);
     const [addressList, setAddressList] = useState([]);
 
@@ -70,8 +68,6 @@ const SearchPlace = ({ onLocationChange }) => {
     // 우편번호 완료 핸들러
     const completeHandler = (data) => {
         console.log('Complete handler data:', data);
-        setZipcode(data.zonecode);
-        setRoadAddress(data.roadAddress);
         setIsOpen(false);
         searchAddress(data.roadAddress);
     }
@@ -123,55 +119,14 @@ const SearchPlace = ({ onLocationChange }) => {
     // 렌더링
     return (
         <Container>
-            {isMobile ? (
-                <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={toggleModal}
-                    style={{ fontSize: '0.75rem' }}
-                >
-                    우편번호 검색
-                </Button>
-            ) : (
-                <>
-                    <SmallTypography variant="h6" gutterBottom>
-                        주소 검색
-                    </SmallTypography>
-                    <SmallTextField
-                        fullWidth
-                        value={zipCode}
-                        readOnly
-                        label="우편번호"
-                        margin="normal"
-                        variant="outlined"
-                    />
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        fullWidth
-                        onClick={toggleModal}
-                        style={{ fontSize: '0.625rem' }}
-                    >
-                        우편번호 검색
-                    </Button>
-                    <SmallTextField
-                        fullWidth
-                        value={roadAddress}
-                        onChange={(e) => setRoadAddress(e.target.value)}
-                        label="도로명 주소"
-                        margin="normal"
-                        variant="outlined"
-                    />
-                    <AddressList>
-                        {addressList.map((address, index) => (
-                            <AddressListItem key={index} onClick={() => selectAddress(address)}>
-                                <ListItemText primary={address.address_name} />
-                            </AddressListItem>
-                        ))}
-                    </AddressList>
-                </>
-            )}
-            {/* Modal 코드는 그대로 유지 */}
+            <Button
+                variant="contained"
+                color="primary"
+                onClick={toggleModal}
+                style={{ fontSize: '0.75rem' }}
+            >
+                우편번호 검색
+            </Button>
             <Modal
                 isOpen={isOpen}
                 onRequestClose={toggleModal}

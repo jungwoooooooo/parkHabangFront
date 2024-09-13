@@ -272,11 +272,11 @@ const ParkingLotList = ({ parkingLots, onMouseOverListItem, onMouseOutListItem, 
       ) : (
         <Paper elevation={3} sx={{ 
           width: '320px', 
-          height: 'calc(93vh - 200px)', 
+          height: 'calc(100vh - 60px)', // 화면 높이에서 상단 여백을 뺀 높이
           overflowY: 'auto', 
           position: 'absolute', 
           left: 0, 
-          top: '280px', 
+          top: '60px', // 상단 여백
           zIndex: 10,
         }}>
           {drawerContent}

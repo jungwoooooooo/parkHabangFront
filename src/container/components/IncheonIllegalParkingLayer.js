@@ -85,65 +85,65 @@ const IncheonIllegalParkingLayer = ({ incheonIllegalParkingData }) => {
     <ThemeProvider theme={theme}>
       <Box sx={{ 
         position: 'absolute', 
-        bottom: isMobile ? 70 : 'auto', // 여기를 10에서 20으로 변경
+        bottom: isMobile ? 70 : 'auto', 
         top: isMobile ? 'auto' : 50, 
         left: isMobile ? 10 : 320, 
         right: isMobile ? 10 : 'auto',
         zIndex: 1000,
         display: 'flex',
-        flexDirection: 'column',
-        alignItems: isMobile ? 'stretch' : 'flex-start',
+        flexDirection: 'row', // 한 줄로 배치
+        alignItems: 'center', // 세로 중앙 정렬
         gap: 1
       }}>
         <Button 
           variant="contained"
           onClick={toggleAllCategories}
-          size={isMobile ? "small" : "medium"}
+          size={isMobile ? "medium" : "large"} // 버튼 크기 조정
           sx={{ 
             backgroundColor: Object.values(visibleCategories).every(value => value) ? '#4CAF50' : '#f44336',
             color: 'white',
             '&:hover': {
               backgroundColor: Object.values(visibleCategories).every(value => value) ? '#45a049' : '#da190b',
             },
-            fontSize: isMobile ? '0.7rem' : '0.875rem',
-            padding: isMobile ? '8px 16px' : '6px 16px',
+            fontSize: isMobile ? '1rem' : '1.25rem', // 폰트 크기 조정
+            padding: isMobile ? '12px 24px' : '10px 24px', // 패딩 조정
+            marginTop: '10px', // 버튼을 아래로 내리기
+            borderRadius: '20px', // 둥근 모서리
+            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', // 그림자 추가
+            transition: 'background-color 0.3s ease', // 배경색 전환 효과
+            height: '56px', // 높이 조정
           }}
         >
           불법주차 구역 {Object.values(visibleCategories).every(value => value) ? '끄기' : '보기'}
         </Button>
-        <Box sx={{ 
-          display: 'flex', 
-          flexDirection: 'row',
-          flexWrap: 'wrap',
-          justifyContent: isMobile ? 'space-between' : 'flex-start',
-          gap: 1
-        }}>
-          {Object.keys(visibleCategories).map(category => (
-            <Button 
-              key={category} 
-              variant="contained"
-              onClick={() => toggleCategory(category)}
-              size={isMobile ? "small" : "medium"}
-              sx={{ 
-                backgroundColor: visibleCategories[category] ? '#4CAF50' : '#f44336',
-                color: 'white',
-                '&:hover': {
-                  backgroundColor: visibleCategories[category] ? '#45a049' : '#da190b',
-                },
-                fontSize: isMobile ? '0.7rem' : '0.875rem',
-                padding: isMobile ? '8px 16px' : '6px 16px',
-                flex: isMobile ? '1 0 30%' : 'none',
-              }}
-            >
-              <img 
-                src={categoryIcons[category]} 
-                alt={category} 
-                style={{ width: isMobile ? '20px' : '20px', height: isMobile ? '20px' : '20px',marginRight: '5px', verticalAlign: 'middle' }} 
-              />
-              {category.charAt(0).toUpperCase() + category.slice(1)}
-            </Button>
-          ))}
-        </Box>
+        {Object.keys(visibleCategories).map(category => (
+          <Button 
+            key={category} 
+            variant="contained"
+            onClick={() => toggleCategory(category)}
+            size={isMobile ? "medium" : "large"} // 버튼 크기 조정
+            sx={{ 
+              backgroundColor: visibleCategories[category] ? '#4CAF50' : '#f44336',
+              color: 'white',
+              '&:hover': {
+                backgroundColor: visibleCategories[category] ? '#45a049' : '#da190b',
+              },
+              fontSize: isMobile ? '1rem' : '1.25rem', // 폰트 크기 조정
+              padding: isMobile ? '12px 24px' : '10px 24px', // 패딩 조정
+              borderRadius: '20px', // 둥근 모서리
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', // 그림자 추가
+              transition: 'background-color 0.3s ease', // 배경색 전환 효과
+              marginLeft: '10px', // 버튼 간격 조정
+              height: '56px', // 높이 조정
+            }}
+          >
+            <img 
+              src={categoryIcons[category]} 
+              alt={category} 
+              style={{ width: isMobile ? '30px' : '30px', height: isMobile ? '30px' : '30px', verticalAlign: 'middle' }} // 아이콘 크기 조정
+            />
+          </Button>
+        ))}
       </Box>
     </ThemeProvider>
   );

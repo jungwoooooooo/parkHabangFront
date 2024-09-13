@@ -97,16 +97,8 @@ export default function MapContainer({ setParkingLots }) {
           options={{ level: 3 }}
         />
         <ParkingLotLayer parkingLots={parkingLots} />
-        {/* <IllegalParkingLayer illegalParkingData={illegalParkingData} />
-        <ChildrenAreaLayer childrenAreaData={childrenAreaData} />
-        <FirePlugLayer firePlugData={firePlugData} /> Add FirePlugLayer */}
         <IncheonIllegalParkingLayer incheonIllegalParkingData={incheonIllegalParkingData} />
       </MapProvider>
-      <Box display="flex" justifyContent="center" marginTop="16px">
-        <Link to="/register-parking-lot">
-          <Button variant="contained" color="primary">내 주차장 등록하기</Button>
-        </Link>
-      </Box>
     </div>
   );
 }
