@@ -1,10 +1,12 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { isMobile } from 'react-device-detect';
 import Login from './pages/Login';
 import MapContainer from './container/MapContainer';
 import ParkingLotDetail from './pages/ParkingLotDetail';
 import Reservation from './pages/Reservation';
 import RegisterParkingLot from './pages/RegisterParkingLot';
+import SignupForm from './pages/Signup';
 
 const App = () => {
   // 로그인 상태와 주차장 목록을 관리하는 상태를 생성합니다.
@@ -16,7 +18,9 @@ const App = () => {
     <Router>
       <Routes>
         {/* 로그인 페이지 라우트 */}
-        <Route path="/login" element={isLoggedIn ? <Navigate to="/" /> : <Login onLogin={() => setIsLoggedIn(true)} />} />
+        <Route path="/login" element={isLoggedIn || isMobile ? <Navigate to="/" /> : <Login onLogin={() => setIsLoggedIn(true)} />} />
+        {/* 회원가입 페이지 라우트 */}
+        <Route path="/signup" element={<SignupForm />} />
         {/* 주차장 상세 정보 페이지 라우트 */}
         <Route path="/parking-lot/:id" element={<ParkingLotDetail parkingLots={parkingLots} />} />
         {/* 예약 페이지 라우트 */}
@@ -24,7 +28,7 @@ const App = () => {
         {/* 주차장 등록 페이지 라우트 */}
         <Route path="/register-parking-lot" element={<RegisterParkingLot />} />
         {/* 메인 페이지 라우트 (로그인 여부에 따라 다른 컴포넌트 렌더링) */}
-        <Route path="/" element={isLoggedIn ? <MapContainer setParkingLots={setParkingLots} /> : <Navigate to="/login" />} />
+        <Route path="/" element={isLoggedIn || isMobile ? <MapContainer setParkingLots={setParkingLots} /> : <Navigate to="/login" />} />
       </Routes>
     </Router>
   );
