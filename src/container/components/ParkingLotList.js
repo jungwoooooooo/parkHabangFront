@@ -206,7 +206,7 @@ const ParkingLotList = ({ parkingLots, onMouseOverListItem, onMouseOutListItem, 
   const drawerContent = (
     <Box p={2}>
       <Typography variant="h5" gutterBottom>주차장 리스트</Typography>
-      <Typography variant="body2" gutterBottom>현재 검색 반경: {currentRadius}m</Typography>
+      <Typography variant="body2" gutterBottom>현재 검색 반경: {currentRadius ? `${currentRadius}m` : '정보 없음'}</Typography>
       <FormControl fullWidth sx={{ mb: 2 }}>
         <InputLabel>정렬 기준</InputLabel>
         <Select

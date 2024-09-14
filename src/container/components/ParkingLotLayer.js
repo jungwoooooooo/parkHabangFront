@@ -41,7 +41,13 @@ const ParkingLotLayer = ({ parkingLots }) => {
   const customOverlaysRef = useRef([]);
 
   // 정보 창 생성 함수
+  // ... existing code ...
   const createInfoWindowContent = useCallback((lot) => {
+    if (!lot) {
+      console.error('유효하지 않은 주차장 정보입니다.');
+      return;
+    }
+  
     const content = document.createElement('div');
     content.innerHTML = `
       <div style="padding:5px; background-color:white; border:1px solid black; border-radius:5px;">
@@ -85,6 +91,11 @@ const ParkingLotLayer = ({ parkingLots }) => {
 
   // 주차장 선택 시 처리
   const handleClickListItem = useCallback(async (lot) => {
+    if (!lot) {
+      console.log('선택된 주차장이 없습니다.');
+      return;
+    }
+  
     const position = new kakao.maps.LatLng(lot.위도, lot.경도);
     map.panTo(position, {
       duration: 1000
@@ -194,8 +205,8 @@ const ParkingLotLayer = ({ parkingLots }) => {
   const handleRadiusIncrease = useCallback(() => {
     const newRadius = radius + 200;
     setRadius(newRadius);
-    const level = calculateZoomLevel(newRadius);
-    map.setLevel(level);
+    // const level = calculateZoomLevel(newRadius);
+    // map.setLevel(level);
     const center = map.getCenter();
     map.setCenter(center);
   }, [radius, map]);
@@ -374,7 +385,8 @@ const ParkingLotLayer = ({ parkingLots }) => {
     });
   }, []);
 
-  useEffect(() => {
+  // 마커 및 오버레이 비동기 로드 함수
+  const loadMarkersAndOverlays = useCallback(async () => {
     if (!map || !parkingLots) return;
 
     // 클러스터러 초기화
@@ -382,10 +394,10 @@ const ParkingLotLayer = ({ parkingLots }) => {
       clustererRef.current = new kakao.maps.MarkerClusterer({
         map: map,
         averageCenter: true,
-        minLevel: 2, // 클러스터링을 최소 2개의 마커로 적용
+        minLevel: 2,//줌 레벨 2 이하로 설정
         disableClickZoom: true,
+        minClusterSize: 3
       });
-      console.log('클러스터러 초기화 완료');
     }
 
     // 클러스터러 클릭 이벤트 추가
@@ -449,13 +461,12 @@ const ParkingLotLayer = ({ parkingLots }) => {
 
     // 클러스터러에 마커 추가
     clustererRef.current.addMarkers(markers);
-    console.log('마커 클러스터러에 추가 완료:', markers.length);
 
     // 줌 레벨 변경 시 커스텀 오버레이 표시/숨김 처리
     const handleZoomChanged = () => {
       const currentZoom = map.getLevel();
       customOverlaysRef.current.forEach(overlay => {
-        if (currentZoom > 2) { // 줌 레벨이 5보다 크면 숨김
+        if (currentZoom > 2) {
           overlay.setMap(null);
         } else {
           overlay.setMap(map);
@@ -496,23 +507,22 @@ const ParkingLotLayer = ({ parkingLots }) => {
         customOverlay.setMap(null);
         setCustomOverlay(null);
       }
-      // 클러스터러에서 마커 제거
       if (clustererRef.current) {
         clustererRef.current.clear();
-        console.log('클러스터러 마커 제거 완료');
       }
-      // 클린업 함수
       Object.values(markerMapRef.current).forEach(marker => {
         marker.setMap(null);
       });
       markerMapRef.current = {};
-      // 커스텀 오버레이 제거
       customOverlaysRef.current.forEach(overlay => overlay.setMap(null));
       customOverlaysRef.current = [];
-      // 줌 변경 이벤트 리스너 제거
       kakao.maps.event.removeListener(map, 'zoom_changed', handleZoomChanged);
     };
   }, [map, parkingLots, radius, activeInfoWindow, createInfoWindowContent, updateVisibleParkingLots, customOverlay, handleHighlight]);
+
+  useEffect(() => {
+    loadMarkersAndOverlays();
+  }, [loadMarkersAndOverlays]);
 
   useEffect(() => {
     if (map) {
@@ -549,6 +559,7 @@ const ParkingLotLayer = ({ parkingLots }) => {
       onRadiusIncrease={handleRadiusIncrease}
       mapCenter={mapCenterRef.current}
       userLocation={userLocation}
+      currentRadius={radius}  // radius 값을 currentRadius로 전달
     />
   );
 };
