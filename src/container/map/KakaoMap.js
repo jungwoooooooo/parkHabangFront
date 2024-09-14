@@ -94,26 +94,25 @@ const KakaoMap = ({ center }) => {
           const moveLatLng = new kakao.maps.LatLng(lat, lng);
           
           mapInstance.panTo(moveLatLng);
-  
+
           // 기존 마커 제거
           if (currentLocationMarker) {
             currentLocationMarker.setMap(null);
           }
-  
+
           // 새 마커 생성
           const marker = new kakao.maps.Marker({
             position: moveLatLng,
             map: mapInstance
           });
-  
+
           setCurrentLocationMarker(marker);
-  
-          // 선택적: 인포윈도우 추가
-          const iwContent = '<div style="padding:5px;">현재 위치</div>';
-          const infowindow = new kakao.maps.InfoWindow({
-            content: iwContent
-          });
-          infowindow.open(mapInstance, marker);
+
+          // 인포윈도우 제거
+          // const infowindow = new kakao.maps.InfoWindow({
+          //   content: '' // 인포윈도우 내용 제거
+          // });
+          // infowindow.open(mapInstance, marker);
         },
         (error) => {
           console.error("Error getting current location:", error);

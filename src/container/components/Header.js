@@ -4,8 +4,8 @@ import { AppBar, Toolbar, Typography, Button } from '@mui/material';
 
 // 색상과 스타일을 사용자 정의합니다.
 const customAppBarStyle = {
-  backgroundColor: '#E0F2F7', // 헤더 배경 색상
-  height: '30px', // 헤더 높이
+  backgroundColor: '#CED8F6', // 헤더 배경 색상
+  height: '60px', // 헤더 높이
 };
 
 const customToolbarStyle = {
@@ -17,24 +17,24 @@ const customToolbarStyle = {
 };
 
 const customTypographyStyle = {
-  color: '#333', // 글씨 색상
+  color: '#0000FF', // 글씨 색상을 흰색으로 변경
   flexGrow: 1, // 제목을 가능한 넓게 확장
-  textAlign: 'center', // 제목 중앙 정렬
+  textAlign: 'left', // 제목 중앙 정렬
 };
 
 const customButtonStyle = {
-  color: '#00796B', // 버튼 글씨 색상
+  color: '#FFFFFF', // 버튼 글씨 색상
 };
 
 const Header = () => {
   return (
-    <AppBar position="static">
-      <Toolbar>
-        <Typography variant="h6" style={{ flexGrow: 1 }}>
-          My App
+    <AppBar position="static" style={customAppBarStyle}>
+      <Toolbar style={customToolbarStyle}>
+        <Typography variant="h6" style={customTypographyStyle}>
+          주차 해방
         </Typography>
         <Link to="/register-parking-lot" style={{ textDecoration: 'none' }}>
-          <Button variant="contained" color="primary">
+          <Button variant="contained" color="primary" style={customButtonStyle}>
             내 주차장 등록하기
           </Button>
         </Link>

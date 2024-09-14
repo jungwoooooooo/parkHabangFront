@@ -230,9 +230,9 @@ const ParkingLotLayer = ({ parkingLots }) => {
         if (lot.요금정보 === '무료') {
           iconUrl = 'https://github.com/jungwoooooooo/parkpark/blob/master/src/assert/%EB%AC%B4%EB%A3%8C%ED%95%98%EC%9D%B4%EB%9D%BC%EC%9D%B4%ED%8A%B8%EB%AC%B4%EC%A7%80%EA%B0%9C.png?raw=true';
         } else if (lot.요금정보 === '유료') {
-          iconUrl = 'https://github.com/jungwoooooooo/parkpark/blob/master/src/assert/%EC%9C%A0%EB%A3%8C%ED%95%98%EC%9D%B4%EB%9D%BC%EC%9D%B4%ED%8A%B8%EB%AC%B4%EC%A7%80%EA%B0%9C.png?raw=true';
+          iconUrl = 'https://github.com/jungwoooooooo/parkpark/blob/master/src/assert/%EC%9C%A0%EB%A3%8C%EB%AC%B4%EC%A7%80%EA%B0%9C%EA%B0%9C.png?raw=true';
         } else {
-          iconUrl = 'https://github.com/jungwoooooooo/parkpark/blob/master/src/assert/%ED%98%BC%ED%95%A9%ED%95%98%EC%9D%B4%EB%9D%BC%EC%9D%B4%ED%8A%B8%EB%AC%B4%EC%A7%80%EA%B0%9C.png?raw=true';
+          iconUrl = 'https://github.com/jungwoooooooo/parkpark/blob/master/src/assert/%ED%98%BC%ED%95%A9%EB%AC%B4%EC%A7%80%EA%B0%9C%EA%B0%9C.png?raw=true';
         }
       } else {
         // 기존 로직
