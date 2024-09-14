@@ -57,9 +57,26 @@ const ParkingLotLayer = ({ parkingLots }) => {
     const findRouteButton = document.createElement('button');
     findRouteButton.textContent = '경로표시';
     findRouteButton.style.marginTop = '5px';
-    findRouteButton.onclick = (e) => {
-      e.stopPropagation(); // 이벤트 버블링 방지
-      window.handleFindRoute(lot.id);
+    findRouteButton.onclick = async () => {
+      console.log('경로표시 버튼 클릭됨');
+      
+      // 선택된 주차장이 있는지 확인
+      if (!lot) {
+        console.log('선택된 주차장이 없습니다.');
+        alert('주차장을 선택해주세요.');
+        return;
+      }
+      
+      // id 속성이 있는지 확인
+      if (!lot.id) {
+        console.log('선택된 주차장에 id 속성이 없습니다.');
+        alert('주차장 정보가 올바르지 않습니다.');
+        return;
+      }
+      
+      // 이제 안전하게 id에 접근할 수 있습니다
+      console.log('경로표시 버튼 클릭됨:', lot.id);
+      await handleFindRoute(lot.id);
     };
     content.querySelector('div').appendChild(findRouteButton);
     
@@ -89,77 +106,84 @@ const ParkingLotLayer = ({ parkingLots }) => {
     setActiveInfoWindow(infowindow);
   }, [map, activeInfoWindow, createInfoWindowContent]);
 
-  // 길찾기 함수
-  // ... existing code ...
+  const handleFindRoute = useCallback(async (lotId) => {
+    console.log('handleFindRoute 함수 시작:', lotId);
+    console.log('parkingLots:', parkingLots); // parkingLots 배열 로깅
+    console.log('parkingLots 길이:', parkingLots.length);
+    console.log('parkingLots 첫 번째 항목:', parkingLots[0]);
 
-const handleFindRoute = useCallback(async (lotId) => {
-  const lot = parkingLots.find(l => l.id === lotId);
-  if (!lot) return;
+    // lotId가 문자열인 경우 숫자로 변환
+    const numericLotId = parseInt(lotId, 10);
 
-  try {
-    if (!userLocation) {
-      throw new Error("사용자 위치를 가져올 수 없습니다.");
+    const lot = parkingLots.find(l => {
+      console.log('비교 중:', l.id, typeof l.id, 'vs', lotId, typeof lotId);
+      return l.id === numericLotId || l.id === lotId;
+    });
+
+    if (!lot) {
+      console.log('주차장을 찾을 수 없습니다. ID:', lotId);
+      console.log('주차장 ID 타입:', typeof lotId);
+      console.log('parkingLots의 ID 타입:', typeof parkingLots[0].id);
+      return;
     }
 
-    // 경로 데이터 가져오기
-    const routeData = await getCarDirection(
-      userLocation,
-      { lat: lot.위도, lng: lot.경도 }
-    );
-    
-    console.log('Route data:', JSON.stringify(routeData, null, 2)); // 경로 데이터 로그 추가
+    console.log('찾은 주차장:', lot);
 
-    // 기존 경로가 있다면 제거합니다
-    if (routePath) {
-      routePath.setMap(null);
-    }
-
-    // 경로 데이터가 유효하다면 경로 표시
-    if (routeData && routeData.routes && routeData.routes.length > 0 && routeData.routes[0].sections) {
-      const path = routeData.routes[0].sections.flatMap(section =>
-        section.roads.flatMap(road =>
-          road.vertexes.reduce((acc, coord, index) => {
-            if (index % 2 === 0) {
-              acc.push(new kakao.maps.LatLng(road.vertexes[index + 1], coord));
-            }
-            return acc;
-          }, [])
-        )
-      );
-
-      // 경로 표시
-      if (path.length > 0) {
-        const polyline = new kakao.maps.Polyline({
-          path: path,
-          strokeWeight: 5,
-          strokeColor: '#424242',
-          strokeOpacity: 0.7,
-          strokeStyle: 'solid'
-        });
-
-        polyline.setMap(map);
-        setRoutePath(polyline);
-        const bounds = new kakao.maps.LatLngBounds();
-        path.forEach(point => bounds.extend(point));
-        map.setBounds(bounds);
-      } else {
-        console.warn('경로 좌표가 없습니다.');
-        alert('경로를 표시할 수 없습니다. 출발지와 도착지가 너무 가깝습니다.');
+    try {
+      if (!userLocation) {
+        throw new Error("사용자 위치를 가져올 수 없습니다.");
       }
-    } else {
-      throw new Error('유효한 경로 데이터가 없습니다.');
+  
+      // 경로 데이터 가져오기
+      const { route, path } = await getCarDirection(userLocation, { lat: lot.위도, lng: lot.경도 });
+      
+      console.log('Route data:', JSON.stringify(route, null, 2));
+      console.log('Path data:', JSON.stringify(path, null, 2));
+  
+      // 기존 경로가 있다면 제거합니다
+      if (routePath) {
+        routePath.setMap(null);
+      }
+  
+      // 경로 데이터가 유효한지 확인
+      if (!path || path.length === 0) {
+        throw new Error('유효한 경로 데이터가 없습니다.');
+      }
+  
+      // 경로 좌표 생성
+      const linePath = path.map(coord => new kakao.maps.LatLng(coord[1], coord[0]));
+  
+      // 경로 그리기
+      const polyline = new kakao.maps.Polyline({
+        path: linePath,
+        strokeWeight: 5,
+        strokeColor: '#424242',
+        strokeOpacity: 0.7,
+        strokeStyle: 'solid'
+      });
+  
+      polyline.setMap(map);
+      setRoutePath(polyline);
+  
+      // 경로가 모두 보이도록 지도 범위 조정
+      const bounds = new kakao.maps.LatLngBounds();
+      linePath.forEach(coord => bounds.extend(coord));
+      map.setBounds(bounds);
+  
+      console.log('경로 그리기 완료');
+  
+    } catch (error) {
+      console.error('경로를 가져오는 데 실패했습니다:', error);
+      alert(error.message || '경로를 가져오는 데 실패했습니다. 잠시 후 다시 시도해 주세요.');
     }
-  } catch (error) {
-    console.error('경로를 가져오는 데 실패했습니다:', error);
-    alert(error.message || '경로를 가져오는 데 실패했습니다. 잠시 후 다시 시도해 주세요.');
-  }
-}, [map, userLocation, routePath]);
-
-// ... existing code ...
+  }, [map, userLocation, routePath, parkingLots]);
 
   useEffect(() => {
     // 전역 함수로 길찾기 핸들러 추가
-    window.handleFindRoute = handleFindRoute;
+    window.handleFindRoute = (lotId) => {
+      console.log('전역 handleFindRoute 호출됨:', lotId);
+      handleFindRoute(lotId);
+    }
 
     return () => {
       // 컴포넌트 언마운트 시 전역 함수 제거
@@ -254,6 +278,7 @@ const handleFindRoute = useCallback(async (lotId) => {
           (position) => {
             const lat = position.coords.latitude;
             const lng = position.coords.longitude;
+            console.log('사용자 위치:', { lat, lng });
             setUserLocation({ lat, lng });
             
             // 사용자 위치로 지도 중심 이동
