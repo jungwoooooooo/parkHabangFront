@@ -228,7 +228,7 @@ const ParkingLotLayer = ({ parkingLots }) => {
       if (isHighlighted) {
         // 하이라이트된 마커용 이미지 (3가지 종류)
         if (lot.요금정보 === '무료') {
-          iconUrl = 'https://github.com/jungwoooooooo/parkpark/blob/master/src/assert/%EB%AC%B4%EB%A3%8C_%ED%95%98%EC%9D%B4%EB%9D%BC%EC%9D%B4%ED%8A%B8.png?raw=true';
+          iconUrl = 'https://github.com/jungwoooooooo/parkpark/blob/master/src/assert/%EB%AC%B4%EB%A3%8C%EA%B2%80%EC%9D%80%ED%95%98%EC%9D%B4%EB%9D%BC%EC%9D%B4%ED%8A%B8.png?raw=true';
         } else if (lot.요금정보 === '유료') {
           iconUrl = 'https://github.com/jungwoooooooo/parkpark/blob/master/src/assert/%EC%9C%A0%EB%A3%8C_%ED%95%98%EC%9D%B4%EB%9D%BC%EC%9D%B4%ED%8A%B8.png?raw=true';
         } else {
