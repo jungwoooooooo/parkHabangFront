@@ -40,6 +40,14 @@ const ParkingLotLayer = ({ parkingLots }) => {
   const clustererRef = useRef(null);
   const customOverlaysRef = useRef([]);
 
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (parkingLots && parkingLots.length > 0) {
+      setIsLoading(false);
+    }
+  }, [parkingLots]);
+
   // 정보 창 생성 함수
   // ... existing code ...
   const createInfoWindowContent = useCallback((lot) => {
@@ -119,27 +127,37 @@ const ParkingLotLayer = ({ parkingLots }) => {
 
   const handleFindRoute = useCallback(async (lotId) => {
     console.log('handleFindRoute 함수 시작:', lotId);
-    console.log('parkingLots:', parkingLots); // parkingLots 배열 로깅
-    console.log('parkingLots 길이:', parkingLots.length);
-    console.log('parkingLots 첫 번째 항목:', parkingLots[0]);
-
-    // lotId가 문자열인 경우 숫자로 변환
-    const numericLotId = parseInt(lotId, 10);
-
-    const lot = parkingLots.find(l => {
-      console.log('비교 중:', l.id, typeof l.id, 'vs', lotId, typeof lotId);
-      return l.id === numericLotId || l.id === lotId;
-    });
-
-    if (!lot) {
-      console.log('주차장을 찾을 수 없습니다. ID:', lotId);
-      console.log('주차장 ID 타입:', typeof lotId);
-      console.log('parkingLots의 ID 타입:', typeof parkingLots[0].id);
+    
+    if (isLoading || !parkingLots || parkingLots.length === 0) {
+      console.error('주차장 데이터가 아직 로드되지 않았습니다.');
+      alert('주차장 데이터를 불러오는 중입니다. 잠시 후 다시 시도해 주세요.');
       return;
     }
-
+    
+    console.log('parkingLots:', parkingLots);
+    console.log('parkingLots 길이:', parkingLots.length);
+    
+    console.log('parkingLots 첫 번째 항목:', parkingLots[0]);
+    console.log('찾으려는 lotId:', lotId, 'type:', typeof lotId);
+    
+    // lotId를 문자열과 숫자 모두로 변환하여 비교
+    const stringLotId = String(lotId);
+    const numericLotId = parseInt(lotId, 10);
+    
+    const lot = parkingLots.find(l => {
+      console.log('비교 중:', l.id, typeof l.id, 'vs', stringLotId, numericLotId);
+      return l.id === stringLotId || l.id === numericLotId;
+    });
+    
+    if (!lot) {
+      console.error('주차장을 찾을 수 없습니다. ID:', lotId);
+      console.log('parkingLots의 ID 예시:', parkingLots[0]?.id, 'type:', typeof parkingLots[0]?.id);
+      alert(`선택한 주차장(ID: ${lotId})을 찾을 수 없습니다.`);
+      return;
+    }
+    
     console.log('찾은 주차장:', lot);
-
+  
     try {
       if (!userLocation) {
         throw new Error("사용자 위치를 가져올 수 없습니다.");
@@ -187,7 +205,7 @@ const ParkingLotLayer = ({ parkingLots }) => {
       console.error('경로를 가져오는 데 실패했습니다:', error);
       alert(error.message || '경로를 가져오는 데 실패했습니다. 잠시 후 다시 시도해 주세요.');
     }
-  }, [map, userLocation, routePath, parkingLots]);
+  }, [map, userLocation, routePath, parkingLots, isLoading]);
 
   useEffect(() => {
     // 전역 함수로 길찾기 핸들러 추가
@@ -301,10 +319,15 @@ const ParkingLotLayer = ({ parkingLots }) => {
           (error) => {
             console.error("사용자 위치를 가져오는데 실패했습니다:", error);
             alert("위치 정보를 가져올 수 없습니다. 기본 위치를 사용합니다.");
-          }
+            // 기본 위치 설정
+            setUserLocation({ lat: 37.5665, lng: 126.9780 });
+          },
+          { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
         );
       } else {
         alert("이 브라우저에서는 위치 정보를 지원하지 않습니다.");
+        // 기본 위치 설정
+        setUserLocation({ lat: 37.5665, lng: 126.9780 });
       }
     };
 
@@ -548,6 +571,10 @@ const ParkingLotLayer = ({ parkingLots }) => {
       updateMarkerHighlight(null, false);
     }
   }, [highlightedLot, updateMarkerHighlight]);
+
+  if (isLoading) {
+    return <div>주차장 데이터를 불러오는 중입니다...</div>;
+  }
 
   return (
     <ParkingLotList 
