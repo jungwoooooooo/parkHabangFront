@@ -10,14 +10,14 @@ const Login = ({ onLogin }) => {
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = async () => {
+  const handleLogin = async (e) => {
+    e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:3000/signin', { email, password });
-      console.log('로그인 성공:', response.data);
-      onLogin(); // 로그인 성공 시 호출
+      const response = await axios.post('http://localhost:3000/api/login', { email, password });
+      const userData = response.data;
+      onLogin(userData);
     } catch (error) {
       console.error('로그인 실패:', error);
-      alert('로그인 실패. 이메일 또는 비밀번호를 확인해 주세요.');
     }
   };
 
