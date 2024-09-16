@@ -71,3 +71,8 @@
       height: 40px;
     }
   }
+  
+  /* 추가된 스타일 */
+  .kakao-map-type-control .maptypecontrol .btn_skyview .ico_comm {
+    content: "ㅋㅋ"; /* 원하는 텍스트로 변경 */
+  }

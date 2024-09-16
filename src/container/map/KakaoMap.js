@@ -39,6 +39,14 @@ const KakaoMap = ({ center }) => {
         const mapTypeControl = new kakao.maps.MapTypeControl();
         newMap.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPRIGHT);
 
+        // 스카이뷰 텍스트 변경
+        setTimeout(() => {
+          const skyviewButton = document.querySelector('.maptypecontrol .btn_skyview .ico_comm');
+          if (skyviewButton) {
+            skyviewButton.textContent = '새 텍스트'; // 원하는 텍스트로 변경
+          }
+        }, 1000); // 1초 후에 텍스트 변경 시도
+
         const zoomControl = new kakao.maps.ZoomControl();
         newMap.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
 

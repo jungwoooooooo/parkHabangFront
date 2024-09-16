@@ -38,11 +38,11 @@ const Reservation = ({ parkingLots }) => {
         차량번호: carNumber
       };
 
-      await axios.post('http://localhost:3000/api/reservations', reservationData);
-      
+      await axios.post('http://localhost:3000/reservations', reservationData); // URL 확인
+
       setSnackbarMessage('예약이 성공적으로 완료되었습니다.');
       setOpenSnackbar(true);
-      
+
       setTimeout(() => navigate('/'), 2000);
     } catch (error) {
       console.error('예약 실패:', error);

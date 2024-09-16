@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Box } from '@mui/material';
 import axios from 'axios';
 
 const AdminReservations = () => {
@@ -11,7 +11,7 @@ const AdminReservations = () => {
 
   const fetchReservations = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/api/reservations');
+      const response = await axios.get('http://localhost:3000/reservations'); // URL 확인
       setReservations(response.data);
     } catch (error) {
       console.error('예약 목록 조회 실패:', error);
@@ -20,7 +20,7 @@ const AdminReservations = () => {
 
   const handleCancelReservation = async (id) => {
     try {
-      await axios.delete(`http://localhost:3000/api/reservations/${id}`);
+      await axios.delete(`http://localhost:3000/reservations/${id}`); // URL 확인
       fetchReservations();
     } catch (error) {
       console.error('예약 취소 실패:', error);
@@ -49,7 +49,9 @@ const AdminReservations = () => {
               <TableCell>{new Date(reservation.종료시간).toLocaleString()}</TableCell>
               <TableCell>{reservation.차량번호}</TableCell>
               <TableCell>
-                <Button onClick={() => handleCancelReservation(reservation.id)}>취소</Button>
+                <Box display="flex" justifyContent="flex-start">
+                  <Button onClick={() => handleCancelReservation(reservation.id)} style={{ marginLeft: '-16px' }}>취소</Button>
+                </Box>
               </TableCell>
             </TableRow>
           ))}

@@ -40,7 +40,7 @@ const App = () => {
           <>
             <MapContainer setParkingLots={setParkingLots} />
             {isAdmin && (
-              <Box sx={{ position: 'absolute', top: 10, right: 10, zIndex: 1000 }}>
+              <Box sx={{ position: 'absolute', top: 14, right: 200, zIndex: 1000 }}>
                 <Button 
                   component={Link} 
                   to="/admin/reservations" 

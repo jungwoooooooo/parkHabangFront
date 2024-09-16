@@ -13,9 +13,14 @@ const Login = ({ onLogin }) => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:3000/api/login', { email, password });
+      const response = await axios.post('http://localhost:3000/signin', { email, password });
       const userData = response.data;
-      onLogin(userData);
+      onLogin(userData); // { accessToken: string, isAdmin: boolean } 형태로 반환됨
+      if (userData.email === 'admin') {
+        navigate('/admin-reservations');
+      } else {
+        navigate('/');
+      }
     } catch (error) {
       console.error('로그인 실패:', error);
     }
@@ -80,6 +85,9 @@ const Login = ({ onLogin }) => {
       </Button>
       <Button variant="outlined" color="secondary" onClick={navigateToSignup} style={{ marginTop: '16px' }}>
         회원가입
+      </Button>
+      <Button variant="outlined" color="secondary" onClick={() => navigate('/admin-reservations')} style={{ marginTop: '16px' }}>
+        관리자 페이지
       </Button>
     </Box>
   );
