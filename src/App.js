@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate, Link } from 'react-router-dom';
+import { Route, Routes, Navigate, Link, useNavigate } from 'react-router-dom';
 import { isMobile } from 'react-device-detect';
 import { Box, Button } from '@mui/material';
 import Login from './pages/Login';
@@ -9,9 +9,15 @@ import Reservation from './pages/Reservation';
 import RegisterParkingLot from './pages/RegisterParkingLot';
 import SignupForm from './pages/Signup';
 import AdminReservations from './pages/AdminReservations';
+import Home from './pages/Home';
+import ServiceIntro from './pages/ServiceIntro';
+import Partnership from './pages/Partnership';
+import ParkingShareInfo from './pages/ParkingShareInfo';
+import './App.css'; // 추가된 CSS 파일 import
+import logo from './assert/배경_없는거.png';
+import ReportIllegalParking from './pages/ReportIllegalParking'; // 불법주차 신고 페이지 import
 
 const App = () => {
-  // 로그인 상태와 주차장 목록을 관리하는 상태를 생성합니다.
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
   const [isAdmin, setIsAdmin] = React.useState(false);
   const [parkingLots, setParkingLots] = React.useState([]);
@@ -21,48 +27,59 @@ const App = () => {
     setIsAdmin(userData.isAdmin);
   };
 
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setIsAdmin(false);
+  };
+
+  const navigate = useNavigate();
+
+  const handleExperienceClick = () => {
+    navigate('/map');
+  };
+
   return (
-    // 라우터를 설정하여 각 경로에 대한 컴포넌트를 지정합니다.
-    <Router>
+    <div>
+      <header className="header">
+        <div className="logo-container">
+          <Link to="/"> {/* 로고를 클릭하면 홈으로 이동 */}
+            <img src={logo} alt="로고" className="logo" />
+          </Link>
+        </div>
+        <nav>
+          <ul className="nav-list">
+            <li><Link to="/">홈</Link></li>
+            <li><Link to="/service-intro">서비스 소개</Link></li>
+            <li><Link to="/map">인천 주차장 2D지도</Link></li>
+            <li><Link to="/partnership">제휴/협력</Link></li>
+            <li><Link to="/parking-share-info">주차 공유 안내</Link></li>
+            <li><Link to="/signup">회원가입</Link></li>
+            <li>
+              <Link to="/" onClick={handleLogout} style={{ textDecoration: 'none', color: 'inherit' }}>
+                로그아웃
+              </Link>
+            </li>
+            <li><Link to="/register-parking-lot">주차장 등록</Link></li>
+            <li><Link to="/admin-reservations">관리자 예약</Link></li>
+            <li><Link to="/report-illegal-parking">불법주차 신고</Link></li> {/* 불법주차 신고 링크 추가 */}
+          </ul>
+        </nav>
+      </header>
       <Routes>
-        {/* 로그인 페이지 라우트 */}
-        <Route path="/login" element={isLoggedIn || isMobile ? <Navigate to="/" /> : <Login onLogin={handleLogin} />} />
-        {/* 회원가입 페이지 라우트 */}
+        <Route path="/" element={<Home />} />
+        <Route path="/service-intro" element={<ServiceIntro />} />
+        <Route path="/map" element={<MapContainer setParkingLots={setParkingLots} />} />
+        <Route path="/partnership" element={<Partnership />} />
+        <Route path="/parking-share-info" element={<ParkingShareInfo />} />
         <Route path="/signup" element={<SignupForm />} />
-        {/* 주차장 상세 정보 페이지 라우트 */}
+        <Route path="/login" element={isLoggedIn || isMobile ? <Navigate to="/" /> : <Login onLogin={handleLogin} />} />
         <Route path="/parking-lot/:id" element={<ParkingLotDetail parkingLots={parkingLots} />} />
-        {/* 예약 페이지 라우트 */}
         <Route path="/reservation" element={<Reservation parkingLots={parkingLots} />} />
-        {/* 주차장 등록 페이지 라우트 */}
         <Route path="/register-parking-lot" element={<RegisterParkingLot />} />
-        {/* 메인 페이지 라우트 (로그인 여부에 따라 다른 컴포넌트 렌더링) */}
-        <Route path="/" element={isLoggedIn || isMobile ? (
-          <>
-            <MapContainer setParkingLots={setParkingLots} />
-            {isAdmin && (
-              <Box sx={{ position: 'absolute', top: 14, right: 200, zIndex: 1000 }}>
-                <Button 
-                  component={Link} 
-                  to="/admin/reservations" 
-                  variant="contained" 
-                  color="primary"
-                >
-                  관리자 페이지
-                </Button>
-              </Box>
-            )}
-          </>
-        ) : (
-          <Navigate to="/login" />
-        )} />
-        
-        {/* 관리자 예약 관리 페이지 라우트 */}
-        <Route 
-          path="/admin/reservations" 
-          element={isAdmin ? <AdminReservations /> : <Navigate to="/" />} 
-        />
+        <Route path="/admin-reservations" element={isAdmin ? <AdminReservations /> : <Navigate to="/" />} />
+        <Route path="/report-illegal-parking" element={<ReportIllegalParking />} /> {/* 불법주차 신고 라우트 추가 */}
       </Routes>
-    </Router>
+    </div>
   );
 };
 

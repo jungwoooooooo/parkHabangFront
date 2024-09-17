@@ -9,7 +9,7 @@ import '../css/Search.css'; // CSS 파일 경로 수정
 // 주소 검색 컨테이너
 const Container = styled(Box)(({ theme }) => ({
     position: 'absolute',
-    top: '10px',
+    top: '100px', // 기존 '10px'에서 '50px'으로 변경
     left: '50%',
     transform: 'translateX(-50%)',
     backgroundColor: 'rgba(255, 255, 255, 0.8)',

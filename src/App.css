@@ -1,3 +1,86 @@
-.App {
+.header {
+  display: flex;
+  align-items: center;
+  background-color: #333;
+  padding: 10px 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  animation: slideIn 0.5s ease-out;
+}
+
+.logo-container {
+  display: inline-block;
+  flex: 1;
+}
+
+.logo {
+  width: 130px; /* 원하는 크기로 변경 */
+  height: auto; /* 비율을 유지하면서 크기 조정 */
+}
+
+.nav-list {
+  list-style: none;
+  display: flex;
+  justify-content: space-around;
+  padding: 0;
+  margin: 0;
+  flex: 3;
+}
+
+.nav-list li {
+  display: inline;
+  margin: 0 15px;
+  font-size: 18px; /* 원하는 글자 크기로 조정 */
+}
+
+.nav-list li a {
+  color: white;
+  text-decoration: none;
+  font-size: 18px;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.nav-list li a:hover {
+  color: #ff6347; /* 호버 시 색상 변경 */
+  transform: scale(1.1); /* 호버 시 크기 확대 */
+}
+
+.main-content {
   text-align: center;
+  padding: 50px 20px;
+}
+
+.main-content h1 {
+  font-size: 2.5em;
+  margin-bottom: 20px;
+}
+
+.main-content p {
+  font-size: 1.2em;
+  margin-bottom: 40px;
+}
+
+.main-content .cta-button {
+  background-color: #007bff;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1em;
+  cursor: pointer;
+}
+
+.main-content .cta-button:hover {
+  background-color: #0056b3;
+}
+
+/* 애니메이션 추가 */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

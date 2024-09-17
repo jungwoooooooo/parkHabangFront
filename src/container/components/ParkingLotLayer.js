@@ -44,7 +44,10 @@ const ParkingLotLayer = ({ parkingLots }) => {
 
   useEffect(() => {
     if (parkingLots && parkingLots.length > 0) {
+      // '소재지지번주소'가 null이 아니고 '인천'이 포함된 경우에만 필터링
+      const filteredParkingLots = parkingLots.filter(lot => lot.소재지지번주소 && lot.소재지지번주소.includes('인천'));
       setIsLoading(false);
+      setVisibleParkingLots(filteredParkingLots); // 필터링된 데이터로 상태 업데이트
     }
   }, [parkingLots]);
 
@@ -127,31 +130,20 @@ const ParkingLotLayer = ({ parkingLots }) => {
 
   const handleFindRoute = useCallback(async (lotId) => {
     console.log('handleFindRoute 함수 시작:', lotId);
+    console.log('현재 parkingLots:', parkingLots); // 로그 추가
     
-    if (isLoading || !parkingLots || parkingLots.length === 0) {
-      console.error('주차장 데이터가 아직 로드되지 않았습니다.');
-      alert('주차장 데이터를 불러오는 중입니다. 잠시 후 다시 시도해 주세요.');
+    if (!parkingLots || parkingLots.length === 0) {
+      console.error('주차장 데이터가 없습니다.');
+      alert('주차장 데이터를 불러올 수 없습니다. 페이지를 새로고침 해주세요.');
       return;
     }
     
-    console.log('parkingLots:', parkingLots);
-    console.log('parkingLots 길이:', parkingLots.length);
-    
-    console.log('parkingLots 첫 번째 항목:', parkingLots[0]);
-    console.log('찾으려는 lotId:', lotId, 'type:', typeof lotId);
-    
-    // lotId를 문자열과 숫자 모두로 변환하여 비교
+    // lotId를 문자열로 변환하여 비교
     const stringLotId = String(lotId);
-    const numericLotId = parseInt(lotId, 10);
-    
-    const lot = parkingLots.find(l => {
-      console.log('비교 중:', l.id, typeof l.id, 'vs', stringLotId, numericLotId);
-      return l.id === stringLotId || l.id === numericLotId;
-    });
+    const lot = parkingLots.find(l => String(l.id) === stringLotId);
     
     if (!lot) {
       console.error('주차장을 찾을 수 없습니다. ID:', lotId);
-      console.log('parkingLots의 ID 예시:', parkingLots[0]?.id, 'type:', typeof parkingLots[0]?.id);
       alert(`선택한 주차장(ID: ${lotId})을 찾을 수 없습니다.`);
       return;
     }
@@ -205,7 +197,11 @@ const ParkingLotLayer = ({ parkingLots }) => {
       console.error('경로를 가져오는 데 실패했습니다:', error);
       alert(error.message || '경로를 가져오는 데 실패했습니다. 잠시 후 다시 시도해 주세요.');
     }
-  }, [map, userLocation, routePath, parkingLots, isLoading]);
+  }, [map, userLocation, routePath, parkingLots]);
+
+  useEffect(() => {
+    console.log('parkingLots 업데이트됨:', parkingLots); // 로그 추가
+  }, [parkingLots]);
 
   useEffect(() => {
     // 전역 함수로 길찾기 핸들러 추가
