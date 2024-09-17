@@ -16,6 +16,7 @@ import ParkingShareInfo from './pages/ParkingShareInfo';
 import './App.css'; // 추가된 CSS 파일 import
 import logo from './assert/배경_없는거.png';
 import ReportIllegalParking from './pages/ReportIllegalParking'; // 불법주차 신고 페이지 import
+import VWorldMap from './pages/VWorldMap'; // VWorldMap 페이지 import
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
@@ -62,6 +63,7 @@ const App = () => {
             <li><Link to="/register-parking-lot">주차장 등록</Link></li>
             <li><Link to="/admin-reservations">관리자 예약</Link></li>
             <li><Link to="/report-illegal-parking">불법주차 신고</Link></li> {/* 불법주차 신고 링크 추가 */}
+            <li><Link to="/vworld-map">3D 주차장 지도</Link></li> {/* 3D 주차장 지도 링크 추가 */}
           </ul>
         </nav>
       </header>
@@ -78,6 +80,7 @@ const App = () => {
         <Route path="/register-parking-lot" element={<RegisterParkingLot />} />
         <Route path="/admin-reservations" element={isAdmin ? <AdminReservations /> : <Navigate to="/" />} />
         <Route path="/report-illegal-parking" element={<ReportIllegalParking />} /> {/* 불법주차 신고 라우트 추가 */}
+        <Route path="/vworld-map" element={<VWorldMap />} /> {/* 3D 주차장 지도 라우트 추가 */}
       </Routes>
     </div>
   );
