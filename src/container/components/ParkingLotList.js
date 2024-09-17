@@ -276,7 +276,7 @@ const ParkingLotList = ({ parkingLots, onMouseOverListItem, onMouseOutListItem, 
           overflowY: 'auto', 
           position: 'absolute', 
           left: 0, 
-          top: '148px', // 상단 여백
+          top: '160px', // 상단 여백
           zIndex: 10,
           maxHeight: 'calc(100vh - 60px)', // 최대 높이 설정
         }}>
