@@ -17,6 +17,7 @@ import './App.css'; // 추가된 CSS 파일 import
 import logo from './assert/배경_없는거.png';
 import ReportIllegalParking from './pages/ReportIllegalParking'; // 불법주차 신고 페이지 import
 import VWorldMap from './pages/VWorldMap'; // VWorldMap 페이지 import
+import MyParkingLots from './pages/MyParkingLots'; // MyParkingLots 페이지 import
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
@@ -54,16 +55,22 @@ const App = () => {
             <li><Link to="/map">인천 주차장 2D지도</Link></li>
             <li><Link to="/partnership">제휴/협력</Link></li>
             <li><Link to="/parking-share-info">주차 공유 안내</Link></li>
-            <li><Link to="/signup">회원가입</Link></li>
-            <li>
-              <Link to="/" onClick={handleLogout} style={{ textDecoration: 'none', color: 'inherit' }}>
-                로그아웃
-              </Link>
-            </li>
-            <li><Link to="/register-parking-lot">주차장 등록</Link></li>
-            <li><Link to="/admin-reservations">관리자 예약</Link></li>
-            <li><Link to="/report-illegal-parking">불법주차 신고</Link></li> {/* 불법주차 신고 링크 추가 */}
-            <li><Link to="/vworld-map">3D 주차장 지도</Link></li> {/* 3D 주차장 지도 링크 추가 */}
+            {isLoggedIn ? (
+              <>
+                <li>
+                  <Link to="/" onClick={handleLogout} style={{ textDecoration: 'none', color: 'inherit' }}>
+                    로그아웃
+                  </Link>
+                </li>
+                <li><Link to="/register-parking-lot">주차장 등록</Link></li>
+                {isAdmin && <li><Link to="/admin-reservations">예약 관리 페이지</Link></li>}
+                <li><Link to="/report-illegal-parking">불법주차 신고</Link></li> {/* 불법주차 신고 링크 추가 */}
+                <li><Link to="/vworld-map">3D 주차장 지도</Link></li> {/* 3D 주차장 지도 링크 추가 */}
+                <li><Link to="/my-parking-lots">내 주차장 관리</Link></li> {/* 내 주차장 관리 링크 추가 */}
+              </>
+            ) : (
+              <li><Link to="/login">로그인</Link></li>
+            )}
           </ul>
         </nav>
       </header>
@@ -81,6 +88,7 @@ const App = () => {
         <Route path="/admin-reservations" element={isAdmin ? <AdminReservations /> : <Navigate to="/" />} />
         <Route path="/report-illegal-parking" element={<ReportIllegalParking />} /> {/* 불법주차 신고 라우트 추가 */}
         <Route path="/vworld-map" element={<VWorldMap />} /> {/* 3D 주차장 지도 라우트 추가 */}
+        <Route path="/my-parking-lots" element={<MyParkingLots />} /> {/* 내 주차장 관리 라우트 추가 */}
       </Routes>
     </div>
   );

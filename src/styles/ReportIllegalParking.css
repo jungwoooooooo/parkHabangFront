@@ -1,0 +1,13 @@
+.center-content {
+    text-align: center;
+  }
+  
+  .center-image {
+    display: block;
+    margin: 0 auto;
+  }
+  
+  .no-bullets {
+    list-style-type: none;
+    padding: 0;
+  }
