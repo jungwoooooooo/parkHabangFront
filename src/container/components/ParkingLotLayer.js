@@ -3,9 +3,23 @@ import { useMap } from '../map/MapContext';
 import ParkingLotList from './ParkingLotList';
 import { getCarDirection } from './getCarDirection';
 import { debounce } from 'lodash';
+import { Card, CardContent, Typography, Button, Box } from '@mui/material';
+import { styled } from '@mui/system';
+import ReactDOM from 'react-dom';
 
 // 카카오맵 초기화
 const { kakao } = window;
+
+// 스타일된 컴포넌트 정의
+const StyledCard = styled(Card)({
+  minWidth: 275,
+  maxWidth: 350,
+  boxShadow: '0 3px 5px 2px rgba(0, 0, 0, .3)',
+});
+
+const StyledButton = styled(Button)({
+  margin: '5px',
+});
 
 // 주차장 레이어 컴포넌트
 const ParkingLotLayer = ({ parkingLots }) => {
@@ -52,7 +66,6 @@ const ParkingLotLayer = ({ parkingLots }) => {
   }, [parkingLots]);
 
   // 정보 창 생성 함수
-  // ... existing code ...
   const createInfoWindowContent = useCallback((lot) => {
     if (!lot) {
       console.error('유효하지 않은 주차장 정보입니다.');
@@ -60,43 +73,43 @@ const ParkingLotLayer = ({ parkingLots }) => {
     }
   
     const content = document.createElement('div');
-    content.innerHTML = `
-      <div style="padding:5px; background-color:white; border:1px solid black; border-radius:5px;">
-        <div><strong>${lot.주차장명}</strong></div>
-        <div>요금: ${lot.요금정보}</div>
-        <div>기본 요금: ${lot.주차기본요금}</div>
-        <div>구분: ${lot.주차장구분}</div>
-        <div>운영요일: ${lot.운영요일}</div>
-        <div>잔여 수: ${lot.가능한주차면}</div>
-      </div>
-    `;
-    
-    const findRouteButton = document.createElement('button');
-    findRouteButton.textContent = '경로표시';
-    findRouteButton.style.marginTop = '5px';
-    findRouteButton.onclick = async () => {
-      console.log('경로표시 버튼 클릭됨');
-      
-      // 선택된 주차장이 있는지 확인
-      if (!lot) {
-        console.log('선택된 주차장이 없습니다.');
-        alert('주차장을 선택해주세요.');
-        return;
-      }
-      
-      // id 속성이 있는지 확인
-      if (!lot.id) {
-        console.log('선택된 주차장에 id 속성이 없습니다.');
-        alert('주차장 정보가 올바르지 않습니다.');
-        return;
-      }
-      
-      // 이제 안전하게 id에 접근할 수 있습니다
-      console.log('경로표시 버튼 클릭됨:', lot.id);
-      await handleFindRoute(lot.id);
-    };
-    content.querySelector('div').appendChild(findRouteButton);
-    
+    ReactDOM.render(
+      <StyledCard>
+        <CardContent>
+          <Typography variant="h6" component="div" gutterBottom>
+            {lot.주차장명}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            요금: {lot.요금정보}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            기본 요금: {lot.주차기본요금}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            구분: {lot.주차장구분}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            운영요일: {lot.운영요일}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            잔여 수: {lot.가능한주차면}
+          </Typography>
+          <Box mt={2}>
+            <StyledButton variant="contained" color="primary" size="small" onClick={() => console.log('상세 정보')}>
+              상세 정보
+            </StyledButton>
+            <StyledButton variant="contained" color="secondary" size="small" onClick={() => console.log('예약하기')}>
+              예약하기
+            </StyledButton>
+            <StyledButton variant="contained" color="info" size="small" onClick={() => window.handleFindRoute(lot.id)}>
+              경로표시
+            </StyledButton>
+          </Box>
+        </CardContent>
+      </StyledCard>,
+      content
+    );
+
     return content;
   }, []);
 
