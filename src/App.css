@@ -44,6 +44,35 @@
   transform: scale(1.1); /* 호버 시 크기 확대 */
 }
 
+.nav-list .dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.nav-list .dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.nav-list .dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.nav-list .dropdown-content a:hover {
+  background-color: #f1f1f1;
+}
+
+.nav-list .dropdown:hover .dropdown-content {
+  display: block;
+}
+
 .main-content {
   text-align: center;
   padding: 50px 20px;
@@ -83,4 +112,8 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.centered-content {
+  text-align: center;
 }

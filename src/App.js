@@ -18,6 +18,8 @@ import logo from './assert/배경_없는거.png';
 import ReportIllegalParking from './pages/ReportIllegalParking'; // 불법주차 신고 페이지 import
 import VWorldMap from './pages/VWorldMap'; // VWorldMap 페이지 import
 import MyParkingLots from './pages/MyParkingLots'; // MyParkingLots 페이지 import
+import IllegalParkingInfo from './pages/IllegalParkingInfo'; // 불법주차 구역 정보 페이지 import
+import MileageInfo from './pages/MileageInfo'; // 마일리지 정보 페이지 import
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
@@ -54,7 +56,14 @@ const App = () => {
             <li><Link to="/service-intro">서비스 소개</Link></li>
             <li><Link to="/map">인천 주차장 2D지도</Link></li>
             <li><Link to="/partnership">제휴/협력</Link></li>
-            <li><Link to="/parking-share-info">주차 공유 안내</Link></li>
+            <li className="dropdown">
+              <span>주차 대여 서비스</span>
+              <div className="dropdown-content">
+                <Link to="/parking-share-info">주차 공유 안내</Link>
+                <Link to="/register-parking-lot">주차장 등록</Link>
+                <Link to="/my-parking-lots">내 주차장 관리</Link>
+              </div>
+            </li>
             {isLoggedIn ? (
               <>
                 <li>
@@ -62,11 +71,16 @@ const App = () => {
                     로그아웃
                   </Link>
                 </li>
-                <li><Link to="/register-parking-lot">주차장 등록</Link></li>
                 {isAdmin && <li><Link to="/admin-reservations">예약 관리 페이지</Link></li>}
-                <li><Link to="/report-illegal-parking">불법주차 신고</Link></li> {/* 불법주차 신고 링크 추가 */}
-                <li><Link to="/vworld-map">3D 주차장 지도</Link></li> {/* 3D 주차장 지도 링크 추가 */}
-                <li><Link to="/my-parking-lots">내 주차장 관리</Link></li> {/* 내 주차장 관리 링크 추가 */}
+                <li className="dropdown">
+                  <span>불법주차</span>
+                  <div className="dropdown-content">
+                    <Link to="/report-illegal-parking">불법주차 신고</Link>
+                    <Link to="/illegal-parking-info">불법주차 구역 정보</Link>
+                    <Link to="/mileage-info">신고 마일리지 정보</Link>
+                  </div>
+                </li>
+                <li><Link to="/vworld-map">3D 주차장 지도</Link></li>
               </>
             ) : (
               <li><Link to="/login">로그인</Link></li>
@@ -74,22 +88,26 @@ const App = () => {
           </ul>
         </nav>
       </header>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/service-intro" element={<ServiceIntro />} />
-        <Route path="/map" element={<MapContainer setParkingLots={setParkingLots} />} />
-        <Route path="/partnership" element={<Partnership />} />
-        <Route path="/parking-share-info" element={<ParkingShareInfo />} />
-        <Route path="/signup" element={<SignupForm />} />
-        <Route path="/login" element={isLoggedIn || isMobile ? <Navigate to="/" /> : <Login onLogin={handleLogin} />} />
-        <Route path="/parking-lot/:id" element={<ParkingLotDetail parkingLots={parkingLots} />} />
-        <Route path="/reservation" element={<Reservation parkingLots={parkingLots} />} />
-        <Route path="/register-parking-lot" element={<RegisterParkingLot />} />
-        <Route path="/admin-reservations" element={isAdmin ? <AdminReservations /> : <Navigate to="/" />} />
-        <Route path="/report-illegal-parking" element={<ReportIllegalParking />} /> {/* 불법주차 신고 라우트 추가 */}
-        <Route path="/vworld-map" element={<VWorldMap />} /> {/* 3D 주차장 지도 라우트 추가 */}
-        <Route path="/my-parking-lots" element={<MyParkingLots />} /> {/* 내 주차장 관리 라우트 추가 */}
-      </Routes>
+      <div style={{ position: 'relative', zIndex: 0 }}> {/* Add zIndex style */}
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/service-intro" element={<ServiceIntro />} />
+          <Route path="/map" element={<MapContainer setParkingLots={setParkingLots} />} />
+          <Route path="/partnership" element={<Partnership />} />
+          <Route path="/parking-share-info" element={<ParkingShareInfo />} />
+          <Route path="/signup" element={<SignupForm />} />
+          <Route path="/login" element={isLoggedIn || isMobile ? <Navigate to="/" /> : <Login onLogin={handleLogin} />} />
+          <Route path="/parking-lot/:id" element={<ParkingLotDetail parkingLots={parkingLots} />} />
+          <Route path="/reservation" element={<Reservation parkingLots={parkingLots} />} />
+          <Route path="/register-parking-lot" element={<RegisterParkingLot />} />
+          <Route path="/admin-reservations" element={isAdmin ? <AdminReservations /> : <Navigate to="/" />} />
+          <Route path="/report-illegal-parking" element={<ReportIllegalParking />} />
+          <Route path="/illegal-parking-info" element={<IllegalParkingInfo />} /> {/* 불법주차 구역 정보 라우트 추가 */}
+          <Route path="/mileage-info" element={<MileageInfo />} /> {/* 마일리지 정보 라우트 추가 */}
+          <Route path="/vworld-map" element={<VWorldMap />} />
+          <Route path="/my-parking-lots" element={<MyParkingLots />} />
+        </Routes>
+      </div>
     </div>
   );
 };

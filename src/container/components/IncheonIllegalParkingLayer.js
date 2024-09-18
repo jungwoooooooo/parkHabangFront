@@ -166,7 +166,7 @@ const IncheonIllegalParkingLayer = ({ incheonIllegalParkingData }) => {
             },
             fontSize: isMobile ? '1rem' : '1.25rem', // 폰트 크기 조정
             padding: isMobile ? '12px 24px' : '10px 24px', // 패딩 조정
-            marginTop: '130px', // 버튼을 아래로 내리기
+            marginTop: '30px', // 버튼을 아래로 내리기
             marginLeft: '20px',
             borderRadius: '20px', // 둥근 모서리
             boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', // 그림자 추가
