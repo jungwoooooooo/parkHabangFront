@@ -26,7 +26,7 @@ const RegisterParkingLot = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:3000/parking-lots', {
+      const response = await axios.post('http://localhost:5000/parking-lots', {
         주차장명: name,
         위도: lat,
         경도: lon,

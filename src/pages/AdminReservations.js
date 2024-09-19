@@ -5,7 +5,7 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:3000';
+const API_URL = 'http://localhost:5000';
 
 const AdminReservations = () => {
   const [reservations, setReservations] = useState([]);

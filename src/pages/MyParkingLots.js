@@ -18,7 +18,7 @@ const MyParkingLots = () => {
       }
 
       try {
-        const response = await axios.get('http://localhost:3000/parking-lots/user-parking-lots', {
+        const response = await axios.get('http://localhost:5000/parking-lots/user-parking-lots', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -59,7 +59,7 @@ const MyParkingLots = () => {
     }
 
     try {
-      await axios.delete(`http://localhost:3000/parking-lots/${id}`, {
+      await axios.delete(`http://localhost:5000/parking-lots/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

@@ -13,7 +13,7 @@ const EditParkingLot = () => {
     const fetchParkingLot = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get(`http://localhost:3000/parking-lots/${id}`, {
+        const response = await axios.get(`http://localhost:5000/parking-lots/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setParkingLot(response.data);
@@ -32,7 +32,7 @@ const EditParkingLot = () => {
     event.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      await axios.put(`http://localhost:3000/parking-lots/${id}`, parkingLot, {
+      await axios.put(`http://localhost:5000/parking-lots/${id}`, parkingLot, {
         headers: { Authorization: `Bearer ${token}` },
       });
       alert('주차장 정보가 수정되었습니다.');

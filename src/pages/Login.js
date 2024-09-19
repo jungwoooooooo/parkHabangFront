@@ -13,7 +13,7 @@ const Login = ({ onLogin }) => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:3000/signin', { email, password });
+      const response = await axios.post('http://localhost:5000/auth/signin', { email, password });
       const userData = response.data;
       localStorage.setItem('token', userData.accessToken); // 토큰을 로컬 스토리지에 저장
       console.log('로그인 성공:', userData);

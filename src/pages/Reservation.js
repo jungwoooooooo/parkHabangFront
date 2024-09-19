@@ -32,7 +32,7 @@ const Reservation = ({ parkingLots }) => {
     const fetchReservedTimes = async () => {
       if (parkingLot) {
         try {
-          const response = await axios.get(`http://localhost:3000/reservations?parkingLot=${parkingLot.id}`);
+          const response = await axios.get(`http://localhost:5000/reservations?parkingLot=${parkingLot.id}`);
           setReservedTimes(response.data);
         } catch (error) {
           console.error('예약된 시간 불러오기 실패:', error);
@@ -84,7 +84,7 @@ const Reservation = ({ parkingLots }) => {
 
       console.log('Reservation Data:', reservationData); // 로그 추가
 
-      await axios.post('http://localhost:3000/reservations', reservationData, {
+      await axios.post('http://localhost:5000/reservations', reservationData, {
         headers: {
           Authorization: `Bearer ${token}` // 헤더에 토큰 추가
         }

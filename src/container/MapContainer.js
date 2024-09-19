@@ -29,11 +29,11 @@ export default function MapContainer({ setParkingLots }) {
       try {
         // 여러 API 엔드포인트에서 데이터를 동시에 가져옵니다.
         const [parkingResponse, illegalParkingResponse, childrenAreaResponse, firePlugResponse, incheonIllegalParkingResponse] = await Promise.all([
-          fetch('http://localhost:3000/parking-lots'),
-          fetch('http://localhost:3000/illegal-parking'),
-          fetch('http://localhost:3000/children-area'),
-          fetch('http://localhost:3000/fire-plug'),
-          fetch('http://localhost:3000/incheon-illegal-parking')
+          fetch('http://localhost:5000/parking-lots'),
+          fetch('http://localhost:5000/illegal-parking'),
+          fetch('http://localhost:5000/children-area'),
+          fetch('http://localhost:5000/fire-plug'),
+          fetch('http://localhost:5000/incheon-illegal-parking')
         ]);
 
         // 응답을 JSON으로 파싱합니다.

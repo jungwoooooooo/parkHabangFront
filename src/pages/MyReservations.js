@@ -20,7 +20,7 @@ const MyReservations = () => {
       }
 
       try {
-        const response = await axios.get('http://localhost:3000/reservations/user-reservations', {
+        const response = await axios.get('http://localhost:5000/reservations/user-reservations', {
           headers: {
             Authorization: `Bearer ${token}`, // 토큰을 헤더에 포함
           },
@@ -57,7 +57,7 @@ const MyReservations = () => {
     }
 
     try {
-      await axios.delete(`http://localhost:3000/reservations/${id}`, {
+      await axios.delete(`http://localhost:5000/reservations/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

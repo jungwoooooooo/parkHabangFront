@@ -13,7 +13,7 @@ const SignupForm = () => {
 
   const handleSignup = async () => {
     try {
-      const response = await axios.post('http://localhost:3000/user/signup', { email, password, nickname });
+      const response = await axios.post('http://localhost:5000/user/signup', { email, password, nickname });
       console.log('회원가입 성공:', response.data);
       alert('회원가입 성공');
       navigate('/login'); // 회원가입 성공 후 로그인 페이지로 이동
