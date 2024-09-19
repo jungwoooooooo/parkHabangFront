@@ -12,6 +12,7 @@ const AdminReservations = () => {
   const [users, setUsers] = useState([]);
   const [parkingLots, setParkingLots] = useState([]);
   const [currentTab, setCurrentTab] = useState(0);
+  const [editUser, setEditUser] = useState({ id: null, name: '' });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -43,9 +44,13 @@ const AdminReservations = () => {
           Authorization: `Bearer ${token}` // 인증 토큰 추가
         }
       });
-      setUsers(response.data);
+      console.log('유저 데이터:', response.data); // 유저 데이터 콘솔 로그 추가
+      const usersData = Array.isArray(response.data) ? response.data : [];
+      setUsers(usersData); // 배열 확인 후 설정
+      console.log('설정된 유저 데이터:', usersData); // 설정된 유저 데이터 콘솔 로그 추가
     } catch (error) {
       console.error('유저 목록 조회 실패:', error);
+      setUsers([]); // 오류 발생 시 빈 배열로 설정
     }
   };
 
@@ -82,6 +87,15 @@ const AdminReservations = () => {
       fetchParkingLots();
     } catch (error) {
       console.error('주차장 삭제 실패:', error);
+    }
+  };
+
+  const handleEditUser = async (id, name) => {
+    try {
+      await axios.put(`${API_URL}/user/${id}`, { name });
+      fetchUsers();
+    } catch (error) {
+      console.error('유저 수정 실패:', error);
     }
   };
 
@@ -147,23 +161,44 @@ const AdminReservations = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {users.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell>{user.id}</TableCell>
-                  <TableCell>{user.name}</TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>
-                    <Box display="flex" justifyContent="flex-start">
-                      <Button 
-                        onClick={() => handleDeleteUser(user.id)} 
-                        style={{ marginLeft: '-16px' }}
-                      >
-                        삭제
-                      </Button>
-                    </Box>
-                  </TableCell>
+              {users.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={4} align="center">유저 데이터가 없습니다.</TableCell>
                 </TableRow>
-              ))}
+              ) : (
+                users.map((user) => (
+                  <TableRow key={user.id}>
+                    <TableCell>{user.id}</TableCell>
+                    <TableCell>
+                      {editUser.id === user.id ? (
+                        <input
+                          value={editUser.name}
+                          onChange={(e) => setEditUser({ ...editUser, name: e.target.value })}
+                        />
+                      ) : (
+                        user.name
+                      )}
+                    </TableCell>
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell>
+                      <Box display="flex" justifyContent="flex-start">
+                        {editUser.id === user.id ? (
+                          <Button onClick={() => handleEditUser(user.id, editUser.name)}>
+                            저장
+                          </Button>
+                        ) : (
+                          <Button onClick={() => setEditUser({ id: user.id, name: user.name })}>
+                            수정
+                          </Button>
+                        )}
+                        <Button onClick={() => handleDeleteUser(user.id)} style={{ marginLeft: '8px' }}>
+                          삭제
+                        </Button>
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </TableContainer>

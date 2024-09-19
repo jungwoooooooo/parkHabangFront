@@ -2,7 +2,7 @@ import React from 'react';
 
 const ParkingShareInfo = () => {
   return (
-    <div>
+    <div style={{ textAlign: 'center' }}>
       <h1>주차 공유 안내</h1>
       <p>거주자우선(주거지)주차공간이나, 사유지 주차공간을 공유하시고 포인트 쌓으세요!</p>
       <p>자신이 주차장을 쓰지 않는 시간에 다른 사람에게 그 자리를 대여하면 포인트가 쌓입니다.</p>

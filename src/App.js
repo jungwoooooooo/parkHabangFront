@@ -65,6 +65,14 @@ const App = () => {
                 <Link to="/my-parking-lots">내 주차장 관리</Link>
               </div>
             </li>
+            <li className="dropdown">
+              <span>불법주차</span>
+              <div className="dropdown-content">
+                <Link to="/report-illegal-parking">불법주차 신고</Link>
+                <Link to="/illegal-parking-info">불법주차 구역 정보</Link>
+                <Link to="/mileage-info">신고 마일리지 정보</Link>
+              </div>
+            </li>
             {isLoggedIn ? (
               <>
                 <li>
@@ -73,14 +81,6 @@ const App = () => {
                   </Link>
                 </li>
                 {isAdmin && <li><Link to="/admin-reservations">관리자 페이지</Link></li>}
-                <li className="dropdown">
-                  <span>불법주차</span>
-                  <div className="dropdown-content">
-                    <Link to="/report-illegal-parking">불법주차 신고</Link>
-                    <Link to="/illegal-parking-info">불법주차 구역 정보</Link>
-                    <Link to="/mileage-info">신고 마일리지 정보</Link>
-                  </div>
-                </li>
                 <li><Link to="/my-reservations">내 예약</Link></li> {/* 내 예약 링크 추가 */}
                 {/* <li><Link to="/vworld-map">3D 주차장 지도</Link></li> */}
               </>

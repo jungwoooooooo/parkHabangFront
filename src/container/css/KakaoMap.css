@@ -76,3 +76,44 @@
   .kakao-map-type-control .maptypecontrol .btn_skyview .ico_comm {
     content: "ㅋㅋ"; /* 원하는 텍스트로 변경 */
   }
+  
+  .maptypecontrol {
+    background-color: rgba(255, 255, 255, 0.8); /* 배경색 변경 */
+    border-radius: 8px; /* 모서리 둥글게 */
+    padding: 10px; /* 패딩 추가 */
+  }
+  
+  .maptypecontrol .btn_skyview .ico_comm {
+    color: #ff0000; /* 텍스트 색상 변경 */
+    font-weight: bold; /* 텍스트 굵게 */
+  }
+  
+  /* 줌 컨트롤러 스타일 */
+  .zoomcontrol {
+    background-color: rgba(0, 0, 0, 0.5); /* 배경색 변경 */
+    border-radius: 8px; /* 모서리 둥글게 */
+    padding: 10px; /* 패딩 추가 */
+  }
+  
+  /* 사용자 컨트롤러 스타일 */
+  .custom-controls {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .custom-controls .btn {
+    background-color: rgba(255, 255, 255, 0.8);
+    border: none;
+    border-radius: 5px;
+    padding: 10px;
+    cursor: pointer;
+  }
+
+  .custom-controls .selected_btn {
+    background-color: rgba(0, 0, 255, 0.8);
+    color: white;
+  }

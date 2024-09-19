@@ -1,22 +1,53 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useSpring, animated } from '@react-spring/web';
+import backgroundImage from '../assert/지도화면.png';
+import '../container/css/Home.css';
 
 const Home = () => {
   const navigate = useNavigate();
+  const [showImage, setShowImage] = React.useState(false);
+  const [showText, setShowText] = React.useState(false);
 
   const handleButtonClick = () => {
     navigate('/map');
   };
 
+  const imageAnimation = useSpring({
+    opacity: showImage ? 1 : 0,
+    transform: showImage ? 'translateY(0)' : 'translateY(-50px)',
+    config: { duration: 2000 }, // 애니메이션 속도를 2초로 설정
+  });
+
+  const textAnimation = useSpring({
+    opacity: showText ? 1 : 0,
+    transform: showText ? 'translateY(0)' : 'translateY(-20px)',
+    config: { duration: 2000 }, // 애니메이션 속도를 2초로 설정
+  });
+
+  React.useEffect(() => {
+    setShowImage(true);
+    setShowText(true);
+  }, []);
+
   return (
     <div className="main-content">
-      <h1>인천의<br />주차고민 해결<br />주차해방</h1>
+      <animated.h1 style={textAnimation}>인천의<br />주차고민 해결<br /><br />주차해방</animated.h1>
+      
+      <div className="image-container">
+        <animated.img
+          src={backgroundImage}
+          alt="인천 주차장 지도"
+          style={imageAnimation}
+        />
+      </div>
+      
       <button className="cta-button" onClick={handleButtonClick}>인천 주차장 지도 보러가기</button>
       
       {/* 소개 섹션 */}
       <section className="intro-section">
         <h2>서비스 소개</h2>
-        <p>주차해방은 인천의 주차 문제를 해결하기 위한 서비스입니다. 실시간 주차장 정보를 제공하여 편리한 주차를 도와드립니다.</p>
+        <p>'주차해방'은 인천의 주차 문제를 해결하기 위한 서비스입니다. 실시간 주차장 정보를 제공하여 편리한 주차를 도와드립니다.</p>
       </section>
       
       {/* 사용자 리뷰 섹션 */}

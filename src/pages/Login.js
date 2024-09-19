@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { TextField, Button, Box, Typography } from '@mui/material';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import backgroundImage from '../assert/바람사진.jpeg';
+import backgroundImage from '../assert/잔잔배경.png';
 import logoImage from '../assert/배경_없는거.png';
 
 const Login = ({ onLogin }) => {
@@ -47,6 +47,7 @@ const Login = ({ onLogin }) => {
         backgroundSize: "cover",
         backgroundPosition: "center",
         position: "relative",
+        backgroundColor: "rgba(0, 0, 0, 0.1)" // 배경 투명도 조절
       }}
     >
       <img 
