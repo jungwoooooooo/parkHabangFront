@@ -62,7 +62,6 @@ const App = () => {
               <div className="dropdown-content">
                 <Link to="/parking-share-info">주차 공유 안내</Link>
                 <Link to="/register-parking-lot">주차장 등록</Link>
-                <Link to="/my-parking-lots">내 주차장 관리</Link>
               </div>
             </li>
             <li className="dropdown">
@@ -75,14 +74,19 @@ const App = () => {
             </li>
             {isLoggedIn ? (
               <>
+                <li className="dropdown">
+                  <span>마이페이지</span>
+                  <div className="dropdown-content">
+                    <Link to="/my-reservations">내 예약</Link>
+                    <Link to="/my-parking-lots">내 주차장 관리</Link>
+                  </div>
+                </li>
                 <li>
                   <Link to="/" onClick={handleLogout} style={{ textDecoration: 'none', color: 'inherit' }}>
                     로그아웃
                   </Link>
                 </li>
                 {isAdmin && <li><Link to="/admin-reservations">관리자 페이지</Link></li>}
-                <li><Link to="/my-reservations">내 예약</Link></li> {/* 내 예약 링크 추가 */}
-                {/* <li><Link to="/vworld-map">3D 주차장 지도</Link></li> */}
               </>
             ) : (
               <li><Link to="/login">로그인</Link></li>
