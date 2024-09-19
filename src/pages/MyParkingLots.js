@@ -11,29 +11,36 @@ const MyParkingLots = () => {
   useEffect(() => {
     const fetchParkingLots = async () => {
       const token = localStorage.getItem('token');
-      console.log('불러온 토큰:', token); // 토큰 확인
       if (!token) {
-        console.log('토큰이 없습니다. 로그인 페이지로 리디렉션합니다.');
-        navigate('/login'); // 토큰이 없으면 로그인 페이지로 리디렉션
-        setLoading(false); // 로딩 상태 종료
+        navigate('/login');
+        setLoading(false);
         return;
       }
 
       try {
         const response = await axios.get('http://localhost:3000/parking-lots/user-parking-lots', {
           headers: {
-            Authorization: `Bearer ${token}`, // 토큰을 헤더에 포함
+            Authorization: `Bearer ${token}`,
           },
         });
-        console.log('주차장 목록 불러오기 성공:', response.data);
         setParkingLots(response.data);
       } catch (error) {
+        if (error.response) {
+          // 서버가 2xx 범위를 벗어나는 상태 코드로 응답한 경우
+          console.error('서버 응답 오류:', error.response.data);
+          console.error('상태 코드:', error.response.status);
+          console.error('헤더:', error.response.headers);
+        } else if (error.request) {
+          // 요청이 이루어졌으나 응답을 받지 못한 경우
+          console.error('응답 없음:', error.request);
+        } else {
+          // 요청 설정 중에 오류가 발생한 경우
+          console.error('오류 메시지:', error.message);
+        }
         if (error.response && error.response.status === 401) {
-          console.error('토큰이 만료되었습니다. 로그인 페이지로 리디렉션합니다.');
           localStorage.removeItem('token');
           navigate('/login');
         } else {
-          console.error('주차장 목록 불러오기 실패:', error);
           alert('주차장 목록을 불러오는 데 실패했습니다.');
         }
       } finally {
@@ -47,24 +54,26 @@ const MyParkingLots = () => {
   const handleDelete = async (id) => {
     const token = localStorage.getItem('token');
     if (!token) {
-      console.log('토큰이 없습니다. 로그인 페이지로 리디렉션합니다.');
-      navigate('/login'); // 토큰이 없으면 로그인 페이지로 리디렉션
+      navigate('/login');
       return;
     }
 
     try {
       await axios.delete(`http://localhost:3000/parking-lots/${id}`, {
         headers: {
-          Authorization: `Bearer ${token}`, // 토큰을 헤더에 포함
+          Authorization: `Bearer ${token}`,
         },
       });
-      console.log('주차장 삭제 성공:', id);
       setParkingLots(parkingLots.filter(lot => lot.id !== id));
       alert('주차장이 삭제되었습니다.');
     } catch (error) {
       console.error('주차장 삭제 실패:', error);
       alert('주차장 삭제에 실패했습니다.');
     }
+  };
+
+  const handleEdit = (id) => {
+    navigate(`/edit-parking-lot/${id}`);
   };
 
   if (loading) {
@@ -82,6 +91,9 @@ const MyParkingLots = () => {
         {parkingLots.map((lot) => (
           <ListItem key={lot.id} divider>
             <ListItemText primary={lot.주차장명} secondary={`주소: ${lot.소재지도로명주소}, 요금: ${lot.주차기본요금}, 수용량: ${lot.총주차면}`} />
+            <Button variant="contained" color="primary" onClick={() => handleEdit(lot.id)} style={{ marginRight: '8px' }}>
+              수정
+            </Button>
             <Button variant="contained" color="secondary" onClick={() => handleDelete(lot.id)}>
               삭제
             </Button>

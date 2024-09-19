@@ -44,6 +44,33 @@ const MyReservations = () => {
     fetchReservations();
   }, [navigate]);
 
+  const handleEdit = (id) => {
+    navigate(`/edit-reservation/${id}`);
+  };
+
+  const handleCancel = async (id) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.log('토큰이 없습니다. 로그인 페이지로 리디렉션합니다.');
+      navigate('/login');
+      return;
+    }
+
+    try {
+      await axios.delete(`http://localhost:3000/reservations/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log('예약 취소 성공:', id);
+      setReservations(reservations.filter(reservation => reservation.id !== id));
+      alert('예약이 취소되었습니다.');
+    } catch (error) {
+      console.error('예약 취소 실패:', error);
+      alert('예약 취소에 실패했습니다.');
+    }
+  };
+
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
@@ -62,6 +89,12 @@ const MyReservations = () => {
               primary={`주차장: ${reservation.parkingLot?.주차장명 || '정보 없음'}`} // 주차장명 확인
               secondary={`시작 시간: ${new Date(reservation.시작시간).toLocaleString()}, 종료 시간: ${new Date(reservation.종료시간).toLocaleString()}`} 
             />
+            <Button variant="contained" color="primary" onClick={() => handleEdit(reservation.id)} style={{ marginRight: '8px' }}>
+              수정
+            </Button>
+            <Button variant="contained" color="secondary" onClick={() => handleCancel(reservation.id)}>
+              취소
+            </Button>
           </ListItem>
         ))}
       </List>

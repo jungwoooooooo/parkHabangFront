@@ -21,6 +21,7 @@ import MyParkingLots from './pages/MyParkingLots'; // MyParkingLots 페이지 im
 import IllegalParkingInfo from './pages/IllegalParkingInfo'; // 불법주차 구역 정보 페이지 import
 import MileageInfo from './pages/MileageInfo'; // 마일리지 정보 페이지 import
 import MyReservations from './pages/MyReservations'; // 내 예약 페이지 import
+import EditParkingLot from './pages/EditParkingLot'; // 새로 추가된 EditParkingLot 컴포넌트 import
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
@@ -113,6 +114,7 @@ const App = () => {
           <Route path="/vworld-map" element={<VWorldMap />} />
           <Route path="/my-parking-lots" element={<MyParkingLots />} />
           <Route path="/my-reservations" element={<MyReservations />} /> {/* 내 예약 라우트 추가 */}
+          <Route path="/edit-parking-lot/:id" element={<EditParkingLot />} /> {/* 새로 추가된 EditParkingLot 라우트 */}
         </Routes>
       </div>
     </div>
