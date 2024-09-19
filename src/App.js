@@ -71,7 +71,7 @@ const App = () => {
                     로그아웃
                   </Link>
                 </li>
-                {isAdmin && <li><Link to="/admin-reservations">예약 관리 페이지</Link></li>}
+                {isAdmin && <li><Link to="/admin-reservations">관리자 페이지</Link></li>}
                 <li className="dropdown">
                   <span>불법주차</span>
                   <div className="dropdown-content">

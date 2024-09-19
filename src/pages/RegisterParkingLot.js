@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { TextField, Button, Box, Typography } from '@mui/material';
-import { useNavigate } from 'react-router-dom'; // useNavigate 추가
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const RegisterParkingLot = () => {
@@ -11,9 +11,16 @@ const RegisterParkingLot = () => {
   const [address, setAddress] = useState('');
   const [fee, setFee] = useState('');
   const [capacity, setCapacity] = useState('');
-  const navigate = useNavigate(); // useNavigate 훅 사용
+  const navigate = useNavigate();
 
   const handleRegister = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.log('토큰이 없습니다. 로그인 페이지로 리디렉션합니다.');
+      navigate('/login'); // 토큰이 없으면 로그인 페이지로 리디렉션
+      return;
+    }
+
     try {
       const response = await axios.post('http://localhost:3000/parking-lots', {
         주차장명: name,
@@ -23,6 +30,10 @@ const RegisterParkingLot = () => {
         주소: address,
         요금: fee,
         수용량: capacity,
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`, // 토큰을 헤더에 포함
+        },
       });
       console.log('주차장 등록 성공:', response.data);
       alert('주차장 등록이 완료되었습니다!'); // 완료 알림
