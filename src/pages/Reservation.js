@@ -29,6 +29,8 @@ const Reservation = ({ parkingLots }) => {
 
   const handleReservation = async () => {
     try {
+      const token = localStorage.getItem('token'); // JWT 토큰 가져오기
+      console.log('불러온 토큰:', token); // 토큰 확인
       const reservationData = {
         parkingLot: parkingLot.id,
         시작시간: new Date(`${startDate}T${startTime}`).toISOString(),
@@ -38,7 +40,13 @@ const Reservation = ({ parkingLots }) => {
         차량번호: carNumber
       };
 
-      await axios.post('http://localhost:3000/reservations', reservationData); // URL 확인
+      console.log('Reservation Data:', reservationData); // 로그 추가
+
+      await axios.post('http://localhost:3000/reservations', reservationData, {
+        headers: {
+          Authorization: `Bearer ${token}` // 헤더에 토큰 추가
+        }
+      });
 
       setSnackbarMessage('예약이 성공적으로 완료되었습니다.');
       setOpenSnackbar(true);

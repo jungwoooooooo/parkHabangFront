@@ -20,6 +20,7 @@ import VWorldMap from './pages/VWorldMap'; // VWorldMap 페이지 import
 import MyParkingLots from './pages/MyParkingLots'; // MyParkingLots 페이지 import
 import IllegalParkingInfo from './pages/IllegalParkingInfo'; // 불법주차 구역 정보 페이지 import
 import MileageInfo from './pages/MileageInfo'; // 마일리지 정보 페이지 import
+import MyReservations from './pages/MyReservations'; // 내 예약 페이지 import
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
@@ -80,7 +81,8 @@ const App = () => {
                     <Link to="/mileage-info">신고 마일리지 정보</Link>
                   </div>
                 </li>
-                <li><Link to="/vworld-map">3D 주차장 지도</Link></li>
+                <li><Link to="/my-reservations">내 예약</Link></li> {/* 내 예약 링크 추가 */}
+                {/* <li><Link to="/vworld-map">3D 주차장 지도</Link></li> */}
               </>
             ) : (
               <li><Link to="/login">로그인</Link></li>
@@ -106,6 +108,7 @@ const App = () => {
           <Route path="/mileage-info" element={<MileageInfo />} /> {/* 마일리지 정보 라우트 추가 */}
           <Route path="/vworld-map" element={<VWorldMap />} />
           <Route path="/my-parking-lots" element={<MyParkingLots />} />
+          <Route path="/my-reservations" element={<MyReservations />} /> {/* 내 예약 라우트 추가 */}
         </Routes>
       </div>
     </div>

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { TextField, Button, Box, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import SearchPlace from '../container/components/Search'; // SearchPlace 컴포넌트 임포트
 
 const RegisterParkingLot = () => {
   const [name, setName] = useState('');
@@ -9,6 +10,7 @@ const RegisterParkingLot = () => {
   const [lat, setLat] = useState('');
   const [time, setTime] = useState('');
   const [address, setAddress] = useState('');
+  const [jibunAddress, setJibunAddress] = useState(''); // 지번 주소 상태 추가
   const [fee, setFee] = useState('');
   const [capacity, setCapacity] = useState('');
   const navigate = useNavigate();
@@ -28,7 +30,8 @@ const RegisterParkingLot = () => {
         경도: lon,
         공유시간: time,
         주소: address,
-        요금: fee,
+        소재지지번주소: jibunAddress, // 지번 주소 추가
+        주차기본요금: fee,
         수용량: capacity,
       }, {
         headers: {
@@ -49,9 +52,17 @@ const RegisterParkingLot = () => {
     }
   };
 
+  const handleLocationChange = ({ lat, lng, roadAddress, jibunAddress }) => {
+    setLat(lat);
+    setLon(lng);
+    setAddress(roadAddress);
+    setJibunAddress(jibunAddress); // 지번 주소 설정
+  };
+
   return (
     <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="100vh">
       <Typography variant="h4" gutterBottom>주차장 등록</Typography>
+      <SearchPlace onLocationChange={handleLocationChange} /> {/* SearchPlace 컴포넌트 추가 */}
       <TextField
         label="주차장 이름"
         variant="outlined"
@@ -67,6 +78,7 @@ const RegisterParkingLot = () => {
         onChange={(e) => setLat(e.target.value)}
         margin="normal"
         fullWidth
+        disabled
       />
       <TextField
         label="경도"
@@ -75,6 +87,7 @@ const RegisterParkingLot = () => {
         onChange={(e) => setLon(e.target.value)}
         margin="normal"
         fullWidth
+        disabled
       />
       <TextField
         label="공유시간"
@@ -91,6 +104,16 @@ const RegisterParkingLot = () => {
         onChange={(e) => setAddress(e.target.value)}
         margin="normal"
         fullWidth
+        disabled
+      />
+      <TextField
+        label="소재지지번주소"
+        variant="outlined"
+        value={jibunAddress}
+        onChange={(e) => setJibunAddress(e.target.value)}
+        margin="normal"
+        fullWidth
+        disabled
       />
       <TextField
         label="요금"

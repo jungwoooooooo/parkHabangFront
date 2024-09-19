@@ -69,15 +69,15 @@ const SearchPlace = ({ onLocationChange }) => {
     const completeHandler = (data) => {
         console.log('Complete handler data:', data);
         setIsOpen(false);
-        searchAddress(data.roadAddress);
+        searchAddress(data.roadAddress, data.jibunAddress); // 지번 주소 추가
     }
 
     // 주소 검색 함수
-    const searchAddress = async (address) => {
-        if (address) {
+    const searchAddress = async (roadAddress, jibunAddress) => {
+        if (roadAddress) {
             try {
                 const response = await axios.get(
-                    `https://dapi.kakao.com/v2/local/search/address.json?query=${encodeURIComponent(address)}`,
+                    `https://dapi.kakao.com/v2/local/search/address.json?query=${encodeURIComponent(roadAddress)}`,
                     {
                         headers: {
                             Authorization: `KakaoAK cc4618fc55e2dc943ad112bb5cdc43c4`, // Replace with your Kakao API key
@@ -91,8 +91,8 @@ const SearchPlace = ({ onLocationChange }) => {
                 if (documents.length > 0) {
                     const { x, y } = documents[0].address;
                     if (onLocationChange) {
-                        console.log('Updating location:', { lat: parseFloat(y), lng: parseFloat(x) });
-                        onLocationChange({ lat: parseFloat(y), lng: parseFloat(x) });
+                        console.log('Updating location:', { lat: parseFloat(y), lng: parseFloat(x), roadAddress, jibunAddress });
+                        onLocationChange({ lat: parseFloat(y), lng: parseFloat(x), roadAddress, jibunAddress });
                     }
                 }
             } catch (error) {
