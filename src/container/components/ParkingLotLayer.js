@@ -5,7 +5,7 @@ import { getCarDirection } from './getCarDirection';
 import { debounce } from 'lodash';
 import { Card, CardContent, Typography, Button, Box } from '@mui/material';
 import { styled } from '@mui/system';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 
 // 카카오맵 초기화
 const { kakao } = window;
@@ -73,41 +73,41 @@ const ParkingLotLayer = ({ parkingLots }) => {
     }
   
     const content = document.createElement('div');
-    ReactDOM.render(
-      <StyledCard>
-        <CardContent>
-          <Typography variant="h6" component="div" gutterBottom>
-            {lot.주차장명}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            요금: {lot.요금정보}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            기본 요금: {lot.주차기본요금}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            구분: {lot.주차장구분}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            운영요일: {lot.운영요일}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            잔여 수: {lot.가능한주차면}
-          </Typography>
-          <Box mt={2}>
-            <StyledButton variant="contained" color="primary" size="small" onClick={() => console.log('상세 정보')}>
-              상세 정보
-            </StyledButton>
-            <StyledButton variant="contained" color="secondary" size="small" onClick={() => console.log('예약하기')}>
-              예약하기
-            </StyledButton>
-            <StyledButton variant="contained" color="info" size="small" onClick={() => window.handleFindRoute(lot.id)}>
-              경로표시
-            </StyledButton>
-          </Box>
-        </CardContent>
-      </StyledCard>,
-      content
+  const root = createRoot(content); // createRoot 사용
+  root.render(
+    <StyledCard>
+      <CardContent>
+        <Typography variant="h6" component="div" gutterBottom>
+          {lot.주차장명}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          요금: {lot.요금정보}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          기본 요금: {lot.주차기본요금}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          구분: {lot.주차장구분}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          운영요일: {lot.운영요일}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          잔여 수: {lot.가능한주차면}
+        </Typography>
+        <Box mt={2}>
+          <StyledButton variant="contained" color="primary" size="small" onClick={() => window.location.href = `/parking-lot-detail/${lot.id}`}>
+            상세 정보
+          </StyledButton>
+          <StyledButton variant="contained" color="secondary" size="small" onClick={() => window.location.href = `/reservation?lotId=${lot.id}`}>
+            예약하기
+          </StyledButton>
+          <StyledButton variant="contained" color="info" size="small" onClick={() => window.handleFindRoute(lot.id)}>
+            경로표시
+          </StyledButton>
+        </Box>
+      </CardContent>
+      </StyledCard>
     );
 
     return content;
