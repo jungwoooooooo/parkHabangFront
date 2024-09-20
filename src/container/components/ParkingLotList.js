@@ -139,6 +139,32 @@ const ParkingLotList = ({ parkingLots, onMouseOverListItem, onMouseOutListItem, 
     handleClose();
   };
 
+  const findBestParkingLot = () => {
+    if (sortedParkingLots.length === 0) return null;
+
+    let bestLot = sortedParkingLots[0];
+    sortedParkingLots.forEach(lot => {
+      const lotPrice = parseFloat(lot.주차기본요금.replace(/[^0-9.-]+/g,"")) || 0;
+      const bestLotPrice = parseFloat(bestLot.주차기본요금.replace(/[^0-9.-]+/g,"")) || 0;
+
+      if (lot.distance < bestLot.distance || 
+          (lot.distance === bestLot.distance && lotPrice < bestLotPrice)) {
+        bestLot = lot;
+      }
+    });
+
+    return bestLot;
+  };
+
+  const handleQuickReserve = () => {
+    const bestLot = findBestParkingLot();
+    if (bestLot) {
+      window.location.href = `/reservation?lotId=${bestLot.id}`;
+    } else {
+      alert('주차장을 찾을 수 없습니다.');
+    }
+  };
+
   const MemoizedListItem = React.memo(({ lot, index }) => {
     const isHighlighted = highlightedLot && highlightedLot.id === lot.id;
 
@@ -259,6 +285,14 @@ const ParkingLotList = ({ parkingLots, onMouseOverListItem, onMouseOutListItem, 
           >
             주차장 리스트 {isDrawerOpen ? '닫기' : '열기'}
           </Button>
+          <Button 
+            variant="contained" 
+            color="primary" 
+            onClick={handleQuickReserve} 
+            sx={{ position: 'fixed', bottom: 16, right: 16, zIndex: 1000 }}
+          >
+            빠른 예약
+          </Button>
           <Drawer
             anchor="bottom"
             open={isDrawerOpen}
@@ -280,11 +314,19 @@ const ParkingLotList = ({ parkingLots, onMouseOverListItem, onMouseOutListItem, 
           overflowY: 'auto', 
           position: 'absolute', 
           left: 0, 
-          top: '60px', // 상단 여백
+          top: '0px', // 상단 여백
           zIndex: 10,
           maxHeight: 'calc(100vh - 60px)', // 최대 높이 설정
         }}>
           {drawerContent}
+          <Button 
+            variant="contained" 
+            color="primary" 
+            onClick={handleQuickReserve} 
+            sx={{ position: 'fixed', bottom: 16, right: 16, zIndex: 1000 }}
+          >
+            빠른 예약
+          </Button>
         </Paper>
       )}
       <Popover
