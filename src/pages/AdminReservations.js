@@ -211,7 +211,7 @@ const AdminReservations = () => {
               <TableRow>
                 <TableCell>주차장 ID</TableCell>
                 <TableCell>주차장명</TableCell>
-                <TableCell>소재지도로명주소</TableCell>
+                <TableCell>소재지지번주소</TableCell>
                 <TableCell>액션</TableCell>
               </TableRow>
             </TableHead>
@@ -220,7 +220,7 @@ const AdminReservations = () => {
                 <TableRow key={lot.id}>
                   <TableCell>{lot.id}</TableCell>
                   <TableCell>{lot.주차장명}</TableCell>
-                  <TableCell>{lot.소재지도로명주소}</TableCell>
+                  <TableCell>{lot.소재지지번주소}</TableCell>
                   <TableCell>
                     <Box display="flex" justifyContent="flex-start">
                       <Button 

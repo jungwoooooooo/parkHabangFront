@@ -39,11 +39,13 @@
   }
   
   .current-location-button {
-    top: 275px;
+    top: 300px; /* 현재 위치 버튼의 위치 조정 */
+    right: 30px; /* 왼쪽으로 이동 */
   }
   
   .traffic-button {
-    top: 380px;
+    top: 450px; /* 교통 정보 버튼의 위치 조정 */
+    right: 30px; /* 왼쪽으로 이동 */
   }
   
   .button-icon {

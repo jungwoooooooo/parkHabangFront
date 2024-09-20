@@ -176,12 +176,20 @@ const KakaoMap = ({ center }) => {
         onClick={() => moveToCurrentLocation()}
         className="highlight-button current-location-button"
         title="현재 위치로 이동"
+        style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '10px' }} // 스타일 수정
       >
         <img 
           src="https://cdn-icons-png.flaticon.com/128/67/67335.png" 
           alt="현재 위치" 
           className="button-icon"
         />
+        <span style={{ 
+          whiteSpace: 'nowrap', 
+          fontWeight: 'bold', 
+          backgroundColor: 'rgba(255, 255, 255, 0.7)', 
+          padding: '2px 5px', 
+          borderRadius: '3px' 
+        }}>현위치</span> {/* 텍스트 스타일 수정 */}
       </button>
 
       {/* 교통정보 켜기/끄기 버튼 */}
@@ -189,6 +197,7 @@ const KakaoMap = ({ center }) => {
         onClick={toggleTraffic}
         className="highlight-button traffic-button"
         title={isTrafficVisible ? '교통 정보 끄기' : '교통 정보 켜기'}
+        style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '10px' }} // 스타일 수정
       >
         <img 
           src={isTrafficVisible 
@@ -198,6 +207,13 @@ const KakaoMap = ({ center }) => {
           alt={isTrafficVisible ? '교통 정보 끄기' : '교통 정보 켜기'} 
           className="button-icon"
         />
+        <span style={{ 
+          whiteSpace: 'nowrap', 
+          fontWeight: 'bold', 
+          backgroundColor: 'rgba(255, 255, 255, 0.7)', 
+          padding: '2px 5px', 
+          borderRadius: '3px' 
+        }}>실시간 교통 상황</span> {/* 텍스트 스타일 수정 */}
       </button>
     </div>
   );

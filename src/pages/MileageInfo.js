@@ -4,6 +4,7 @@ import '../App.css';
 const MileageInfo = () => {
   return (
     <div className="centered-content">
+      <br/><br/>
       <h1>안전신문고 마일리지</h1>
       <p>안전신문고 마일리지는 신고건수 등에 따라 적립이 되며, 마일리지 적립금에 따라 여러 가지 혜택을 받을 수 있습니다.</p>
       <br/>

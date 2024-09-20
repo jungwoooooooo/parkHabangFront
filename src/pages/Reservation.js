@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TextField, Button, Box, Typography, Snackbar, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
+import { TextField, Button, Box, Typography, Snackbar, MenuItem, Select, InputLabel, FormControl, Paper } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -112,90 +112,92 @@ const Reservation = ({ parkingLots }) => {
   });
 
   return (
-    <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="100vh">
-      <Typography variant="h4" gutterBottom>예약</Typography>
-      <Typography variant="h6" gutterBottom>{parkingLot.주차장명}</Typography>
-      <TextField
-        label="예약자 이름"
-        variant="outlined"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        margin="normal"
-        fullWidth
-      />
-      <TextField
-        label="시작 날짜"
-        type="date"
-        variant="outlined"
-        value={startDate}
-        onChange={(e) => setStartDate(e.target.value)}
-        margin="normal"
-        fullWidth
-        InputLabelProps={{ shrink: true }}
-      />
-      <FormControl fullWidth margin="normal" variant="outlined">
-        <InputLabel shrink>시작 시간</InputLabel>
-        <Select
-          value={startTime}
-          onChange={(e) => setStartTime(e.target.value)}
-          displayEmpty
-        >
-          {timeOptions.map((time) => (
-            <MenuItem key={time} value={time} disabled={isTimeDisabled(time, startDate)}>
-              {time}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-      <TextField
-        label="종료 날짜"
-        type="date"
-        variant="outlined"
-        value={endDate}
-        onChange={(e) => setEndDate(e.target.value)}
-        margin="normal"
-        fullWidth
-        InputLabelProps={{ shrink: true }}
-      />
-      <FormControl fullWidth margin="normal" variant="outlined">
-        <InputLabel shrink>종료 시간</InputLabel>
-        <Select
-          value={endTime}
-          onChange={(e) => setEndTime(e.target.value)}
-          displayEmpty
-        >
-          {timeOptions.map((time) => (
-            <MenuItem key={time} value={time} disabled={isTimeDisabled(time, endDate)}>
-              {time}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-      <TextField
-        label="전화번호"
-        variant="outlined"
-        value={phoneNumber}
-        onChange={(e) => setPhoneNumber(e.target.value)}
-        margin="normal"
-        fullWidth
-      />
-      <TextField
-        label="차량번호"
-        variant="outlined"
-        value={carNumber}
-        onChange={(e) => setCarNumber(e.target.value)}
-        margin="normal"
-        fullWidth
-      />
-      <Button variant="contained" color="primary" onClick={handleReservation} style={{ marginTop: '16px' }}>
-        예약하기
-      </Button>
-      <Snackbar
-        open={openSnackbar}
-        autoHideDuration={6000}
-        onClose={() => setOpenSnackbar(false)}
-        message={snackbarMessage}
-      />
+    <Box padding="16px" display="flex" justifyContent="center">
+      <Paper elevation={3} style={{ padding: '16px', textAlign: 'center', maxWidth: '600px', width: '100%' }}>
+        <Typography variant="h4" gutterBottom>예약</Typography>
+        <Typography variant="h6" gutterBottom>{parkingLot.주차장명}</Typography>
+        <TextField
+          label="예약자 이름"
+          variant="outlined"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          margin="normal"
+          fullWidth
+        />
+        <TextField
+          label="시작 날짜"
+          type="date"
+          variant="outlined"
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+          margin="normal"
+          fullWidth
+          InputLabelProps={{ shrink: true }}
+        />
+        <FormControl fullWidth margin="normal" variant="outlined">
+          <InputLabel shrink>시작 시간</InputLabel>
+          <Select
+            value={startTime}
+            onChange={(e) => setStartTime(e.target.value)}
+            displayEmpty
+          >
+            {timeOptions.map((time) => (
+              <MenuItem key={time} value={time} disabled={isTimeDisabled(time, startDate)}>
+                {time}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <TextField
+          label="종료 날짜"
+          type="date"
+          variant="outlined"
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
+          margin="normal"
+          fullWidth
+          InputLabelProps={{ shrink: true }}
+        />
+        <FormControl fullWidth margin="normal" variant="outlined">
+          <InputLabel shrink>종료 시간</InputLabel>
+          <Select
+            value={endTime}
+            onChange={(e) => setEndTime(e.target.value)}
+            displayEmpty
+          >
+            {timeOptions.map((time) => (
+              <MenuItem key={time} value={time} disabled={isTimeDisabled(time, endDate)}>
+                {time}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <TextField
+          label="전화번호"
+          variant="outlined"
+          value={phoneNumber}
+          onChange={(e) => setPhoneNumber(e.target.value)}
+          margin="normal"
+          fullWidth
+        />
+        <TextField
+          label="차량번호"
+          variant="outlined"
+          value={carNumber}
+          onChange={(e) => setCarNumber(e.target.value)}
+          margin="normal"
+          fullWidth
+        />
+        <Button variant="contained" color="primary" onClick={handleReservation} style={{ marginTop: '16px' }}>
+          예약하기
+        </Button>
+        <Snackbar
+          open={openSnackbar}
+          autoHideDuration={6000}
+          onClose={() => setOpenSnackbar(false)}
+          message={snackbarMessage}
+        />
+      </Paper>
     </Box>
   );
 };

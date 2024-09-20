@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Box, Typography, TextField, Button, CircularProgress } from '@mui/material';
+import { Box, Typography, TextField, Button, CircularProgress, Grid, Paper } from '@mui/material';
+import SearchPlace from '../container/components/Search'; // SearchPlace 컴포넌트 임포트
 
 const EditParkingLot = () => {
   const { id } = useParams();
@@ -47,6 +48,16 @@ const EditParkingLot = () => {
     setParkingLot({ ...parkingLot, [event.target.name]: event.target.value });
   };
 
+  const handleLocationChange = ({ lat, lng, roadAddress, jibunAddress }) => {
+    setParkingLot({
+      ...parkingLot,
+      위도: lat,
+      경도: lng,
+      주소: roadAddress,
+      소재지지번주소: jibunAddress,
+    });
+  };
+
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
@@ -64,49 +75,150 @@ const EditParkingLot = () => {
   }
 
   return (
-    <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" minHeight="100vh" padding={3}>
+    <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" minHeight="100vh" bgcolor="#f5f5f5" p={2}>
       <Typography variant="h4" gutterBottom>주차장 정보 수정</Typography>
-      <form onSubmit={handleSubmit} style={{ width: '100%', maxWidth: '500px' }}>
-        <TextField
-          name="주차장명"
-          label="주차장명"
-          value={parkingLot.주차장명 || ''}
-          onChange={handleChange}
-          fullWidth
-          margin="normal"
-        />
-        <TextField
-          name="소재지도로명주소"
-          label="주소"
-          value={parkingLot.소재지도로명주소 || ''}
-          onChange={handleChange}
-          fullWidth
-          margin="normal"
-        />
-        <TextField
-          name="주차기본요금"
-          label="기본 요금"
-          type="number"
-          value={parkingLot.주차기본요금 || ''}
-          onChange={handleChange}
-          fullWidth
-          margin="normal"
-        />
-        <TextField
-          name="총주차면"
-          label="총 주차면"
-          type="number"
-          value={parkingLot.총주차면 || ''}
-          onChange={handleChange}
-          fullWidth
-          margin="normal"
-        />
-        <Box mt={2}>
-          <Button type="submit" variant="contained" color="primary" fullWidth>
-            수정 완료
-          </Button>
-        </Box>
-      </form>
+      <Box mt={2}>
+        <Button variant="contained" color="primary" onClick={() => navigate('/my-parking-lots')}>
+          내 주차장 관리
+        </Button>
+      </Box>
+      <Paper elevation={3} style={{ padding: '32px', maxWidth: '800px', width: '100%', marginTop: '16px' }}>
+        <form onSubmit={handleSubmit} style={{ width: '100%' }}>
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <SearchPlace onLocationChange={handleLocationChange} />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                name="주차장명"
+                label="주차장명"
+                value={parkingLot.주차장명 || ''}
+                onChange={handleChange}
+                fullWidth
+                margin="normal"
+                variant="outlined"
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                name="위도"
+                label="위도"
+                value={parkingLot.위도 || ''}
+                onChange={handleChange}
+                fullWidth
+                margin="normal"
+                variant="outlined"
+                disabled
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                name="경도"
+                label="경도"
+                value={parkingLot.경도 || ''}
+                onChange={handleChange}
+                fullWidth
+                margin="normal"
+                variant="outlined"
+                disabled
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                name="공유시간"
+                label="공유시간"
+                value={parkingLot.공유시간 || ''}
+                onChange={handleChange}
+                fullWidth
+                margin="normal"
+                variant="outlined"
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                name="주소"
+                label="주소"
+                value={parkingLot.주소 || ''}
+                onChange={handleChange}
+                fullWidth
+                margin="normal"
+                variant="outlined"
+                disabled
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                name="소재지지번주소"
+                label="소재지지번주소"
+                value={parkingLot.소재지지번주소 || ''}
+                onChange={handleChange}
+                fullWidth
+                margin="normal"
+                variant="outlined"
+                disabled
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                name="주차기본요금"
+                label="기본 요금"
+                type="number"
+                value={parkingLot.주차기본요금 || ''}
+                onChange={handleChange}
+                fullWidth
+                margin="normal"
+                variant="outlined"
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                name="총주차면"
+                label="총 주차면"
+                type="number"
+                value={parkingLot.총주차면 || ''}
+                onChange={handleChange}
+                fullWidth
+                margin="normal"
+                variant="outlined"
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                name="연락처"
+                label="연락처"
+                value={parkingLot.연락처 || ''}
+                onChange={handleChange}
+                fullWidth
+                margin="normal"
+                variant="outlined"
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                name="설명"
+                label="설명"
+                value={parkingLot.설명 || ''}
+                onChange={handleChange}
+                fullWidth
+                margin="normal"
+                variant="outlined"
+                multiline
+                rows={4}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Box mt={2} display="flex" justifyContent="space-between">
+                <Button type="submit" variant="contained" color="primary">
+                  수정 완료
+                </Button>
+                <Button variant="contained" color="secondary" onClick={() => navigate('/my-parking-lots')}>
+                  취소
+                </Button>
+              </Box>
+            </Grid>
+          </Grid>
+        </form>
+      </Paper>
     </Box>
   );
 };

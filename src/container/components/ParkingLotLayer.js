@@ -3,9 +3,10 @@ import { useMap } from '../map/MapContext';
 import ParkingLotList from './ParkingLotList';
 import { getCarDirection } from './getCarDirection';
 import { debounce } from 'lodash';
-import { Card, CardContent, Typography, Button, Box } from '@mui/material';
+import { Card, CardContent, Typography, Button, Box, Popover, MenuItem } from '@mui/material';
 import { styled } from '@mui/system';
 import { createRoot } from 'react-dom/client';
+import { useNavigate } from 'react-router-dom';
 
 // 카카오맵 초기화
 const { kakao } = window;
@@ -23,6 +24,8 @@ const StyledButton = styled(Button)({
 
 // 주차장 레이어 컴포넌트
 const ParkingLotLayer = ({ parkingLots }) => {
+  const navigate = useNavigate(); // useNavigate 훅 사용
+
   // 카카오맵 초기화
   const { map } = useMap();
   // 마커 상태 관리
@@ -56,6 +59,9 @@ const ParkingLotLayer = ({ parkingLots }) => {
 
   const [isLoading, setIsLoading] = useState(true);
 
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [selectedLot, setSelectedLot] = useState(null);
+
   useEffect(() => {
     if (parkingLots && parkingLots.length > 0) {
       // '소재지지번주소'가 null이 아니고 '인천'이 포함된 경우에만 필터링
@@ -65,6 +71,55 @@ const ParkingLotLayer = ({ parkingLots }) => {
     }
   }, [parkingLots]);
 
+
+  // 상세 정보 처리 함수
+  const handleDetailInfo = useCallback((lotId) => {
+    console.log('상세 정보 요청:', lotId);
+    console.log('현재 parkingLots:', parkingLots); // parkingLots 데이터 로그 추가
+    const lot = parkingLots.find(lot => lot.id.toString() === lotId.toString());
+    if (!lot) {
+      console.error('주차장을 찾을 수 없습니다. ID:', lotId);
+      alert(`선택한 주차장(ID: ${lotId})을 찾을 수 없습니다.`);
+      return;
+    }
+    console.log('주차장 데이터:', lot);
+    navigate(`/parking-lot/${lotId}`); // useNavigate로 페이지 이동
+  }, [parkingLots, navigate]);
+
+  // 예약 처리 함수
+  const handleReservation = useCallback((lotId) => {
+    console.log('예약 요청:', lotId);
+    navigate(`/reservation?lotId=${lotId}`); // useNavigate로 페이지 이동
+  }, [navigate]);
+
+  // 경로 찾기 클릭 처리 함수
+  const handleFindRouteClick = useCallback((event, lot) => {
+    setAnchorEl(event.currentTarget);
+    setSelectedLot(lot);
+  }, []);
+
+  const handleClose = useCallback(() => {
+    setAnchorEl(null);
+  }, []);
+
+  const handleMapChoice = useCallback((mapType) => {
+    if (!selectedLot) return;
+
+    const encodedName = encodeURIComponent(selectedLot.주차장명);
+    let url;
+
+    if (mapType === 'kakao') {
+      url = `https://map.kakao.com/link/to/${encodedName},${selectedLot.위도},${selectedLot.경도}`;
+    } else if (mapType === 'naver') {
+      const startLat = userLocation ? userLocation.lat : mapCenterRef.current.lat;
+      const startLng = userLocation ? userLocation.lng : mapCenterRef.current.lng;
+      url = `http://map.naver.com/index.nhn?slng=${startLng}&slat=${startLat}&stext=현재위치&elng=${selectedLot.경도}&elat=${selectedLot.위도}&etext=${encodedName}&menu=route`;
+    }
+
+    window.open(url, '_blank');
+    handleClose();
+  }, [selectedLot, userLocation]);
+
   // 정보 창 생성 함수
   const createInfoWindowContent = useCallback((lot) => {
     if (!lot) {
@@ -73,45 +128,60 @@ const ParkingLotLayer = ({ parkingLots }) => {
     }
   
     const content = document.createElement('div');
-  const root = createRoot(content); // createRoot 사용
-  root.render(
-    <StyledCard>
-      <CardContent>
-        <Typography variant="h6" component="div" gutterBottom>
-          {lot.주차장명}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          요금: {lot.요금정보}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          기본 요금: {lot.주차기본요금}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          구분: {lot.주차장구분}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          운영요일: {lot.운영요일}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          잔여 수: {lot.가능한주차면}
-        </Typography>
-        <Box mt={2}>
-          <StyledButton variant="contained" color="primary" size="small" onClick={() => window.location.href = `/parking-lot-detail/${lot.id}`}>
-            상세 정보
-          </StyledButton>
-          <StyledButton variant="contained" color="secondary" size="small" onClick={() => window.location.href = `/reservation?lotId=${lot.id}`}>
-            예약하기
-          </StyledButton>
-          <StyledButton variant="contained" color="info" size="small" onClick={() => window.handleFindRoute(lot.id)}>
-            경로표시
-          </StyledButton>
-        </Box>
-      </CardContent>
-      </StyledCard>
+    const root = createRoot(content); // createRoot 사용
+    root.render(
+      <Box mt={2}>
+        <StyledCard>
+          <CardContent>
+            <Typography variant="h6" component="div" gutterBottom>
+              {lot.주차장명}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              요금: {lot.요금정보}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              기본 요금: {lot.주차기본요금}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              구분: {lot.주차장구분}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              운영요일: {lot.운영요일}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              잔여 수: {lot.가능한주차면}
+            </Typography>
+            <Box mt={2}>
+              <StyledButton variant="contained" color="primary" size="small" onClick={() => handleDetailInfo(lot.id)}>
+                상세 정보
+              </StyledButton>
+              <StyledButton variant="contained" color="secondary" size="small" onClick={() => handleReservation(lot.id)}>
+                예약하기
+              </StyledButton>
+              <StyledButton variant="contained" color="info" size="small" onClick={() => window.handleFindRoute(lot.id)}>
+                경로표시
+              </StyledButton>
+              <StyledButton 
+                variant="contained" 
+                size="small" 
+                color="secondary" 
+                onClick={(e) => {
+                  e.stopPropagation(); // 이벤트 버블링 방지
+                  handleFindRouteClick(e, lot);
+                }}
+              >
+                길찾기
+              </StyledButton>
+            </Box>
+          </CardContent>
+        </StyledCard>
+      </Box>
     );
-
+  
     return content;
-  }, []);
+  }, [handleDetailInfo, handleReservation, handleFindRouteClick]);
+
+  
 
   // 주차장 선택 시 처리
   const handleClickListItem = useCallback(async (lot) => {
@@ -152,8 +222,7 @@ const ParkingLotLayer = ({ parkingLots }) => {
     }
     
     // lotId를 문자열로 변환하여 비교
-    const stringLotId = String(lotId);
-    const lot = parkingLots.find(l => String(l.id) === stringLotId);
+    const lot = parkingLots.find(l => l.id.toString() === lotId.toString());
     
     if (!lot) {
       console.error('주차장을 찾을 수 없습니다. ID:', lotId);
@@ -586,17 +655,35 @@ const ParkingLotLayer = ({ parkingLots }) => {
   }
 
   return (
-    <ParkingLotList 
-      parkingLots={visibleParkingLots} 
-      onMouseOverListItem={handleMouseOverListItem} 
-      onMouseOutListItem={handleMouseOutListItem} 
-      onClickListItem={handleClickListItem}
-      highlightedLot={highlightedLot}
-      onRadiusIncrease={handleRadiusIncrease}
-      mapCenter={mapCenterRef.current}
-      userLocation={userLocation}
-      currentRadius={radius}  // radius 값을 currentRadius로 전달
-    />
+    <>
+      <ParkingLotList 
+        parkingLots={visibleParkingLots} 
+        onMouseOverListItem={handleMouseOverListItem} 
+        onMouseOutListItem={handleMouseOutListItem} 
+        onClickListItem={handleClickListItem}
+        highlightedLot={highlightedLot}
+        onRadiusIncrease={handleRadiusIncrease}
+        mapCenter={mapCenterRef.current}
+        userLocation={userLocation}
+        currentRadius={radius}  // radius 값을 currentRadius로 전달
+      />
+      <Popover
+        open={Boolean(anchorEl)}
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'left',
+        }}
+      >
+        <MenuItem onClick={() => handleMapChoice('kakao')}>카카오 지도로 보기</MenuItem>
+        <MenuItem onClick={() => handleMapChoice('naver')}>네이버 지도로 보기</MenuItem>
+      </Popover>
+    </>
   );
 };
 
