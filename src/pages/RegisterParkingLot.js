@@ -70,9 +70,6 @@ const RegisterParkingLot = () => {
       <Typography variant="h4" gutterBottom>주차장 등록</Typography>
       <Paper elevation={3} style={{ padding: '32px', maxWidth: '600px', width: '100%' }}>
         <Grid container spacing={2}>
-          <Grid item xs={12} style={{ textAlign: 'left' }}> {/* 왼쪽 정렬 추가 */}
-            <SearchPlace onLocationChange={handleLocationChange} /> {/* SearchPlace 컴포넌트 추가 */}
-          </Grid>
           <Grid item xs={12}>
             <TextField
               label="주차장 이름"
@@ -82,6 +79,9 @@ const RegisterParkingLot = () => {
               margin="normal"
               fullWidth
             />
+          </Grid>
+          <Grid item xs={12} style={{ textAlign: 'left', marginBottom: '19px' }}> {/* 왼쪽 정렬 및 마진 추가 */}
+            <SearchPlace onLocationChange={handleLocationChange} /> {/* SearchPlace 컴포넌트 추가 */}
           </Grid>
           <Grid item xs={6}>
             <TextField
