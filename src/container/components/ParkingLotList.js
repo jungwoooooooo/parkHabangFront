@@ -21,7 +21,7 @@ const StyledListItem = styled(ListItem)(({ theme, highlighted }) => ({
 // 주차장 리스트 컴포넌트
 const ParkingLotList = ({ parkingLots, onMouseOverListItem, onMouseOutListItem, onClickListItem, highlightedLot, onRadiusIncrease, mapCenter, currentRadius, userLocation }) => {
   const [showRadiusAlert, setShowRadiusAlert] = useState(false);
-  const [sortBy, setSortBy] = useState('distance');
+  const [sortBy, setSortBy] = useState(['distance']);
   const [sortedParkingLots, setSortedParkingLots] = useState([]);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -57,12 +57,14 @@ const ParkingLotList = ({ parkingLots, onMouseOverListItem, onMouseOutListItem, 
           distance: Math.round(distance * 1000)
         };
       }).sort((a, b) => {
-        if (sortBy === 'distance') {
-          return a.distance - b.distance;
-        } else if (sortBy === 'price') {
-          const priceA = parseFloat(a.요금정보.replace(/[^0-9.-]+/g,"")) || 0;
-          const priceB = parseFloat(b.요금정보.replace(/[^0-9.-]+/g,"")) || 0;
-          return priceA - priceB;
+        for (let criterion of sortBy) {
+          if (criterion === 'distance') {
+            if (a.distance !== b.distance) return a.distance - b.distance;
+          } else if (criterion === 'price') {
+            const priceA = parseFloat(a.주차기본요금.replace(/[^0-9.-]+/g,"")) || 0;
+            const priceB = parseFloat(b.주차기본요금.replace(/[^0-9.-]+/g,"")) || 0;
+            if (priceA !== priceB) return priceA - priceB; // 주차기본요금 기준으로 정렬
+          }
         }
         return 0;
       });
@@ -169,6 +171,7 @@ const ParkingLotList = ({ parkingLots, onMouseOverListItem, onMouseOutListItem, 
             <Typography variant="body2">요금: {lot.요금정보}</Typography>
             <Typography variant="body2">잔여 수: {lot.가능한주차면}</Typography>
             <Typography variant="body2">거리: {formatDistance(lot.distance)}</Typography>
+            <Typography variant="body2">금액: {lot.주차기본요금}</Typography>
             <Box mt={1}>
               <Button component={Link} to={`/parking-lot/${lot.id}`} variant="outlined" size="small" sx={{ mr: 1 }}>
                 상세 정보
@@ -210,6 +213,7 @@ const ParkingLotList = ({ parkingLots, onMouseOverListItem, onMouseOutListItem, 
       <FormControl fullWidth sx={{ mb: 2 }}>
         <InputLabel>정렬 기준</InputLabel>
         <Select
+          multiple
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value)}
         >

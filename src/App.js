@@ -2,6 +2,7 @@ import React from 'react';
 import { Route, Routes, Navigate, Link, useNavigate } from 'react-router-dom';
 import { isMobile } from 'react-device-detect';
 import { Box, Button } from '@mui/material';
+import { FaBars } from 'react-icons/fa'; // react-icons에서 햄버거 메뉴 아이콘 가져오기
 import Login from './pages/Login';
 import MapContainer from './container/MapContainer';
 import ParkingLotDetail from './pages/ParkingLotDetail';
@@ -27,6 +28,7 @@ const App = () => {
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
   const [isAdmin, setIsAdmin] = React.useState(false);
   const [parkingLots, setParkingLots] = React.useState([]);
+  const [menuOpen, setMenuOpen] = React.useState(false); // 메뉴 상태 추가
 
   const handleLogin = (userData) => {
     setIsLoggedIn(true);
@@ -44,6 +46,10 @@ const App = () => {
     navigate('/map');
   };
 
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen);
+  };
+
   return (
     <div>
       <header className="header">
@@ -52,8 +58,9 @@ const App = () => {
             <img src={logo} alt="로고" className="logo" />
           </Link>
         </div>
-        <nav>
-          <ul className="nav-list">
+        <nav className="nav"> {/* nav 태그에 클래스 추가 */}
+          <FaBars className="menu-icon" onClick={toggleMenu} /> {/* 햄버거 메뉴 아이콘 추가 */}
+          <ul className={`nav-list ${menuOpen ? 'open' : ''}`}>
             <li><Link to="/">홈</Link></li>
             <li><Link to="/service-intro">서비스 소개</Link></li>
             <li><Link to="/map">인천 주차장 2D지도</Link></li>

@@ -17,6 +17,7 @@ const ParkingShareInfo = () => {
       <p>주차장을 등록하려면 아래의 단계를 따르세요:</p>
       <ul style={{ listStyleType: 'none', paddingLeft: 0 }}>
         <li>주차장 사진을 찍습니다.</li>
+        <li><img src="../assert/촬영아이콘.png" alt="주차장 사진" style={{ width: '50%', height: 'auto' }} /></li>
         <li>사진과 함께 주차장 정보를 입력합니다.</li>
         <li>등록 버튼을 눌러 완료합니다.</li>
       </ul>

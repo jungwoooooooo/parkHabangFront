@@ -59,7 +59,7 @@ const Home = () => {
       </div>
       
       <button className="cta-button" onClick={handleButtonClick}>인천 주차장 지도 보러가기</button>
-      <br/><br/><br/><br/><br/><br/><br/>
+      <br/><br/><br/><br/>
       {/* 소개 섹션 */}
       <animated.section className="intro-section" style={introAnimation} ref={introRef}>
         <h2>서비스 소개</h2>
