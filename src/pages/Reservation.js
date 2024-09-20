@@ -52,7 +52,7 @@ const Reservation = ({ parkingLots }) => {
   };
 
   const isTimeDisabled = (time, date) => {
-    const dateTime = new Date(`${date}T${time}`);
+    const dateTime = new Date(`${date}T${time}:00`);
     return reservedTimes.some(reservation => {
       const resStart = new Date(reservation.시작시간);
       const resEnd = new Date(reservation.종료시간);
@@ -62,8 +62,14 @@ const Reservation = ({ parkingLots }) => {
 
   const handleReservation = async () => {
     try {
-      const start = new Date(`${startDate}T${startTime}`);
-      const end = new Date(`${endDate}T${endTime}`);
+      const start = new Date(`${startDate}T${startTime}:00`);
+      const end = new Date(`${endDate}T${endTime}:00`);
+
+      if (isNaN(start) || isNaN(end)) {
+        setSnackbarMessage('유효한 날짜와 시간을 입력해주세요.');
+        setOpenSnackbar(true);
+        return;
+      }
 
       if (isTimeOverlap(start, end)) {
         setSnackbarMessage('이미 예약된 시간입니다. 다른 시간을 선택해주세요.');
@@ -75,8 +81,8 @@ const Reservation = ({ parkingLots }) => {
       console.log('불러온 토큰:', token); // 토큰 확인
       const reservationData = {
         parkingLot: parkingLot.id,
-        시작시간: new Date(`${startDate}T${startTime}`).toISOString(),
-        종료시간: new Date(`${endDate}T${endTime}`).toISOString(),
+        시작시간: start.toISOString(),
+        종료시간: end.toISOString(),
         사용자이름: name,
         연락처: phoneNumber,
         차량번호: carNumber

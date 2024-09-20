@@ -9,11 +9,12 @@ const SignupForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [nickname, setNickname] = useState('');
+  const [parkingLotId, setParkingLotId] = useState(undefined); // 주차장 아이디 상태 추가
   const navigate = useNavigate();
 
   const handleSignup = async () => {
     try {
-      const response = await axios.post('http://localhost:5000/user/signup', { email, password, nickname });
+      const response = await axios.post('http://localhost:5000/user/signup', { email, password, nickname, parkingLotId });
       console.log('회원가입 성공:', response.data);
       alert('회원가입 성공');
       navigate('/login'); // 회원가입 성공 후 로그인 페이지로 이동
@@ -78,6 +79,19 @@ const SignupForm = () => {
         variant="outlined"
         value={nickname}
         onChange={(e) => setNickname(e.target.value)}
+        margin="normal"
+        fullWidth
+        sx={{ 
+          backgroundColor: "rgba(255, 255, 255, 0.8)", 
+          maxWidth: "400px" // 최대 넓이 조정
+        }} 
+      />
+      <TextField
+        label="주차장 아이디 (선택)"
+        type="number"
+        variant="outlined"
+        value={parkingLotId}
+        onChange={(e) => setParkingLotId(e.target.value ? parseInt(e.target.value) : undefined)}
         margin="normal"
         fullWidth
         sx={{ 

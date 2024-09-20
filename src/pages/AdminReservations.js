@@ -12,21 +12,56 @@ const AdminReservations = () => {
   const [users, setUsers] = useState([]);
   const [parkingLots, setParkingLots] = useState([]);
   const [currentTab, setCurrentTab] = useState(0);
-  const [editUser, setEditUser] = useState({ id: null, name: '' });
+  const [currentUser, setCurrentUser] = useState(null);
+  const [selectedParkingLot, setSelectedParkingLot] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
-      await fetchReservations();
-      await fetchUsers();
-      await fetchParkingLots();
+      await fetchCurrentUser();
     };
     fetchData();
-  }, []);
+  }, []); // 컴포넌트가 마운트될 때 한 번만 호출
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (currentUser) {
+        await fetchUsers();
+        await fetchParkingLots();
+        await fetchReservations(); // currentUser가 설정된 후에 호출
+      }
+    };
+    fetchData();
+  }, [currentUser]); // currentUser가 변경될 때마다 fetchData 호출
+
+  const fetchCurrentUser = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('토큰이 없습니다.');
+      }
+  
+      const response = await axios.get(`${API_URL}/user/current`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      console.log('현재 사용자 데이터:', response.data); // currentUser 확인용 로그
+      setCurrentUser(response.data);
+    } catch (error) {
+      console.error('현재 사용자 정보 조회 실패:', error);
+    }
+  };
 
   const fetchReservations = async () => {
     try {
       const response = await axios.get(`${API_URL}/reservations`);
-      setReservations(response.data);
+      console.log('예약 데이터:', response.data); // 데이터 확인용 로그
+      console.log('현재 사용자:', currentUser); // currentUser 확인용 로그
+      const filteredReservations = response.data.filter(reservation => 
+        reservation.parkingLot?.id === currentUser?.parkingLotId
+      );
+      console.log('필터링된 예약 데이터:', filteredReservations); // 필터링된 데이터 확인용 로그
+      setReservations(filteredReservations);
     } catch (error) {
       console.error('예약 목록 조회 실패:', error);
     }
@@ -41,16 +76,14 @@ const AdminReservations = () => {
 
       const response = await axios.get(`${API_URL}/user`, {
         headers: {
-          Authorization: `Bearer ${token}` // 인증 토큰 추가
+          Authorization: `Bearer ${token}`
         }
       });
-      console.log('유저 데이터:', response.data); // 유저 데이터 콘솔 로그 추가
       const usersData = Array.isArray(response.data) ? response.data : [];
-      setUsers(usersData); // 배열 확인 후 설정
-      console.log('설정된 유저 데이터:', usersData); // 설정된 유저 데이터 콘솔 로그 추가
+      setUsers(usersData);
     } catch (error) {
       console.error('유저 목록 조회 실패:', error);
-      setUsers([]); // 오류 발생 시 빈 배열로 설정
+      setUsers([]);
     }
   };
 
@@ -63,21 +96,21 @@ const AdminReservations = () => {
     }
   };
 
+  const fetchReservationsByParkingLot = async (parkingLotId) => {
+    try {
+      const response = await axios.get(`${API_URL}/reservations/parking-lot/${parkingLotId}`);
+      setReservations(response.data);
+    } catch (error) {
+      console.error('주차장 예약 목록 조회 실패:', error);
+    }
+  };
+
   const handleCancelReservation = async (id) => {
     try {
       await axios.delete(`${API_URL}/reservations/${id}`);
       fetchReservations();
     } catch (error) {
       console.error('예약 취소 실패:', error);
-    }
-  };
-
-  const handleDeleteUser = async (id) => {
-    try {
-      await axios.delete(`${API_URL}/users/${id}`);
-      fetchUsers();
-    } catch (error) {
-      console.error('유저 삭제 실패:', error);
     }
   };
 
@@ -90,28 +123,183 @@ const AdminReservations = () => {
     }
   };
 
-  const handleEditUser = async (id, name) => {
-    try {
-      await axios.put(`${API_URL}/user/${id}`, { name });
-      fetchUsers();
-    } catch (error) {
-      console.error('유저 수정 실패:', error);
-    }
+  const handleEditParkingLot = (id) => {
+    // 수정 로직을 여기에 추가하세요
+    console.log(`주차장 ${id} 수정`);
   };
 
   const handleTabChange = (event, newValue) => {
     setCurrentTab(newValue);
   };
 
+  const handleParkingLotClick = (parkingLotId) => {
+    setSelectedParkingLot(parkingLotId);
+    fetchReservationsByParkingLot(parkingLotId);
+  };
+
+  const handleCheckIn = async (id) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('토큰이 없습니다.');
+      }
+
+      await axios.post(`${API_URL}/parking-lots/${id}/check-in`, {}, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      // 예약 목록을 다시 가져오지 않고 상태를 직접 업데이트
+      setReservations(prevReservations => 
+        prevReservations.map(reservation => 
+          reservation.parkingLot.id === id ? { ...reservation, checkedIn: true, checkedOut: false } : reservation
+        )
+      );
+    } catch (error) {
+      console.error('입차 실패:', error);
+    }
+  };
+
+  const handleCheckOut = async (id) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('토큰이 없습니다.');
+      }
+
+      const response = await axios.post(`${API_URL}/parking-lots/${id}/check-out`, {}, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      if (response.status === 200 || response.status === 201) { // 201 상태 코드도 처리
+        // 예약 목록을 다시 가져오지 않고 상태를 직접 업데이트
+        setReservations(prevReservations => 
+          prevReservations.map(reservation => 
+            reservation.parkingLot.id === id ? { ...reservation, checkedOut: true } : reservation
+          )
+        );
+        alert('출차완료');
+      } else {
+        console.error('출차 실패:', response.statusText);
+      }
+    } catch (error) {
+      console.error('출차 실패:', error);
+    }
+  };
+
   return (
     <Box display="flex" flexDirection="column" alignItems="center">
       <Tabs value={currentTab} onChange={handleTabChange} centered>
         <Tab label="예약 관리" />
-        <Tab label="유저 관리" />
         <Tab label="주차장 관리" />
       </Tabs>
 
       {currentTab === 0 && (
+        <TableContainer component={Paper} style={{ marginTop: '20px' }}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>주차장 ID</TableCell> {/* 주차장 ID 열 추가 */}
+                <TableCell>주차장명</TableCell>
+                <TableCell>사용자</TableCell>
+                <TableCell>시작 시간</TableCell>
+                <TableCell>종료 시간</TableCell>
+                <TableCell>차량 번호</TableCell>
+                <TableCell>잔여석</TableCell>
+                <TableCell>액션</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {reservations.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={8} align="center">예약이 없습니다.</TableCell> {/* colSpan 수정 */}
+                </TableRow>
+              ) : (
+                reservations.map((reservation) => (
+                  <TableRow key={reservation.id}>
+                    <TableCell>{reservation.parkingLot?.id}</TableCell> {/* 주차장 ID 데이터 추가 */}
+                    <TableCell>{reservation.parkingLot?.주차장명}</TableCell>
+                    <TableCell>{reservation.사용자이름 || 'N/A'}</TableCell> {/* 사용자 데이터가 없을 때 'N/A' 표시 */}
+                    <TableCell>{new Date(reservation.시작시간).toLocaleString()}</TableCell>
+                    <TableCell>{new Date(reservation.종료시간).toLocaleString()}</TableCell>
+                    <TableCell>{reservation.차량번호 || 'N/A'}</TableCell> {/* 차량 번호 데이터가 없을 때 'N/A' 표시 */}
+                    <TableCell>{reservation.parkingLot?.가능한주차면}</TableCell> {/* 가능한주차면 데이터 추가 */}
+                    <TableCell>
+                      <Box display="flex" justifyContent="flex-start">
+                        <Button 
+                          onClick={() => handleCancelReservation(reservation.id)} 
+                          style={{ marginLeft: '-16px' }}
+                        >
+                          취소
+                        </Button>
+                        {!reservation.checkedIn && (
+                          <Button 
+                            onClick={() => handleCheckIn(reservation.parkingLot.id)} 
+                            style={{ marginLeft: '8px' }}
+                          >
+                            입차
+                          </Button>
+                        )}
+                        {reservation.checkedIn && !reservation.checkedOut && (
+                          <Button 
+                            onClick={() => handleCheckOut(reservation.parkingLot.id)} 
+                            style={{ marginLeft: '8px' }}
+                          >
+                            출차
+                          </Button>
+                        )}
+                        {reservation.checkedOut && (
+                          <span>출차 완료된 차량</span>
+                        )}
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
+
+      {currentTab === 1 && (
+        <TableContainer component={Paper} style={{ marginTop: '20px' }}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>주차장 ID</TableCell>
+                <TableCell>주차장명</TableCell>
+                <TableCell>소재지지번주소</TableCell>
+                <TableCell>액션</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {parkingLots
+                .filter(lot => lot.id === currentUser?.parkingLotId)
+                .map((lot) => (
+                  <TableRow key={lot.id}>
+                    <TableCell>{lot.id}</TableCell>
+                    <TableCell>{lot.주차장명}</TableCell>
+                    <TableCell>{lot.소재지지번주소}</TableCell>
+                    <TableCell>
+                      <Box display="flex" justifyContent="flex-start">
+                        <Button 
+                          onClick={() => handleEditParkingLot(lot.id)} 
+                          style={{ marginLeft: '-16px' }}
+                        >
+                          수정
+                        </Button>
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
+
+      {selectedParkingLot && (
         <TableContainer component={Paper} style={{ marginTop: '20px' }}>
           <Table>
             <TableHead>
@@ -140,94 +328,17 @@ const AdminReservations = () => {
                       >
                         취소
                       </Button>
-                    </Box>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
-
-      {currentTab === 1 && (
-        <TableContainer component={Paper} style={{ marginTop: '20px' }}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>유저 ID</TableCell>
-                <TableCell>유저 이름</TableCell>
-                <TableCell>이메일</TableCell>
-                <TableCell>액션</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {users.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={4} align="center">유저 데이터가 없습니다.</TableCell>
-                </TableRow>
-              ) : (
-                users.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell>{user.id}</TableCell>
-                    <TableCell>
-                      {editUser.id === user.id ? (
-                        <input
-                          value={editUser.name}
-                          onChange={(e) => setEditUser({ ...editUser, name: e.target.value })}
-                        />
-                      ) : (
-                        user.name
-                      )}
-                    </TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell>
-                      <Box display="flex" justifyContent="flex-start">
-                        {editUser.id === user.id ? (
-                          <Button onClick={() => handleEditUser(user.id, editUser.name)}>
-                            저장
-                          </Button>
-                        ) : (
-                          <Button onClick={() => setEditUser({ id: user.id, name: user.name })}>
-                            수정
-                          </Button>
-                        )}
-                        <Button onClick={() => handleDeleteUser(user.id)} style={{ marginLeft: '8px' }}>
-                          삭제
-                        </Button>
-                      </Box>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
-
-      {currentTab === 2 && (
-        <TableContainer component={Paper} style={{ marginTop: '20px' }}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>주차장 ID</TableCell>
-                <TableCell>주차장명</TableCell>
-                <TableCell>소재지지번주소</TableCell>
-                <TableCell>액션</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {parkingLots.map((lot) => (
-                <TableRow key={lot.id}>
-                  <TableCell>{lot.id}</TableCell>
-                  <TableCell>{lot.주차장명}</TableCell>
-                  <TableCell>{lot.소재지지번주소}</TableCell>
-                  <TableCell>
-                    <Box display="flex" justifyContent="flex-start">
                       <Button 
-                        onClick={() => handleDeleteParkingLot(lot.id)} 
-                        style={{ marginLeft: '-16px' }}
+                        onClick={() => handleCheckIn(reservation.parkingLot.id)} 
+                        style={{ marginLeft: '8px' }}
                       >
-                        삭제
+                        입차
+                      </Button>
+                      <Button 
+                        onClick={() => handleCheckOut(reservation.parkingLot.id)} 
+                        style={{ marginLeft: '8px' }}
+                      >
+                        출차
                       </Button>
                     </Box>
                   </TableCell>
