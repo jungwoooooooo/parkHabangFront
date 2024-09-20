@@ -1,0 +1,61 @@
+.parking-share-info {
+    text-align: center;
+    font-size: 1.2em; /* 글씨 크기 키움 */
+  }
+  
+  .image-container {
+    display: flex;
+    justify-content: center;
+    animation: fadeIn 2s ease-in-out; /* 애니메이션 추가 */
+  }
+  
+  .image-container img {
+    width: 20%;
+    height: auto;
+    margin-right: 10px;
+    transition: transform 0.3s; /* 애니메이션 추가 */
+  }
+  
+  .image-container img:last-child {
+    width: 30%;
+    margin-right: 0;
+  }
+  
+  .image-container img:hover {
+    transform: scale(1.1); /* 호버 시 확대 */
+  }
+  
+  ul {
+    list-style-type: none;
+    padding-left: 0;
+  }
+  
+  ul img {
+    width: 30%;
+    height: auto;
+    transition: transform 0.3s; /* 애니메이션 추가 */
+  }
+  
+  ul img:hover {
+    transform: scale(1.1); /* 호버 시 확대 */
+  }
+  
+  .register-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 1.2em; /* 글씨 크기 키움 */
+    transition: background-color 0.3s; /* 애니메이션 추가 */
+  }
+  
+  .register-button:hover {
+    background-color: #0056b3; /* 호버 시 색상 변경 */
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }

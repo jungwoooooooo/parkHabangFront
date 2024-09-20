@@ -7,10 +7,10 @@ import { styled } from '@mui/material/styles';
 import '../css/Search.css'; // CSS 파일 경로 수정
 
 // 주소 검색 컨테이너
-const Container = styled(Box)(({ theme }) => ({
-    position: 'absolute',
-    top: '80px', // 기존 '10px'에서 '50px'으로 변경
-    left: '55%',
+const Container = styled(Box)(({ theme, top, left }) => ({
+    position: 'absolute', // position을 absolute로 변경
+    top: top || '80px', // 기본값을 '80px'로 설정
+    left: left || '50%', // 기본값을 '50%'로 설정
     transform: 'translateX(-50%)',
     backgroundColor: 'rgba(255, 255, 255, 0.8)',
     padding: '5px',
@@ -58,7 +58,7 @@ const SmallTextField = styled(TextField)(({ theme }) => ({
 }));
 
 // 주소 검색 컴포넌트
-const SearchPlace = ({ onLocationChange }) => {
+const SearchPlace = ({ onLocationChange, top, left }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [addressList, setAddressList] = useState([]);
 
@@ -118,7 +118,7 @@ const SearchPlace = ({ onLocationChange }) => {
 
     // 렌더링
     return (
-        <Container>
+        <Container top={top} left={left}>
             <Button
                 variant="contained"
                 color="primary"

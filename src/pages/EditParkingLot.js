@@ -1,223 +1,298 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { TextField, Button, Box, Typography, Grid, Paper, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
-import { Box, Typography, TextField, Button, CircularProgress, Grid, Paper } from '@mui/material';
 import SearchPlace from '../container/components/Search'; // SearchPlace 컴포넌트 임포트
 
 const EditParkingLot = () => {
   const { id } = useParams();
+  const [name, setName] = useState('');
+  const [lon, setLon] = useState('');
+  const [lat, setLat] = useState('');
+  const [startDate, setStartDate] = useState(''); // 시작 날짜 상태 추가
+  const [startTime, setStartTime] = useState(''); // 시작 시간 상태 추가
+  const [endDate, setEndDate] = useState(''); // 종료 날짜 상태 추가
+  const [endTime, setEndTime] = useState(''); // 종료 시간 상태 추가
+  const [address, setAddress] = useState('');
+  const [jibunAddress, setJibunAddress] = useState(''); // 지번 주소 상태 추가
+  const [fee, setFee] = useState('');
+  const [capacity, setCapacity] = useState('');
+  const [contact, setContact] = useState(''); // 연락처 상태 추가
+  const [description, setDescription] = useState(''); // 설명 상태 추가
+  const [image, setImage] = useState(null); // 이미지 상태 추가
   const navigate = useNavigate();
-  const [parkingLot, setParkingLot] = useState(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchParkingLot = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        navigate('/login');
+        return;
+      }
+
       try {
-        const token = localStorage.getItem('token');
         const response = await axios.get(`http://localhost:5000/parking-lots/${id}`, {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
-        setParkingLot(response.data);
+        const data = response.data;
+        setName(data.주차장명);
+        setLat(data.위도);
+        setLon(data.경도);
+        setStartDate(data.시작날짜);
+        setStartTime(data.시작시간);
+        setEndDate(data.종료날짜);
+        setEndTime(data.종료시간);
+        setAddress(data.주소);
+        setJibunAddress(data.소재지지번주소);
+        setFee(data.주차기본요금);
+        setCapacity(data.총주차면);
+        setContact(data.연락처);
+        setDescription(data.설명);
       } catch (error) {
         console.error('주차장 정보 불러오기 실패:', error);
-        alert('주차장 정보를 불러오는데 실패했습니다.');
-      } finally {
-        setLoading(false);
+        alert('주차장 정보를 불러오는 데 실패했습니다.');
       }
     };
 
     fetchParkingLot();
-  }, [id]);
+  }, [id, navigate]);
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  const handleUpdate = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.log('토큰이 없습니다. 로그인 페이지로 리디렉션합니다.');
+      navigate('/login');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('주차장명', name);
+    formData.append('위도', lat);
+    formData.append('경도', lon);
+    formData.append('시작날짜', startDate);
+    formData.append('시작시간', startTime);
+    formData.append('종료날짜', endDate);
+    formData.append('종료시간', endTime);
+    formData.append('주소', address);
+    formData.append('소재지지번주소', jibunAddress);
+    formData.append('주차기본요금', fee);
+    formData.append('총주차면', capacity);
+    formData.append('가능한주차면', capacity);
+    formData.append('주차장구분', '대여');
+    formData.append('연락처', contact);
+    formData.append('설명', description);
+    if (image) {
+      formData.append('image', image);
+    }
+
     try {
-      const token = localStorage.getItem('token');
-      await axios.put(`http://localhost:5000/parking-lots/${id}`, parkingLot, {
-        headers: { Authorization: `Bearer ${token}` },
+      const response = await axios.put(`http://localhost:5000/parking-lots/${id}`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
+        },
       });
-      alert('주차장 정보가 수정되었습니다.');
-      navigate('/my-parking-lots');
+      console.log('주차장 수정 성공:', response.data);
+      alert('주차장 수정이 완료되었습니다!');
+      navigate('/');
     } catch (error) {
-      console.error('주차장 수정 실패:', error);
-      alert('주차장 수정에 실패했습니다.');
+      if (error.response) {
+        console.error('주차장 수정 실패:', error.response.data);
+      } else if (error.request) {
+        console.error('주차장 수정 실패: 응답 없음', error.request);
+      } else {
+        console.error('주차장 수정 실패:', error.message);
+      }
     }
   };
 
-  const handleChange = (event) => {
-    setParkingLot({ ...parkingLot, [event.target.name]: event.target.value });
-  };
-
   const handleLocationChange = ({ lat, lng, roadAddress, jibunAddress }) => {
-    setParkingLot({
-      ...parkingLot,
-      위도: lat,
-      경도: lng,
-      주소: roadAddress,
-      소재지지번주소: jibunAddress,
-    });
+    setLat(lat);
+    setLon(lng);
+    setAddress(roadAddress);
+    setJibunAddress(jibunAddress);
   };
 
-  if (loading) {
-    return (
-      <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
-        <CircularProgress size={60} />
-      </Box>
-    );
-  }
-
-  if (!parkingLot) {
-    return (
-      <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
-        <Typography>주차장 정보를 찾을 수 없습니다.</Typography>
-      </Box>
-    );
-  }
+  const timeOptions = Array.from({ length: 24 * 6 }, (_, i) => {
+    const hours = String(Math.floor(i / 6)).padStart(2, '0');
+    const minutes = String((i % 6) * 10).padStart(2, '0');
+    return `${hours}:${minutes}`;
+  });
 
   return (
-    <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" minHeight="100vh" bgcolor="#f5f5f5" p={2}>
-      <Typography variant="h4" gutterBottom>주차장 정보 수정</Typography>
-      <Box mt={2}>
-        <Button variant="contained" color="primary" onClick={() => navigate('/my-parking-lots')}>
-          내 주차장 관리
-        </Button>
-      </Box>
-      <Paper elevation={3} style={{ padding: '32px', maxWidth: '800px', width: '100%', marginTop: '16px' }}>
-        <form onSubmit={handleSubmit} style={{ width: '100%' }}>
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <SearchPlace onLocationChange={handleLocationChange} />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                name="주차장명"
-                label="주차장명"
-                value={parkingLot.주차장명 || ''}
-                onChange={handleChange}
-                fullWidth
-                margin="normal"
-                variant="outlined"
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                name="위도"
-                label="위도"
-                value={parkingLot.위도 || ''}
-                onChange={handleChange}
-                fullWidth
-                margin="normal"
-                variant="outlined"
-                disabled
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                name="경도"
-                label="경도"
-                value={parkingLot.경도 || ''}
-                onChange={handleChange}
-                fullWidth
-                margin="normal"
-                variant="outlined"
-                disabled
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                name="공유시간"
-                label="공유시간"
-                value={parkingLot.공유시간 || ''}
-                onChange={handleChange}
-                fullWidth
-                margin="normal"
-                variant="outlined"
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                name="주소"
-                label="주소"
-                value={parkingLot.주소 || ''}
-                onChange={handleChange}
-                fullWidth
-                margin="normal"
-                variant="outlined"
-                disabled
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                name="소재지지번주소"
-                label="소재지지번주소"
-                value={parkingLot.소재지지번주소 || ''}
-                onChange={handleChange}
-                fullWidth
-                margin="normal"
-                variant="outlined"
-                disabled
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                name="주차기본요금"
-                label="기본 요금"
-                type="number"
-                value={parkingLot.주차기본요금 || ''}
-                onChange={handleChange}
-                fullWidth
-                margin="normal"
-                variant="outlined"
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                name="총주차면"
-                label="총 주차면"
-                type="number"
-                value={parkingLot.총주차면 || ''}
-                onChange={handleChange}
-                fullWidth
-                margin="normal"
-                variant="outlined"
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                name="연락처"
-                label="연락처"
-                value={parkingLot.연락처 || ''}
-                onChange={handleChange}
-                fullWidth
-                margin="normal"
-                variant="outlined"
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                name="설명"
-                label="설명"
-                value={parkingLot.설명 || ''}
-                onChange={handleChange}
-                fullWidth
-                margin="normal"
-                variant="outlined"
-                multiline
-                rows={4}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Box mt={2} display="flex" justifyContent="space-between">
-                <Button type="submit" variant="contained" color="primary">
-                  수정 완료
-                </Button>
-                <Button variant="contained" color="secondary" onClick={() => navigate('/my-parking-lots')}>
-                  취소
-                </Button>
-              </Box>
-            </Grid>
+    <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="100vh" bgcolor="#f5f5f5">
+      <Typography variant="h4" gutterBottom>주차장 수정</Typography>
+      <Paper elevation={3} style={{ padding: '32px', maxWidth: '600px', width: '100%', position: 'relative' }}>
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <TextField
+              label="주차장 이름"
+              variant="outlined"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              margin="normal"
+              fullWidth
+            />
           </Grid>
-        </form>
+          <Grid item xs={12} style={{ textAlign: 'left', marginBottom: '19px' }}>
+            <SearchPlace onLocationChange={handleLocationChange} top="115px" left="50%" />
+          </Grid>
+          <Grid item xs={6}>
+            <TextField
+              label="위도"
+              variant="outlined"
+              value={lat}
+              onChange={(e) => setLat(e.target.value)}
+              margin="normal"
+              fullWidth
+              disabled
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <TextField
+              label="경도"
+              variant="outlined"
+              value={lon}
+              onChange={(e) => setLon(e.target.value)}
+              margin="normal"
+              fullWidth
+              disabled
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <TextField
+              label="시작 날짜"
+              type="date"
+              variant="outlined"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              margin="normal"
+              fullWidth
+              InputLabelProps={{ shrink: true }}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <FormControl fullWidth margin="normal" variant="outlined">
+              <InputLabel shrink>시작 시간</InputLabel>
+              <Select
+                value={startTime}
+                onChange={(e) => setStartTime(e.target.value)}
+                displayEmpty
+              >
+                {timeOptions.map((time) => (
+                  <MenuItem key={time} value={time}>
+                    {time}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={6}>
+            <TextField
+              label="종료 날짜"
+              type="date"
+              variant="outlined"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              margin="normal"
+              fullWidth
+              InputLabelProps={{ shrink: true }}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <FormControl fullWidth margin="normal" variant="outlined">
+              <InputLabel shrink>종료 시간</InputLabel>
+              <Select
+                value={endTime}
+                onChange={(e) => setEndTime(e.target.value)}
+                displayEmpty
+              >
+                {timeOptions.map((time) => (
+                  <MenuItem key={time} value={time}>
+                    {time}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              label="주소"
+              variant="outlined"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              margin="normal"
+              fullWidth
+              disabled
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              label="소재지지번주소"
+              variant="outlined"
+              value={jibunAddress}
+              onChange={(e) => setJibunAddress(e.target.value)}
+              margin="normal"
+              fullWidth
+              disabled
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <TextField
+              label="요금"
+              variant="outlined"
+              value={fee}
+              onChange={(e) => setFee(e.target.value)}
+              margin="normal"
+              fullWidth
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <TextField
+              label="수용량"
+              variant="outlined"
+              value={capacity}
+              onChange={(e) => setCapacity(e.target.value)}
+              margin="normal"
+              fullWidth
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              label="연락처"
+              variant="outlined"
+              value={contact}
+              onChange={(e) => setContact(e.target.value)}
+              margin="normal"
+              fullWidth
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              label="설명"
+              variant="outlined"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              margin="normal"
+              fullWidth
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setImage(e.target.files[0])}
+              style={{ margin: '16px 0' }}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <Button variant="contained" color="primary" onClick={handleUpdate} fullWidth>
+              수정하기
+            </Button>
+          </Grid>
+        </Grid>
       </Paper>
     </Box>
   );
