@@ -91,52 +91,35 @@ const MyReservations = () => {
   };
 
   const handleEditSave = async () => {
-
     const token = localStorage.getItem('token');
-
     if (!token) {
-
       console.log('토큰이 없습니다. 로그인 페이지로 리디렉션합니다.');
-
       navigate('/login');
-
       return;
     }
 
-
     try {
-      await axios.put(`http://localhost:5000/reservations/${editReservation.id}`, {
-
+      const response = await axios.put(`http://localhost:5000/reservations/${editReservation.id}`, {
         시작시간: new Date(`${editStartDate}T${editStartTime}`).toISOString(),
-
         종료시간: new Date(`${editEndDate}T${editEndTime}`).toISOString(),
       }, {
-
         headers: {
-
           Authorization: `Bearer ${token}`,
-
         },
-
       });
 
-      console.log('예약 수정 성공:', editReservation.id);
+      console.log('예약 수정 성공:', response.data);
       setReservations(reservations.map(reservation => 
         reservation.id === editReservation.id 
-
           ? { ...reservation, 시작시간: `${editStartDate}T${editStartTime}`, 종료시간: `${editEndDate}T${editEndTime}` } 
-
           : reservation
-
       ));
 
       setEditDialogOpen(false);
       alert('예약이 수정되었습니다.');
     } catch (error) {
       console.error('예약 수정 실패:', error);
-
       alert('예약 수정에 실패했습니다.');
-
     }
   };
 
