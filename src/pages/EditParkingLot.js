@@ -31,6 +31,7 @@ const EditParkingLot = () => {
       }
 
       try {
+        console.log(`Fetching parking lot with ID: ${id}`); // 디버깅용 로그 추가
         const response = await axios.get(`http://localhost:5000/parking-lots/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -67,36 +68,38 @@ const EditParkingLot = () => {
       return;
     }
 
-    const formData = new FormData();
-    formData.append('주차장명', name);
-    formData.append('위도', lat);
-    formData.append('경도', lon);
-    formData.append('시작날짜', startDate);
-    formData.append('시작시간', startTime);
-    formData.append('종료날짜', endDate);
-    formData.append('종료시간', endTime);
-    formData.append('주소', address);
-    formData.append('소재지지번주소', jibunAddress);
-    formData.append('주차기본요금', fee);
-    formData.append('총주차면', capacity);
-    formData.append('가능한주차면', capacity);
-    formData.append('주차장구분', '대여');
-    formData.append('연락처', contact);
-    formData.append('설명', description);
-    if (image) {
-      formData.append('image', image);
-    }
+    const data = {
+      주차장명: name,
+      위도: lat,
+      경도: lon,
+      시작날짜: startDate,
+      시작시간: startTime,
+      종료날짜: endDate,
+      종료시간: endTime,
+      소재지도로명주소: address,
+      소재지지번주소: jibunAddress,
+      주차기본요금: fee,
+      총주차면: capacity,
+      가능한주차면: capacity, // 가능한주차면 필드 추가
+      주차장구분: '대여',
+      전화번호: contact,
+      특기사항: description,
+      주차장사진: image ? URL.createObjectURL(image) : null, // 이미지 URL로 변환
+      userId: 1, // 예시로 사용자 ID를 1로 설정
+      장애인전용주차구역보유여부: 'N', // 예시로 설정
+    };
 
     try {
-      const response = await axios.put(`http://localhost:5000/parking-lots/${id}`, formData, {
+      console.log(`Updating parking lot with ID: ${id}`); // 디버깅용 로그 추가
+      const response = await axios.put(`http://localhost:5000/parking-lots/${id}`, data, {
         headers: {
           Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data',
+          'Content-Type': 'application/json',
         },
       });
       console.log('주차장 수정 성공:', response.data);
       alert('주차장 수정이 완료되었습니다!');
-      navigate('/');
+      navigate('/my-parking-lots', { state: { refresh: true } }); // 수정 후 내 주차장 관리 페이지로 이동
     } catch (error) {
       if (error.response) {
         console.error('주차장 수정 실패:', error.response.data);
@@ -106,6 +109,9 @@ const EditParkingLot = () => {
         console.error('주차장 수정 실패:', error.message);
       }
     }
+
+    // 토큰 상태 확인
+    console.log('토큰 상태:', localStorage.getItem('token'));
   };
 
   const handleLocationChange = ({ lat, lng, roadAddress, jibunAddress }) => {

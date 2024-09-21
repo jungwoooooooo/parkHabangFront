@@ -45,7 +45,6 @@ const Reservation = ({ parkingLots }) => {
 
   const isTimeOverlap = (start, end) => {
     return reservedTimes.some(reservation => {
-      if (reservation.parkingLot !== parkingLot.id) return false; // 주차장 ID 확인
       const resStart = new Date(reservation.시작시간);
       const resEnd = new Date(reservation.종료시간);
       return (start < resEnd && end > resStart);
@@ -55,10 +54,9 @@ const Reservation = ({ parkingLots }) => {
   const isTimeDisabled = (time, date) => {
     const dateTime = new Date(`${date}T${time}:00`);
     return reservedTimes.some(reservation => {
-      if (reservation.parkingLot !== parkingLot.id) return false; // 주차장 ID 확인
       const resStart = new Date(reservation.시작시간);
       const resEnd = new Date(reservation.종료시간);
-      return dateTime >= resStart && dateTime <= resEnd;
+      return dateTime >= resStart && dateTime < resEnd;
     });
   };
 
@@ -92,11 +90,13 @@ const Reservation = ({ parkingLots }) => {
 
       console.log('Reservation Data:', reservationData); // 로그 추가
 
-      await axios.post('http://localhost:5000/reservations', reservationData, {
+      const response = await axios.post('http://localhost:5000/reservations', reservationData, {
         headers: {
           Authorization: `Bearer ${token}` // 헤더에 토큰 추가
         }
       });
+
+      console.log('서버 응답:', response.data); // 서버 응답 로그 추가
 
       setSnackbarMessage('예약이 성공적으로 완료되었습니다.');
       setOpenSnackbar(true);

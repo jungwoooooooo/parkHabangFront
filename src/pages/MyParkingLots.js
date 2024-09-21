@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, Button, List, ListItem, ListItemText, CircularProgress } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom'; // useLocation 추가
 import axios from 'axios';
 
 const MyParkingLots = () => {
   const [parkingLots, setParkingLots] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const location = useLocation(); // useLocation 사용
 
   useEffect(() => {
     const fetchParkingLots = async () => {
@@ -25,28 +26,14 @@ const MyParkingLots = () => {
         });
         setParkingLots(response.data);
       } catch (error) {
-        if (error.response) {
-          console.error('서버 응답 오류:', error.response.data);
-          console.error('상태 코드:', error.response.status);
-          console.error('헤더:', error.response.headers);
-        } else if (error.request) {
-          console.error('응답 없음:', error.request);
-        } else {
-          console.error('오류 메시지:', error.message);
-        }
-        if (error.response && error.response.status === 401) {
-          localStorage.removeItem('token');
-          navigate('/login');
-        } else {
-          alert('주차장 목록을 불러오는 데 실패했습니다.');
-        }
+        console.error('주차장 목록 불러오기 실패:', error);
       } finally {
         setLoading(false);
       }
     };
 
     fetchParkingLots();
-  }, [navigate]);
+  }, [navigate, location.state?.refresh]); // location.state?.refresh가 변경될 때마다 목록을 다시 불러옴
 
   const handleDelete = async (id) => {
     const token = localStorage.getItem('token');
