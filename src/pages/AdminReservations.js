@@ -4,10 +4,12 @@ import {
   Paper, Button, Box, Tabs, Tab 
 } from '@mui/material';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const API_URL = 'http://localhost:5000';
 
 const AdminReservations = () => {
+  const navigate = useNavigate();
   const [reservations, setReservations] = useState([]);
   const [users, setUsers] = useState([]);
   const [parkingLots, setParkingLots] = useState([]);
@@ -133,8 +135,7 @@ const AdminReservations = () => {
   };
 
   const handleEditParkingLot = (id) => {
-    // 수정 로직을 여기에 추가하세요
-    console.log(`주차장 ${id} 수정`);
+    navigate(`/edit-parking-lot/${id}`);
   };
 
   const handleTabChange = (event, newValue) => {
