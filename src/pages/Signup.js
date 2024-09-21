@@ -87,7 +87,7 @@ const SignupForm = () => {
         }} 
       />
       <TextField
-        label="주차장 아이디 (선택)"
+        label="관리자시 주차장 아이디 (선택)"
         type="number"
         variant="outlined"
         value={parkingLotId}

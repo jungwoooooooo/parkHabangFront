@@ -89,7 +89,7 @@ export default function MapContainer({ setParkingLots }) {
   return (
     <div className="map-container"> {/* Add a wrapper div with a class */}
       <MapProvider>
-        <SearchPlace onLocationChange={setSearchLocation} top="50px" left="1200px" /> {/* onLocationChange 콜백 전달 */}
+        <SearchPlace onLocationChange={setSearchLocation} top="50px" left="1100px" /> {/* onLocationChange 콜백 전달 */}
         <KakaoMap
           center={center}
           markers={[{ title: '현재 위치', position: center }]}

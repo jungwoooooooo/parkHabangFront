@@ -63,7 +63,7 @@ const App = () => {
           <ul className={`nav-list ${menuOpen ? 'open' : ''}`}>
             <li><Link to="/">홈</Link></li>
             <li><Link to="/service-intro">서비스 소개</Link></li>
-            <li><Link to="/map">인천 주차장 2D지도</Link></li>
+            <li><Link to="/map">인천 주차장 지도</Link></li>
             <li><Link to="/partnership">제휴/협력</Link></li>
             <li className="dropdown">
               <span>주차 대여 서비스</span>

@@ -3,8 +3,6 @@ import { useParams, Link } from 'react-router-dom';
 import { Box, Typography, Paper, Button, IconButton, Tooltip, TableContainer, Table, TableBody, TableRow, TableCell } from '@mui/material';
 import { FileCopy as FileCopyIcon } from '@mui/icons-material';
 
-const { kakao } = window;
-
 const ParkingLotDetail = ({ parkingLots }) => {
   const { id } = useParams();
   const parkingLot = parkingLots.find(lot => lot.id === parseInt(id));
@@ -13,41 +11,6 @@ const ParkingLotDetail = ({ parkingLots }) => {
 
   useEffect(() => {
     if (!parkingLot) return; // parkingLot이 undefined일 경우 useEffect 훅이 실행되지 않도록 함
-
-    const loadKakaoMap = () => {
-      const container = document.getElementById('map');
-      const options = {
-        center: new kakao.maps.LatLng(parkingLot.latitude, parkingLot.longitude),
-        level: 3,
-      };
-
-      const map = new kakao.maps.Map(container, options);
-
-      const markerPosition = new kakao.maps.LatLng(parkingLot.latitude, parkingLot.longitude);
-      const marker = new kakao.maps.Marker({
-        position: markerPosition,
-      });
-
-      marker.setMap(map);
-
-      const infowindow = new kakao.maps.InfoWindow({
-        content: `<div style="width: 150px; text-align: center; padding: 6px 0;">${parkingLot.주차장명}</div>`,
-        position: markerPosition,
-      });
-
-      infowindow.open(map, marker);
-    };
-
-    if (window.kakao && window.kakao.maps) {
-      loadKakaoMap();
-    } else {
-      const script = document.createElement('script');
-      script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=cc4618fc55e2dc943ad112bb5cdc43c4&autoload=false`;
-      script.onload = () => {
-        window.kakao.maps.load(loadKakaoMap);
-      };
-      document.head.appendChild(script);
-    }
 
     // 랜덤 이미지 선택
     const images = [
@@ -75,8 +38,6 @@ const ParkingLotDetail = ({ parkingLots }) => {
     <Box padding="16px" display="flex" justifyContent="center">
       <Paper elevation={3} style={{ padding: '16px', textAlign: 'center' }}>
         <Typography variant="h4">{parkingLot.주차장명}</Typography>
-        <br/>
-        <div id="map" style={{ width: '100%', height: '300px' }}></div>
         <br/>
         <TableContainer component={Paper}>
           <Table>
@@ -112,11 +73,11 @@ const ParkingLotDetail = ({ parkingLots }) => {
               </TableRow>
               <TableRow>
                 <TableCell>평일 운영 시작 시간</TableCell>
-                <TableCell>{parkingLot.평일운영시작시각}</TableCell>
+                <TableCell>{parkingLot.시작시간}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell>평일 운영 종료 시간</TableCell>
-                <TableCell>{parkingLot.평일운영종료시각}</TableCell>
+                <TableCell>{parkingLot.종료시간}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell>토요일 운영 시작 시간</TableCell>
