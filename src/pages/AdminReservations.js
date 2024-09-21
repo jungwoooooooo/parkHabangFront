@@ -107,7 +107,16 @@ const AdminReservations = () => {
 
   const handleCancelReservation = async (id) => {
     try {
-      await axios.delete(`${API_URL}/reservations/${id}`);
+      const token = localStorage.getItem('token'); // 토큰 가져오기
+      if (!token) {
+        throw new Error('토큰이 없습니다.');
+      }
+
+      await axios.delete(`${API_URL}/reservations/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}` // 인증 헤더 추가
+        }
+      });
       fetchReservations();
     } catch (error) {
       console.error('예약 취소 실패:', error);
@@ -137,49 +146,99 @@ const AdminReservations = () => {
     fetchReservationsByParkingLot(parkingLotId);
   };
 
-  const handleCheckIn = async (id) => {
+  const handleCheckIn = async (reservationId) => {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
         throw new Error('토큰이 없습니다.');
       }
-
-      await axios.post(`${API_URL}/parking-lots/${id}/check-in`, {}, {
+  
+      await axios.post(`${API_URL}/reservations/${reservationId}/check-in`, {}, {
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
-      // 예약 목록을 다시 가져오지 않고 상태를 직접 업데이트
-      setReservations(prevReservations => 
-        prevReservations.map(reservation => 
-          reservation.parkingLot.id === id ? { ...reservation, checkedIn: true, checkedOut: false } : reservation
-        )
-      );
+  
+      setReservations(prevReservations => {
+        const updatedReservations = prevReservations.map(reservation => {
+          if (reservation.id === reservationId) {
+            return { 
+              ...reservation, 
+              checkedIn: true, 
+              checkedOut: false,
+              parkingLot: {
+                ...reservation.parkingLot,
+                가능한주차면: reservation.parkingLot.가능한주차면 - 1 // 잔여석 업데이트
+              }
+            };
+          }
+          return reservation;
+        });
+  
+        // 모든 예약의 주차장 잔여석 업데이트
+        const parkingLotId = prevReservations.find(res => res.id === reservationId)?.parkingLot?.id;
+        return updatedReservations.map(reservation => {
+          if (reservation.parkingLot?.id === parkingLotId) {
+            return {
+              ...reservation,
+              parkingLot: {
+                ...reservation.parkingLot,
+                가능한주차면: updatedReservations.find(res => res.id === reservationId)?.parkingLot?.가능한주차면
+              }
+            };
+          }
+          return reservation;
+        });
+      });
     } catch (error) {
       console.error('입차 실패:', error);
     }
   };
-
-  const handleCheckOut = async (id) => {
+  
+  const handleCheckOut = async (reservationId) => {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
         throw new Error('토큰이 없습니다.');
       }
-
-      const response = await axios.post(`${API_URL}/parking-lots/${id}/check-out`, {}, {
+  
+      const response = await axios.post(`${API_URL}/reservations/${reservationId}/check-out`, {}, {
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
-
+  
       if (response.status === 200 || response.status === 201) { // 201 상태 코드도 처리
-        // 예약 목록을 다시 가져오지 않고 상태를 직접 업데이트
-        setReservations(prevReservations => 
-          prevReservations.map(reservation => 
-            reservation.parkingLot.id === id ? { ...reservation, checkedOut: true } : reservation
-          )
-        );
+        setReservations(prevReservations => {
+          const updatedReservations = prevReservations.map(reservation => {
+            if (reservation.id === reservationId) {
+              return { 
+                ...reservation, 
+                checkedOut: true,
+                parkingLot: {
+                  ...reservation.parkingLot,
+                  가능한주차면: reservation.parkingLot.가능한주차면 + 1 // 잔여석 업데이트
+                }
+              };
+            }
+            return reservation;
+          });
+  
+          // 모든 예약의 주차장 잔여석 업데이트
+          const parkingLotId = prevReservations.find(res => res.id === reservationId)?.parkingLot?.id;
+          return updatedReservations.map(reservation => {
+            if (reservation.parkingLot?.id === parkingLotId) {
+              return {
+                ...reservation,
+                parkingLot: {
+                  ...reservation.parkingLot,
+                  가능한주차면: updatedReservations.find(res => res.id === reservationId)?.parkingLot?.가능한주차면
+                }
+              };
+            }
+            return reservation;
+          });
+        });
         alert('출차완료');
       } else {
         console.error('출차 실패:', response.statusText);
@@ -208,13 +267,14 @@ const AdminReservations = () => {
                 <TableCell>종료 시간</TableCell>
                 <TableCell>차량 번호</TableCell>
                 <TableCell>잔여석</TableCell>
+                <TableCell>주소</TableCell> {/* 주소 열 추가 */}
                 <TableCell>액션</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {reservations.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={8} align="center">예약이 없습니다.</TableCell> {/* colSpan 수정 */}
+                  <TableCell colSpan={9} align="center">예약이 없습니다.</TableCell> {/* colSpan 수정 */}
                 </TableRow>
               ) : (
                 reservations.map((reservation) => (
@@ -226,6 +286,7 @@ const AdminReservations = () => {
                     <TableCell>{new Date(reservation.종료시간).toLocaleString()}</TableCell>
                     <TableCell>{reservation.차량번호 || 'N/A'}</TableCell> {/* 차량 번호 데이터가 없을 때 'N/A' 표시 */}
                     <TableCell>{reservation.parkingLot?.가능한주차면}</TableCell> {/* 가능한주차면 데이터 추가 */}
+                    <TableCell>{reservation.parkingLot?.소재지지번주소}</TableCell> {/* 주소 데이터 추가 */}
                     <TableCell>
                       <Box display="flex" justifyContent="flex-start">
                         <Button 
@@ -236,7 +297,7 @@ const AdminReservations = () => {
                         </Button>
                         {!reservation.checkedIn && (
                           <Button 
-                            onClick={() => handleCheckIn(reservation.parkingLot.id)} 
+                            onClick={() => handleCheckIn(reservation.id)} 
                             style={{ marginLeft: '8px' }}
                           >
                             입차
@@ -244,7 +305,7 @@ const AdminReservations = () => {
                         )}
                         {reservation.checkedIn && !reservation.checkedOut && (
                           <Button 
-                            onClick={() => handleCheckOut(reservation.parkingLot.id)} 
+                            onClick={() => handleCheckOut(reservation.id)} 
                             style={{ marginLeft: '8px' }}
                           >
                             출차

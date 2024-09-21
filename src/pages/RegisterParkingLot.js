@@ -25,40 +25,41 @@ const RegisterParkingLot = () => {
     const token = localStorage.getItem('token');
     if (!token) {
       console.log('토큰이 없습니다. 로그인 페이지로 리디렉션합니다.');
-      navigate('/login'); // 토큰이 없으면 로그인 페이지로 리디렉션
+      navigate('/login');
       return;
     }
 
-    const formData = new FormData();
-    formData.append('주차장명', name);
-    formData.append('위도', lat);
-    formData.append('경도', lon);
-    formData.append('시작날짜', startDate); // 시작 날짜 추가
-    formData.append('시작시간', startTime); // 시작 시간 추가
-    formData.append('종료날짜', endDate); // 종료 날짜 추가
-    formData.append('종료시간', endTime); // 종료 시간 추가
-    formData.append('주소', address);
-    formData.append('소재지지번주소', jibunAddress); // 지번 주소 추가
-    formData.append('주차기본요금', fee);
-    formData.append('총주차면', capacity);
-    formData.append('가능한주차면', capacity); // 가능한주차면을 총주차면과 동일하게 설정
-    formData.append('주차장구분', '대여'); // 주차장구분을 대여로 설정
-    formData.append('연락처', contact); // 연락처 추가
-    formData.append('설명', description); // 설명 추가
-    if (image) {
-      formData.append('image', image); // 이미지 추가
-    }
+    const data = {
+      주차장명: name,
+      위도: lat,
+      경도: lon,
+      시작날짜: startDate,
+      시작시간: startTime,
+      종료날짜: endDate,
+      종료시간: endTime,
+      소재지도로명주소: address,
+      소재지지번주소: jibunAddress,
+      주차기본요금: fee,
+      총주차면: capacity,
+      가능한주차면: capacity,
+      주차장구분: '대여',
+      전화번호: contact,
+      특기사항: description,
+      주차장사진: image ? URL.createObjectURL(image) : null, // 이미지 URL로 변환
+      userId: 1, // 예시로 사용자 ID를 1로 설정
+      장애인전용주차구역보유여부: 'N', // 예시로 설정
+    };
 
     try {
-      const response = await axios.post('http://localhost:5000/parking-lots', formData, {
+      const response = await axios.post('http://localhost:5000/parking-lots', data, {
         headers: {
-          Authorization: `Bearer ${token}`, // 토큰을 헤더에 포함
-          'Content-Type': 'multipart/form-data', // 멀티파트 폼 데이터 설정
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
       });
       console.log('주차장 등록 성공:', response.data);
-      alert('주차장 등록이 완료되었습니다!'); // 완료 알림
-      navigate('/'); // 메인 화면으로 이동
+      alert('주차장 등록이 완료되었습니다!');
+      navigate('/');
     } catch (error) {
       if (error.response) {
         console.error('주차장 등록 실패:', error.response.data);

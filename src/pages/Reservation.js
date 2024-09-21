@@ -45,6 +45,7 @@ const Reservation = ({ parkingLots }) => {
 
   const isTimeOverlap = (start, end) => {
     return reservedTimes.some(reservation => {
+      if (reservation.parkingLot !== parkingLot.id) return false; // 주차장 ID 확인
       const resStart = new Date(reservation.시작시간);
       const resEnd = new Date(reservation.종료시간);
       return (start < resEnd && end > resStart);
@@ -54,6 +55,7 @@ const Reservation = ({ parkingLots }) => {
   const isTimeDisabled = (time, date) => {
     const dateTime = new Date(`${date}T${time}:00`);
     return reservedTimes.some(reservation => {
+      if (reservation.parkingLot !== parkingLot.id) return false; // 주차장 ID 확인
       const resStart = new Date(reservation.시작시간);
       const resEnd = new Date(reservation.종료시간);
       return dateTime >= resStart && dateTime <= resEnd;
@@ -194,7 +196,18 @@ const Reservation = ({ parkingLots }) => {
           margin="normal"
           fullWidth
         />
-        <Button variant="contained" color="primary" onClick={handleReservation} style={{ marginTop: '16px' }}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleReservation}
+          style={{ marginTop: '16px' }}
+          disabled={
+            !startDate || !startTime || !endDate || !endTime || 
+            isTimeDisabled(startTime, startDate) ||
+            isTimeDisabled(endTime, endDate) ||
+            isTimeOverlap(new Date(`${startDate}T${startTime}:00`), new Date(`${endDate}T${endTime}:00`))
+          }
+        >
           예약하기
         </Button>
         <Snackbar
