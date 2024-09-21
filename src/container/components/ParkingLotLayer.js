@@ -441,9 +441,9 @@ const ParkingLotLayer = ({ parkingLots }) => {
 
     // 잔여석에 따른 색상 설정
     let backgroundColor;
-    if (lot.가능한주차면 === '0') {
+    if (lot.가능한주차면 <= 10) {
       backgroundColor = 'red';
-    } else if (lot.가능한주차면 <= 10) {
+    } else if (lot.가능한주차면 >= 10 && lot.가능한주차면 <= 20) {
       backgroundColor = 'orange';
     } else {
       backgroundColor = 'green';
@@ -459,24 +459,24 @@ const ParkingLotLayer = ({ parkingLots }) => {
 
     // 스타일을 삽입
     const style = document.createElement('style');
-    style.innerHTML = `
-      .custom-overlay {
-        position: relative; /* 위치 설정 */
-        padding: 10px;
-      }
-      .custom-overlay .arrow {
-        position: absolute;
-        bottom: -10px; /* 꼬리가 오버레이 아래에 위치 */
-        left: 50%;
-        transform: translateX(-50%);
-        width: 0;
-        height: 0;
-        border-left: 10px solid transparent;
-        border-right: 10px solid transparent;
-        border-top: 10px solid ${backgroundColor}; /* 배경색과 동일 */
-      }
-    `;
-    document.head.appendChild(style);
+  style.innerHTML = `
+    .custom-overlay {
+      position: relative; /* 위치 설정 */
+      padding: 10px;
+    }
+    .custom-overlay .arrow {
+      position: absolute;
+      bottom: -10px; /* 꼬리가 오버레이 아래에 위치 */
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-top: 10px solid ${backgroundColor}; /* 배경색과 동일 */
+    }
+  `;
+  document.head.appendChild(style);
 
     return new kakao.maps.CustomOverlay({
       content: content,
