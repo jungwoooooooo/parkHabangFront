@@ -14,6 +14,10 @@ const Home = () => {
     navigate('/map');
   };
 
+  const handleServiceIntroClick = () => {
+    navigate('/service-intro');
+  };
+
   const imageAnimation = useSpring({
     opacity: showImage ? 1 : 0,
     transform: showImage ? 'translateY(0)' : 'translateY(-50px)',
@@ -66,6 +70,9 @@ const Home = () => {
         <p>'주차해방'은 인천의 주차 문제를 해결하기 위한 서비스입니다. <p/>주차장 정보를 제공하고 미리 예약할 수 있고, 사람들끼리 주차장을 공유하여 주차 문제를 해결합니다.</p>
         <p>또한 불법주차에 관한 정보를 제공하여 전국의 불법주차를 줄이고 교통 혼잡과 사건 사고를 줄이는 것이 저희의 목표입니다.</p>
       </animated.section>
+
+      <button className="cta-button" onClick={handleServiceIntroClick}>서비스 소개 영상 보러가기</button>
+      <br/><br/><br/><br/>
       
       {/* 사용자 리뷰 섹션 */}
       <animated.section className="reviews-section" style={reviewsAnimation} ref={reviewsRef}>
