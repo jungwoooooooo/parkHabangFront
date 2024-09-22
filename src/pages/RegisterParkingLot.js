@@ -87,7 +87,7 @@ const RegisterParkingLot = () => {
   return (
     <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="100vh" bgcolor="#f5f5f5">
       <Typography variant="h4" gutterBottom>주차장 등록</Typography>
-      <Paper elevation={3} style={{ padding: '32px', maxWidth: '600px', width: '100%', position: 'relative' }}> {/* position: relative 추가 */}
+      <Paper elevation={3} style={{ padding: '32px', maxWidth: '500px', width: '90%', position: 'relative', maxHeight: '80vh', overflowY: 'auto' }}> {/* maxHeight와 overflowY 추가 */}
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <TextField

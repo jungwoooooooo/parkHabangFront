@@ -61,8 +61,8 @@ const ParkingLotList = ({ parkingLots, onMouseOverListItem, onMouseOutListItem, 
           if (criterion === 'distance') {
             if (a.distance !== b.distance) return a.distance - b.distance;
           } else if (criterion === 'price') {
-            const priceA = parseFloat(a.주차기본요금.replace(/[^0-9.-]+/g,"")) || 0;
-            const priceB = parseFloat(b.주차기본요금.replace(/[^0-9.-]+/g,"")) || 0;
+            const priceA = a.주차기본요금 ? parseFloat(a.주차기본요금.replace(/[^0-9.-]+/g,"")) : 0;
+            const priceB = b.주차기본요금 ? parseFloat(b.주차기본요금.replace(/[^0-9.-]+/g,"")) : 0;
             if (priceA !== priceB) return priceA - priceB; // 주차기본요금 기준으로 정렬
           }
         }
@@ -144,8 +144,8 @@ const ParkingLotList = ({ parkingLots, onMouseOverListItem, onMouseOutListItem, 
 
     let bestLot = sortedParkingLots[0];
     sortedParkingLots.forEach(lot => {
-      const lotPrice = parseFloat(lot.주차기본요금.replace(/[^0-9.-]+/g,"")) || 0;
-      const bestLotPrice = parseFloat(bestLot.주차기본요금.replace(/[^0-9.-]+/g,"")) || 0;
+      const lotPrice = lot.주차기본요금 ? parseFloat(lot.주차기본요금.replace(/[^0-9.-]+/g,"")) : 0;
+      const bestLotPrice = bestLot.주차기본요금 ? parseFloat(bestLot.주차기본요금.replace(/[^0-9.-]+/g,"")) : 0;
 
       if (lot.distance < bestLot.distance || 
           (lot.distance === bestLot.distance && lotPrice < bestLotPrice)) {
