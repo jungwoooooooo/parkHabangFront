@@ -2,23 +2,23 @@ import React, { useState } from 'react';
 import { TextField, Button, Box, Typography, Grid, Paper, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import SearchPlace from '../container/components/Search'; // SearchPlace 컴포넌트 임포트
+import SearchPlace from '../container/components/Search';
 
 const RegisterParkingLot = () => {
   const [name, setName] = useState('');
   const [lon, setLon] = useState('');
   const [lat, setLat] = useState('');
-  const [startDate, setStartDate] = useState(''); // 시작 날짜 상태 추가
-  const [startTime, setStartTime] = useState(''); // 시작 시간 상태 추가
-  const [endDate, setEndDate] = useState(''); // 종료 날짜 상태 추가
-  const [endTime, setEndTime] = useState(''); // 종료 시간 상태 추가
+  const [startDate, setStartDate] = useState('');
+  const [startTime, setStartTime] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [endTime, setEndTime] = useState('');
   const [address, setAddress] = useState('');
-  const [jibunAddress, setJibunAddress] = useState(''); // 지번 주소 상태 추가
+  const [jibunAddress, setJibunAddress] = useState('');
   const [fee, setFee] = useState('');
   const [capacity, setCapacity] = useState('');
-  const [contact, setContact] = useState(''); // 연락처 상태 추가
-  const [description, setDescription] = useState(''); // 설명 상태 추가
-  const [image, setImage] = useState(null); // 이미지 상태 추가
+  const [contact, setContact] = useState('');
+  const [description, setDescription] = useState('');
+  const [image, setImage] = useState(null);
   const navigate = useNavigate();
 
   const handleRegister = async () => {

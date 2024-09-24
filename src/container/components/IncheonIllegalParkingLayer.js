@@ -16,8 +16,8 @@ const IncheonIllegalParkingLayer = ({ incheonIllegalParkingData }) => {
     child: false,
     cctv: false
   });
-  const [circles, setCircles] = useState([]); // 원 상태 추가
-  const [isExpanded, setIsExpanded] = useState(false); // 버튼 확장 상태 추가
+  const [circles, setCircles] = useState([]);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -30,10 +30,9 @@ const IncheonIllegalParkingLayer = ({ incheonIllegalParkingData }) => {
   useEffect(() => {
     if (!map || !incheonIllegalParkingData.length) return;
 
-    // 현재 표시된 마커 및 원 제거
     markers.forEach(marker => marker.setMap(null));
     setMarkers([]);
-    circles.forEach(circle => circle.setMap(null)); // 원 제거
+    circles.forEach(circle => circle.setMap(null));
     setCircles([]);
 
     const newMarkers = [];
@@ -58,7 +57,6 @@ const IncheonIllegalParkingLayer = ({ incheonIllegalParkingData }) => {
 
           newMarkers.push(marker);
 
-          // 어린이 보호구역일 경우 반경 300m 원 추가
           if (parking.category === 'child') {
             const circle = new kakao.maps.Circle({
               center: position,
@@ -74,7 +72,6 @@ const IncheonIllegalParkingLayer = ({ incheonIllegalParkingData }) => {
             newCircles.push(circle);
           }
 
-          // CCTV 구역일 경우 반경 100m 원 추가
           if (parking.category === 'cctv') {
             const circle = new kakao.maps.Circle({
               center: position,
@@ -90,7 +87,6 @@ const IncheonIllegalParkingLayer = ({ incheonIllegalParkingData }) => {
             newCircles.push(circle);
           }
 
-          // 소화전 구역일 경우 반경 5m 원 추가
           if (parking.category === 'fire') {
             const circle = new kakao.maps.Circle({
               center: position,
@@ -150,99 +146,99 @@ const IncheonIllegalParkingLayer = ({ incheonIllegalParkingData }) => {
         right: isMobile ? 10 : 'auto',
         zIndex: 1000,
         display: 'flex',
-        flexDirection: 'column', // 세로로 배치
-        alignItems: 'center', // 세로 중앙 정렬
+        flexDirection: 'column',
+        alignItems: 'center',
         gap: 1
       }}>
         <Button 
           variant="contained"
           onClick={toggleExpand}
-          size={isMobile ? "medium" : "large"} // 버튼 크기 조정
+          size={isMobile ? "medium" : "large"}
           sx={{ 
             backgroundColor: isExpanded ? '#4CAF50' : '#f44336',
             color: 'white',
             '&:hover': {
               backgroundColor: isExpanded ? '#45a049' : '#da190b',
             },
-            fontSize: isMobile ? '1rem' : '1.25rem', // 폰트 크기 조정
-            padding: isMobile ? '12px 24px' : '10px 24px', // 패딩 조정
-            marginTop: '0px', // 버튼을 아래로 내리기
+            fontSize: isMobile ? '1rem' : '1.25rem',
+            padding: isMobile ? '12px 24px' : '10px 24px',
+            marginTop: '0px',
             marginLeft: '20px',
-            borderRadius: '20px', // 둥근 모서리
-            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', // 그림자 추가
-            transition: 'background-color 0.3s ease', // 배경색 전환 효과
-            height: '56px', // 높이 조정
-            display: 'flex', // 아이콘과 텍스트를 함께 배치
-            alignItems: 'center' // 아이콘과 텍스트를 세로 중앙 정렬
+            borderRadius: '20px',
+            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+            transition: 'background-color 0.3s ease',
+            height: '56px',
+            display: 'flex',
+            alignItems: 'center'
           }}
         >
           <img 
             src="https://cdn-icons-png.flaticon.com/512/4956/4956198.png" 
             alt="icon" 
-            style={{ width: '30px', height: '30px', marginRight: '10px' }} // 아이콘 크기 및 간격 조정
+            style={{ width: '30px', height: '30px', marginRight: '10px' }}
           />
           불법주차 구역 {isExpanded ? '접기' : '보기'}
         </Button>
         {isExpanded && (
           <Box sx={{ 
             display: 'flex', 
-            flexDirection: 'column', // 세로로 배치
-            alignItems: 'center', // 세로 중앙 정렬
+            flexDirection: 'column',
+            alignItems: 'center',
             gap: 1,
-            marginTop: '10px' // 버튼을 아래로 내리기
+            marginTop: '10px'
           }}>
             <Button 
               variant="contained"
               onClick={toggleAllCategories}
-              size={isMobile ? "medium" : "large"} // 버튼 크기 조정
+              size={isMobile ? "medium" : "large"}
               sx={{ 
                 backgroundColor: Object.values(visibleCategories).every(value => value) ? '#4CAF50' : '#f44336',
                 color: 'white',
                 '&:hover': {
                   backgroundColor: Object.values(visibleCategories).every(value => value) ? '#45a049' : '#da190b',
                 },
-                fontSize: isMobile ? '1rem' : '1.25rem', // 폰트 크기 조정
-                padding: isMobile ? '12px 24px' : '10px 24px', // 패딩 조정
-                borderRadius: '20px', // 둥근 모서리
-                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', // 그림자 추가
-                transition: 'background-color 0.3s ease', // 배경색 전환 효과
-                height: '56px', // 높이 조정
+                fontSize: isMobile ? '1rem' : '1.25rem',
+                padding: isMobile ? '12px 24px' : '10px 24px',
+                borderRadius: '20px',
+                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                transition: 'background-color 0.3s ease',
+                height: '56px',
               }}
             >
               전체 {Object.values(visibleCategories).every(value => value) ? '끄기' : '보기'}
             </Button>
             <Box sx={{ 
               display: 'flex', 
-              flexDirection: 'row', // 한 줄로 배치
-              alignItems: 'center', // 세로 중앙 정렬
+              flexDirection: 'row',
+              alignItems: 'center',
               gap: 1,
-              marginTop: '10px' // 버튼을 아래로 내리기
+              marginTop: '10px'
             }}>
               {Object.keys(visibleCategories).map(category => (
                 <Button 
                   key={category} 
                   variant="contained"
                   onClick={() => toggleCategory(category)}
-                  size={isMobile ? "medium" : "large"} // 버튼 크기 조정
+                  size={isMobile ? "medium" : "large"}
                   sx={{ 
                     backgroundColor: visibleCategories[category] ? '#4CAF50' : '#f44336',
                     color: 'white',
                     '&:hover': {
                       backgroundColor: visibleCategories[category] ? '#45a049' : '#da190b',
                     },
-                    fontSize: isMobile ? '1rem' : '1.25rem', // 폰트 크기 조정
-                    padding: isMobile ? '12px 24px' : '10px 24px', // 패딩 조정
-                    borderRadius: '20px', // 둥근 모서리
-                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', // 그림자 추가
-                    transition: 'background-color 0.3s ease', // 배경색 전환 효과
-                    marginLeft: '10px', // 버튼 간격 조정
-                    height: '56px', // 높이 조정
+                    fontSize: isMobile ? '1rem' : '1.25rem',
+                    padding: isMobile ? '12px 24px' : '10px 24px',
+                    borderRadius: '20px',
+                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                    transition: 'background-color 0.3s ease',
+                    marginLeft: '10px',
+                    height: '56px',
                   }}
                 >
                   <img 
                     src={categoryIcons[category]} 
                     alt={category} 
-                    style={{ width: isMobile ? '30px' : '30px', height: isMobile ? '30px' : '30px', verticalAlign: 'middle' }} // 아이콘 크기 조정
+                    style={{ width: isMobile ? '30px' : '30px', height: isMobile ? '30px' : '30px', verticalAlign: 'middle' }}
                   />
                 </Button>
               ))}

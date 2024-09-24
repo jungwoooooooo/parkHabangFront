@@ -8,7 +8,6 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 
 const theme = createTheme();
 
-// 주차장 리스트 스타일 컴포넌트
 const StyledListItem = styled(ListItem)(({ theme, highlighted }) => ({
   marginBottom: theme.spacing(2),
   backgroundColor: highlighted ? theme.palette.action.selected : 'inherit',

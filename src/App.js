@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Route, Routes, Navigate, Link, useNavigate } from 'react-router-dom';
 import { isMobile } from 'react-device-detect';
 import { Box, Button } from '@mui/material';
-import { FaBars } from 'react-icons/fa'; // react-icons에서 햄버거 메뉴 아이콘 가져오기
+import { FaBars } from 'react-icons/fa';
 import Login from './pages/Login';
 import MapContainer from './container/MapContainer';
 import ParkingLotDetail from './pages/ParkingLotDetail';
@@ -14,21 +14,20 @@ import Home from './pages/Home';
 import ServiceIntro from './pages/ServiceIntro';
 import Partnership from './pages/Partnership';
 import ParkingShareInfo from './pages/ParkingShareInfo';
-import './App.css'; // 추가된 CSS 파일 import
+import './App.css';
 import logo from './assert/배경_없는거.png';
-import ReportIllegalParking from './pages/ReportIllegalParking'; // 불법주차 신고 페이지 import
-import VWorldMap from './pages/VWorldMap'; // VWorldMap 페이지 import
-import MyParkingLots from './pages/MyParkingLots'; // MyParkingLots 페이지 import
-import IllegalParkingInfo from './pages/IllegalParkingInfo'; // 불법주차 구역 정보 페이지 import
-import MileageInfo from './pages/MileageInfo'; // 마일리지 정보 페이지 import
-import MyReservations from './pages/MyReservations'; // 내 예약 페이지 import
-import EditParkingLot from './pages/EditParkingLot'; // 새로 추가된 EditParkingLot 컴포넌트 import
+import ReportIllegalParking from './pages/ReportIllegalParking';
+import MyParkingLots from './pages/MyParkingLots';
+import IllegalParkingInfo from './pages/IllegalParkingInfo';
+import MileageInfo from './pages/MileageInfo';
+import MyReservations from './pages/MyReservations';
+import EditParkingLot from './pages/EditParkingLot';
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
   const [isAdmin, setIsAdmin] = React.useState(false);
   const [parkingLots, setParkingLots] = React.useState([]);
-  const [menuOpen, setMenuOpen] = React.useState(false); // 메뉴 상태 추가
+  const [menuOpen, setMenuOpen] = React.useState(false);
 
   const handleLogin = (userData) => {
     setIsLoggedIn(true);
@@ -67,12 +66,12 @@ const App = () => {
         <>
           <header className="header">
             <div className="logo-container">
-              <Link to="/"> {/* 로고를 클릭하면 홈으로 이동 */}
+              <Link to="/">
                 <img src={logo} alt="로고" className="logo" />
               </Link>
             </div>
-            <nav className="nav"> {/* nav 태그에 클래스 추가 */}
-              <FaBars className="menu-icon" onClick={toggleMenu} /> {/* 햄버거 메뉴 아이콘 추가 */}
+            <nav className="nav">
+              <FaBars className="menu-icon" onClick={toggleMenu} />
               <ul className={`nav-list ${menuOpen ? 'open' : ''}`}>
                 <li><Link to="/">홈</Link></li>
                 <li><Link to="/service-intro">서비스 소개</Link></li>
@@ -115,7 +114,7 @@ const App = () => {
               </ul>
             </nav>
           </header>
-          <div style={{ position: 'relative', zIndex: 0 }}> {/* Add zIndex style */}
+          <div style={{ position: 'relative', zIndex: 0 }}>
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/service-intro" element={<ServiceIntro />} />
@@ -129,12 +128,11 @@ const App = () => {
               <Route path="/register-parking-lot" element={<RegisterParkingLot />} />
               <Route path="/admin-reservations" element={isAdmin ? <AdminReservations /> : <Navigate to="/" />} />
               <Route path="/report-illegal-parking" element={<ReportIllegalParking />} />
-              <Route path="/illegal-parking-info" element={<IllegalParkingInfo />} /> {/* 불법주차 구역 정보 라우트 추가 */}
-              <Route path="/mileage-info" element={<MileageInfo />} /> {/* 마일리지 정보 라우트 추가 */}
-              <Route path="/vworld-map" element={<VWorldMap />} />
+              <Route path="/illegal-parking-info" element={<IllegalParkingInfo />} />
+              <Route path="/mileage-info" element={<MileageInfo />} />
               <Route path="/my-parking-lots" element={<MyParkingLots />} />
-              <Route path="/my-reservations" element={<MyReservations />} /> {/* 내 예약 라우트 추가 */}
-              <Route path="/edit-parking-lot/:id" element={<EditParkingLot />} /> {/* 새로 추가된 EditParkingLot 라우트 */}
+              <Route path="/my-reservations" element={<MyReservations />} />
+              <Route path="/edit-parking-lot/:id" element={<EditParkingLot />} />
             </Routes>
           </div>
         </>

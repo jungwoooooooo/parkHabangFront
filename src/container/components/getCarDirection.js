@@ -1,6 +1,6 @@
 // 카카오 주차장 경로 찾기
 export async function getCarDirection(startPoint, endPoint) {
-    const REST_API_KEY = process.env.REACT_APP_KAKAO_REST_API_KEY; // 환경 변수 사용
+    const REST_API_KEY = process.env.REACT_APP_KAKAO_REST_API_KEY;
     const url = 'https://apis-navi.kakaomobility.com/v1/directions';
 
     const origin = `${startPoint.lng},${startPoint.lat}`; // 출발지 좌표
